@@ -288,7 +288,7 @@ static bool anim_in_bk = false;
 static AnimationSad sad[ANIMATION_SAD_LIST_CAPACITY];
 
 // 0x5566D4
-static PathNode dad[2000];
+static PathNode dad[20000];
 
 // 0x560314
 static AnimationSequence anim_set[ANIMATION_SEQUENCE_LIST_CAPACITY];
@@ -297,7 +297,7 @@ static AnimationSequence anim_set[ANIMATION_SEQUENCE_LIST_CAPACITY];
 static unsigned char seen[5000];
 
 // 0x54CA94
-static PathNode child[2000];
+static PathNode child[20000];
 
 // 0x56B56C
 static int curr_anim_counter;
@@ -1837,7 +1837,7 @@ int make_path_func(Object* object, int from, int to, unsigned char* rotations, i
 
         closedPathNodeListLength += 1;
 
-        if (closedPathNodeListLength == 2000) {
+        if (closedPathNodeListLength == 20000) {
             return 0;
         }
 
@@ -1858,7 +1858,7 @@ int make_path_func(Object* object, int from, int to, unsigned char* rotations, i
             }
 
             int v25 = 0;
-            for (; v25 < 2000; v25++) {
+            for (; v25 < 20000; v25++) {
                 if (child[v25].tile == -1) {
                     break;
                 }
@@ -1866,7 +1866,7 @@ int make_path_func(Object* object, int from, int to, unsigned char* rotations, i
 
             openPathNodeListLength += 1;
 
-            if (openPathNodeListLength == 2000) {
+            if (openPathNodeListLength == 20000) {
                 return 0;
             }
 
@@ -1897,7 +1897,7 @@ int make_path_func(Object* object, int from, int to, unsigned char* rotations, i
     if (openPathNodeListLength != 0) {
         unsigned char* v39 = rotations;
         int index = 0;
-        for (; index < 800; index++) {
+        for (; index < 20000; index++) {
             if (temp.tile == from) {
                 break;
             }
@@ -2039,7 +2039,7 @@ int make_straight_path_func(Object* a1, int from, int to, StraightPathNode* path
 
             v22 += 1;
             if (v22 == a6) {
-                if (pathNodeIndex >= 200) {
+                if (pathNodeIndex >= 5000) {
                     return 0;
                 }
 
@@ -2092,7 +2092,7 @@ int make_straight_path_func(Object* a1, int from, int to, StraightPathNode* path
 
             v22 += 1;
             if (v22 == a6) {
-                if (pathNodeIndex >= 200) {
+                if (pathNodeIndex >= 5000) {
                     return 0;
                 }
 
