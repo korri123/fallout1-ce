@@ -130,6 +130,8 @@ Core Fallout gameplay systems (~88,600 lines).
 - `tweaks.h`: Runtime configuration via `tweaks.ini`
 - Supports quality-of-life enhancements like auto mouse mode and hover-to-hide roof
 
+The player object is generally referred by `obj_dude`
+
 ### 4. Modern Platform Compatibility (src/ root)
 
 - `audio_engine.h`: SDL audio wrapper with DirectSound-like API
