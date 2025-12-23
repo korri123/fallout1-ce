@@ -1,5 +1,7 @@
 #include "plib/gnw/dxinput.h"
 
+#include "plib/gnw/svga.h"
+
 namespace fallout {
 
 static bool dxinput_mouse_init();
@@ -63,26 +65,40 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // CE: This function is sometimes called outside loops calling `get_input`
     // and subsequently `GNW95_process_message`, so mouse events might not be
     // handled by SDL yet.
-    //
-    // TODO: Move mouse events processing into `GNW95_process_message` and
-    // update mouse position manually.
     SDL_PumpEvents();
 
-    // Use absolute mouse position and calculate deltas manually
-    // This allows the native cursor to remain visible
-    int currentX, currentY;
-    Uint32 buttons = SDL_GetMouseState(&currentX, &currentY);
+    // Get absolute window mouse position
+    int windowX, windowY;
+    Uint32 buttons = SDL_GetMouseState(&windowX, &windowY);
 
+    // Convert window coordinates to game (logical) coordinates
+    // This handles scaling automatically via SDL's renderer
+    float logicalX, logicalY;
+    if (gSdlRenderer != NULL) {
+        SDL_RenderWindowToLogical(gSdlRenderer, windowX, windowY, &logicalX, &logicalY);
+    } else {
+        logicalX = (float)windowX;
+        logicalY = (float)windowY;
+    }
+
+    int gameX = (int)logicalX;
+    int gameY = (int)logicalY;
+
+    // Store absolute position in game coordinates
+    mouseState->absX = gameX;
+    mouseState->absY = gameY;
+
+    // Calculate deltas in game coordinates for VCR compatibility
     if (!gMousePrevInitialized) {
-        gMousePrevX = currentX;
-        gMousePrevY = currentY;
+        gMousePrevX = gameX;
+        gMousePrevY = gameY;
         gMousePrevInitialized = true;
     }
 
-    mouseState->x = currentX - gMousePrevX;
-    mouseState->y = currentY - gMousePrevY;
-    gMousePrevX = currentX;
-    gMousePrevY = currentY;
+    mouseState->x = gameX - gMousePrevX;
+    mouseState->y = gameY - gMousePrevY;
+    gMousePrevX = gameX;
+    gMousePrevY = gameY;
 
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;

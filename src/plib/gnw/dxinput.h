@@ -11,6 +11,9 @@ typedef struct MouseData {
     unsigned char buttons[2];
     int wheelX;
     int wheelY;
+    // Absolute position in game coordinates (for cursor sync)
+    int absX;
+    int absY;
 } MouseData;
 
 typedef struct KeyboardData {
