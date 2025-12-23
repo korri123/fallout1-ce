@@ -475,6 +475,91 @@ int gmouse_is_scrolling()
     return is_scrolling;
 }
 
+void hide_roof_on_hover(int mouseX, int mouseY)
+{
+    // Hover-hide roof tracking
+    static int gmouse_hover_roof_x = -1;
+    static int gmouse_hover_roof_y = -1;
+    static int gmouse_hover_roof_elev = -1;
+
+    int roofX;
+    int roofY;
+    square_xy_roof(mouseX, mouseY, map_elevation, &roofX, &roofY);
+
+    // Check bounds
+    if (roofX >= 0 && roofX < 100 && roofY >= 0 && roofY < 100) {
+        int currentSquare = square[map_elevation]->field_0[roofX + 100 * roofY];
+        int roofData = (currentSquare >> 16) & 0xFFFF;
+        int roofTileId = roofData & 0xFFF;
+        int roofFlags = (roofData >> 12) & 0xF;
+        int emptyRoofTileId = 1;
+
+        int emptyRoofArtId = art_id(OBJ_TYPE_TILE, emptyRoofTileId, 0, 0, 0);
+        bool hasRoof = art_id(OBJ_TYPE_TILE, roofTileId, 0, 0, 0) != emptyRoofArtId;
+        bool isHidden = (roofFlags & 0x01) != 0;
+
+        // Check if player is under a roof (to avoid conflicts with player-hide system)
+        int playerRoofX, playerRoofY, playerElev;
+        bool playerUnderRoof = obj_get_player_roof_info(&playerRoofX, &playerRoofY, &playerElev);
+
+        if (hasRoof) {
+            bool isNewPosition = roofX != gmouse_hover_roof_x || roofY != gmouse_hover_roof_y || map_elevation != gmouse_hover_roof_elev;
+
+            if (isNewPosition) {
+                if (isHidden) {
+                    // Roof is already hidden - could be our hover-hide or player-inside-hide
+                    if (playerUnderRoof && map_elevation == playerElev) {
+                        // Player is under a roof on same elevation - assume this is player-hidden
+                        // Restore our tracked roof if it's on a different elevation
+                        if (gmouse_hover_roof_x != -1 && gmouse_hover_roof_elev != playerElev) {
+                            tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                            tile_refresh_display();
+                        }
+                        gmouse_hover_roof_x = -1;
+                        gmouse_hover_roof_y = -1;
+                        gmouse_hover_roof_elev = -1;
+                    } else if (gmouse_hover_roof_x != -1 && map_elevation == gmouse_hover_roof_elev) {
+                        // No player conflict, same elevation as our tracked roof
+                        // This tile was hidden by our flood-fill - just update tracking position
+                        gmouse_hover_roof_x = roofX;
+                        gmouse_hover_roof_y = roofY;
+                    } else if (gmouse_hover_roof_x != -1) {
+                        // Tracking a roof on different elevation - restore it
+                        tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                        gmouse_hover_roof_x = -1;
+                        gmouse_hover_roof_y = -1;
+                        gmouse_hover_roof_elev = -1;
+                        tile_refresh_display();
+                    }
+                    // else: not tracking anything and roof is hidden (by player), ignore it
+                } else {
+                    // Roof is visible - we need to hide it
+                    // First restore any previously hidden roof
+                    if (gmouse_hover_roof_x != -1) {
+                        tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                    }
+
+                    // Hide the new roof
+                    tile_fill_roof(roofX, roofY, map_elevation, false);
+                    gmouse_hover_roof_x = roofX;
+                    gmouse_hover_roof_y = roofY;
+                    gmouse_hover_roof_elev = map_elevation;
+                    tile_refresh_display();
+                }
+            }
+            // else: same position as we're already tracking, do nothing
+        } else {
+            // No roof at this position - restore any previously hidden roof
+            if (gmouse_hover_roof_x != -1) {
+                tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                gmouse_hover_roof_x = -1;
+                gmouse_hover_roof_y = -1;
+                gmouse_hover_roof_elev = -1;
+                tile_refresh_display();
+            }
+        }
+    }
+}
 // 0x443274
 void gmouse_bk_process()
 {
@@ -815,6 +900,11 @@ void gmouse_bk_process()
             }
         }
         gmouse_3d_reset_fid();
+    }
+
+    // Hover-hide roof: hide roofs when mouse hovers over them
+    if (tweaks_hover_hide_roof() && tile_roof_visible()) {
+        hide_roof_on_hover(mouseX, mouseY);
     }
 
     int v34 = 0;

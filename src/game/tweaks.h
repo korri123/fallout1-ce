@@ -15,6 +15,11 @@ void tweaks_exit();
 // mouse modes based on what's under the cursor.
 bool tweaks_auto_mouse_mode();
 
+// Returns true if hover-to-hide roof is enabled.
+// When enabled, roofs are hidden when the mouse cursor hovers over them,
+// allowing the player to see inside buildings.
+bool tweaks_hover_hide_roof();
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_TWEAKS_H_ */
