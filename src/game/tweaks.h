@@ -20,6 +20,11 @@ bool tweaks_auto_mouse_mode();
 // allowing the player to see inside buildings.
 bool tweaks_hover_hide_roof();
 
+// Returns true if object name tooltip is enabled.
+// When enabled, hovering over objects displays their name as a tooltip
+// near the mouse cursor.
+bool tweaks_object_tooltip();
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_TWEAKS_H_ */
