@@ -10,6 +10,11 @@ static void dxinput_keyboard_exit();
 static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
 
+// Track previous mouse position for calculating deltas in non-relative mode
+static int gMousePrevX = 0;
+static int gMousePrevY = 0;
+static bool gMousePrevInitialized = false;
+
 // 0x4E0400
 bool dxinput_init()
 {
@@ -63,7 +68,22 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // update mouse position manually.
     SDL_PumpEvents();
 
-    Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
+    // Use absolute mouse position and calculate deltas manually
+    // This allows the native cursor to remain visible
+    int currentX, currentY;
+    Uint32 buttons = SDL_GetMouseState(&currentX, &currentY);
+
+    if (!gMousePrevInitialized) {
+        gMousePrevX = currentX;
+        gMousePrevY = currentY;
+        gMousePrevInitialized = true;
+    }
+
+    mouseState->x = currentX - gMousePrevX;
+    mouseState->y = currentY - gMousePrevY;
+    gMousePrevX = currentX;
+    gMousePrevY = currentY;
+
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
@@ -103,7 +123,11 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+    // Disable relative mouse mode to keep the native cursor visible
+    // Deltas are calculated manually in dxinput_get_mouse_state()
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    gMousePrevInitialized = false;
+    return true;
 }
 
 // 0x4E078C
