@@ -338,6 +338,14 @@ if(APPLE)
         set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
         set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
         set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
+
+        # Copy Debug build to /Applications/Fallout/
+        add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E $<IF:$<CONFIG:Debug>,copy_directory,echo>
+                    "$<$<CONFIG:Debug>:$<TARGET_BUNDLE_DIR:${EXECUTABLE_NAME}>>"
+                    "$<$<CONFIG:Debug>:/Applications/Fallout/Fallout Community Edition Debug.app>"
+            COMMENT "Copying Debug build to /Applications/Fallout/"
+        )
     endif()
 
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.alexbatalov.fallout-ce")
