@@ -25,6 +25,7 @@
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/kb.h"
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
@@ -295,6 +296,9 @@ bool gmouse_clicked_on_edge = false;
 static int gmouse_tooltip_win = -1;
 static bool gmouse_tooltip_visible = false;
 static Object* gmouse_tooltip_object = NULL;
+
+// Accessibility highlight state
+static bool accessibility_highlight_active = false;
 
 // Maximum width for tooltip (characters can have long names)
 static const int GMOUSE_TOOLTIP_MAX_WIDTH = 200;
@@ -583,6 +587,9 @@ void gmouse_bk_process()
     if (!gmouse_initialized) {
         return;
     }
+
+    // Check accessibility highlight key state
+    gmouse_accessibility_highlight_check();
 
     int mouseX;
     int mouseY;
@@ -2697,6 +2704,83 @@ void gameMouseRefreshImmediately()
 {
     gmouse_bk_process();
     renderPresent();
+}
+
+// Applies accessibility outlines to all interactable objects on current elevation.
+static void gmouse_accessibility_highlight_on()
+{
+    if (accessibility_highlight_active) {
+        return;
+    }
+
+    Object* obj = obj_find_first_at(map_elevation);
+    while (obj != NULL) {
+        int objType = PID_TYPE(obj->pid);
+
+        if (objType == OBJ_TYPE_CRITTER) {
+            // Living NPCs (not dead, not player)
+            if (obj != obj_dude && !critter_is_dead(obj)) {
+                obj_outline_object(obj, OUTLINE_TYPE_FRIENDLY, NULL);
+            }
+        } else if (objType == OBJ_TYPE_ITEM) {
+            // Ground items and containers
+            obj_outline_object(obj, OUTLINE_TYPE_ITEM, NULL);
+        } else if (objType == OBJ_TYPE_MISC) {
+            // Exit grids: PIDs 0x5000010 to 0x5000017
+            if (obj->pid >= 0x5000010 && obj->pid <= 0x5000017) {
+                obj_outline_object(obj, OUTLINE_TYPE_2, NULL);
+            }
+        } else if (objType == OBJ_TYPE_SCENERY) {
+            // Doors, stairs, ladders
+            Proto* proto;
+            if (proto_ptr(obj->pid, &proto) == 0) {
+                int sceneryType = proto->scenery.type;
+                if (sceneryType == SCENERY_TYPE_DOOR
+                    || sceneryType == SCENERY_TYPE_STAIRS
+                    || sceneryType == SCENERY_TYPE_LADDER_UP
+                    || sceneryType == SCENERY_TYPE_LADDER_DOWN) {
+                    obj_outline_object(obj, OUTLINE_TYPE_4, NULL);
+                }
+            }
+        }
+
+        obj = obj_find_next_at();
+    }
+
+    accessibility_highlight_active = true;
+    tile_refresh_display();
+}
+
+// Removes accessibility outlines from all objects on current elevation.
+static void gmouse_accessibility_highlight_off()
+{
+    if (!accessibility_highlight_active) {
+        return;
+    }
+
+    Object* obj = obj_find_first_at(map_elevation);
+    while (obj != NULL) {
+        obj_remove_outline(obj, NULL);
+        obj = obj_find_next_at();
+    }
+
+    accessibility_highlight_active = false;
+    tile_refresh_display();
+}
+
+// Checks if the accessibility highlight key is held and toggles highlights.
+void gmouse_accessibility_highlight_check()
+{
+    int highlightKey = tweaks_highlight_objects_key();
+    if (highlightKey <= 0 || highlightKey >= SDL_NUM_SCANCODES) {
+        return;
+    }
+
+    if (keys[highlightKey]) {
+        gmouse_accessibility_highlight_on();
+    } else {
+        gmouse_accessibility_highlight_off();
+    }
 }
 
 } // namespace fallout
