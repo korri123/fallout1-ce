@@ -6,32 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Fallout Community Edition is a fully working re-implementation of Fallout 1, maintaining the original gameplay while adding engine bugfixes and quality of life improvements. The codebase is a faithful reconstruction of the original Fallout engine (v1.1, November 1997) with modern platform support for Windows, macOS, Linux, Android, and iOS.
 
-### Code Quality Tools
-
-**Format checking:**
-```bash
-find src -type f -name \*.cc -o -name \*.h | xargs clang-format --dry-run --Werror
-```
-
-**Auto-format:**
-```bash
-find src -type f -name \*.cc -o -name \*.h | xargs clang-format -i
-```
-Code style: WebKit-based (see `.clang-format`)
-
-**Static analysis:**
-```bash
-cppcheck --std=c++17 src/
-```
-
-**Sanitizers:**
-```bash
-# Address sanitizer
-cmake -B build -D ASAN=ON
-# Undefined behavior sanitizer
-cmake -B build -D UBSAN=ON
-```
-
 ## Architecture
 
 The codebase (~120,000 lines) is organized into three main layers:
