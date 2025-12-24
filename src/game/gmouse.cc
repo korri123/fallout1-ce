@@ -2720,15 +2720,17 @@ static void gmouse_accessibility_highlight_on()
         if (objType == OBJ_TYPE_CRITTER) {
             // Living NPCs (not dead, not player)
             if (obj != obj_dude && !critter_is_dead(obj)) {
-                obj_outline_object(obj, OUTLINE_TYPE_FRIENDLY, NULL);
+                obj_outline_object(obj, OUTLINE_TYPE_FRIENDLY, NULL, true);
             }
         } else if (objType == OBJ_TYPE_ITEM) {
             // Ground items and containers
-            obj_outline_object(obj, OUTLINE_TYPE_ITEM, NULL);
-        } else if (objType == OBJ_TYPE_MISC) {
-            // Exit grids: PIDs 0x5000010 to 0x5000017
-            if (obj->pid >= 0x5000010 && obj->pid <= 0x5000017) {
-                obj_outline_object(obj, OUTLINE_TYPE_2, NULL);
+            Proto* proto;
+            if (proto_ptr(obj->pid, &proto) == 0) {
+                if (proto->item.type == ITEM_TYPE_CONTAINER && obj->data.inventory.length == 0) {
+                    obj = obj_find_next_at();
+                    continue;
+                }
+                obj_outline_object(obj, OUTLINE_TYPE_ITEM, NULL, true);
             }
         } else if (objType == OBJ_TYPE_SCENERY) {
             // Doors, stairs, ladders
@@ -2739,7 +2741,7 @@ static void gmouse_accessibility_highlight_on()
                     || sceneryType == SCENERY_TYPE_STAIRS
                     || sceneryType == SCENERY_TYPE_LADDER_UP
                     || sceneryType == SCENERY_TYPE_LADDER_DOWN) {
-                    obj_outline_object(obj, OUTLINE_TYPE_4, NULL);
+                    obj_outline_object(obj, OUTLINE_TYPE_4, NULL, true);
                 }
             }
         }
