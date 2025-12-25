@@ -244,7 +244,7 @@ static int lips_read_lipsynch_info(LipsData* lipsData, DB_FILE* stream)
     if (db_freadInt8List(stream, lipsData->file_name, 8) == -1) return -1;
     if (db_freadInt8List(stream, lipsData->field_58, 4) == -1) return -1;
     if (db_freadInt8List(stream, lipsData->field_5C, 4) == -1) return -1;
-    if (db_freadInt8List(stream, lipsData->field_60, 4) == -1) return -1;
+    if (db_freadInt8List(stream, lipsData->file_extension, 4) == -1) return -1;
     if (db_freadInt8List(stream, lipsData->field_64, 260) == -1) return -1;
 
     // NOTE: Original code is different. For unknown reason it assigns values
@@ -293,7 +293,7 @@ int lips_load_file(const char* audioFileName, const char* headFileName)
 
     strcat(path, lips_fix_string(lip_info.file_name, sizeof(lip_info.file_name)));
     strcat(path, ".");
-    strcat(path, lip_info.field_60);
+    strcat(path, lip_info.file_extension);
 
     lips_free_speech();
 
@@ -410,7 +410,7 @@ int lips_load_file(const char* audioFileName, const char* headFileName)
     strcpy(lip_info.field_58, "VOC");
     strcpy(lip_info.field_58, "ACM");
     strcpy(lip_info.field_5C, "TXT");
-    strcpy(lip_info.field_60, "LIP");
+    strcpy(lip_info.file_extension, "LIP");
 
     lips_make_speech();
 

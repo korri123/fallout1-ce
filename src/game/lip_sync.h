@@ -44,7 +44,7 @@ typedef struct LipsData {
     char file_name[8];
     char field_58[4];
     char field_5C[4];
-    char field_60[4];
+    char file_extension[4];
     char field_64[260];
 } LipsData;
 

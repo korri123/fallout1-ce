@@ -214,6 +214,9 @@ static Art* lipsFp = NULL;
 // 0x504FF8
 static bool gdialog_speech_playing = false;
 
+// Tracks whether speech is played via gsound (true) or lips (false).
+static bool gdialog_speech_using_gsound = false;
+
 // 0x504FFC
 static unsigned char* headWindowBuffer = NULL;
 
@@ -739,30 +742,74 @@ void dialogue_system_enter()
 // 0x43E10C
 void gdialog_setup_speech(const char* audioFileName)
 {
-    char name[16];
-    if (art_get_base_name(OBJ_TYPE_HEAD, dialogue_head & 0xFFF, name) == -1) {
+    char name[0x400];
+
+    // First try to get the head base name for lip-sync speech
+    if (art_get_base_name(OBJ_TYPE_HEAD, dialogue_head & 0xFFF, name) != -1) {
+        // Head exists, use lip-sync speech
+        if (lips_load_file(audioFileName, name) == -1) {
+            return;
+        }
+
+        gdialog_speech_playing = true;
+        gdialog_speech_using_gsound = false;
+
+        lips_play_speech();
+
+        debug_printf("Starting lipsynch speech");
         return;
     }
 
-    if (lips_load_file(audioFileName, name) == -1) {
+    // No head, try to play speech via gsound using script name as subdirectory
+    if (dialogue_scr_id == -1) {
+        return;
+    }
+
+    Script* script;
+    if (scr_ptr(dialogue_scr_id, &script) == -1) {
+        return;
+    }
+
+    char scriptName[0x400];
+    if (scr_list_str(script->scr_script_idx, scriptName, sizeof(scriptName)) == -1) {
+        return;
+    }
+
+    // Remove extension if present
+    char* pch = strchr(scriptName, '.');
+    if (pch != nullptr) {
+        *pch = '\0';
+    }
+
+    // Build the path: scriptName/audioFileName
+    char path[COMPAT_MAX_PATH];
+    snprintf(path, sizeof(path), "%s\\%s", scriptName, audioFileName);
+
+    // Play speech immediately (a2=12, a3=13, a4=15)
+    if (gsound_speech_play(path, 12, 13, 15) == -1) {
+        debug_printf("Failed to play headless speech: %s\n", path);
         return;
     }
 
     gdialog_speech_playing = true;
+    gdialog_speech_using_gsound = true;
 
-    lips_play_speech();
-
-    debug_printf("Starting lipsynch speech");
+    debug_printf("Starting headless speech: %s", path);
 }
 
 // 0x43E164
 void gdialog_free_speech()
 {
     if (gdialog_speech_playing) {
-        debug_printf("Ending lipsynch system");
         gdialog_speech_playing = false;
 
-        lips_free_speech();
+        if (gdialog_speech_using_gsound) {
+            debug_printf("Ending headless speech");
+            gsound_speech_stop();
+        } else {
+            debug_printf("Ending lipsynch system");
+            lips_free_speech();
+        }
     }
 }
 

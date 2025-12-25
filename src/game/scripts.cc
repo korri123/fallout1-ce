@@ -2541,9 +2541,8 @@ char* scr_get_msg_str_speech(int messageListId, int messageId, int a3)
         return NULL;
     }
 
-    if (FID_TYPE(dialogue_head) != OBJ_TYPE_HEAD) {
-        a3 = 0;
-    }
+    // NOTE: We no longer disable speech when no head is present.
+    // gdialog_setup_speech now handles headless speech via gsound_speech_play.
 
     MessageListItem messageListItem;
     messageListItem.num = messageId;
