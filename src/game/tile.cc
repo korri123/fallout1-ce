@@ -1989,6 +1989,7 @@ void tile_update_bounds_base()
     int min_y = INT_MAX;
     int max_x = INT_MIN;
     int max_y = INT_MIN;
+    bool found = false;
 
     // Determine bounding rectangle of scroll blocking objects.
     for (int tile = 0; tile < grid_size; tile++) {
@@ -2014,6 +2015,8 @@ void tile_update_bounds_base()
             if (y > max_y) {
                 max_y = y;
             }
+
+            found = true;
         }
     }
 
@@ -2027,10 +2030,19 @@ void tile_update_bounds_base()
     geometric_center_x += 16;
     geometric_center_y += 8;
 
-    tile_bounds_left_off = min_x - geometric_center_x;
-    tile_bounds_top_off = min_y - geometric_center_y;
-    tile_bounds_right_off = max_x - geometric_center_x;
-    tile_bounds_bottom_off = max_y - geometric_center_y;
+    if (found) {
+        tile_bounds_left_off = min_x - geometric_center_x;
+        tile_bounds_top_off = min_y - geometric_center_y;
+        tile_bounds_right_off = max_x - geometric_center_x;
+        tile_bounds_bottom_off = max_y - geometric_center_y;
+    } else {
+        // No scroll blocking objects found - set empty bounds to avoid
+        // INT_MIN/INT_MAX underflow when subtracting geometric_center.
+        tile_bounds_left_off = 0;
+        tile_bounds_top_off = 0;
+        tile_bounds_right_off = 0;
+        tile_bounds_bottom_off = 0;
+    }
 }
 
 void tile_update_bounds_rect()
