@@ -2054,9 +2054,6 @@ static void op_critter_damage(Program* program)
     }
 
     Object* self = scr_find_obj_from_program(program);
-    if (object->data.critter.combat.whoHitMeCid == -1) {
-        object->data.critter.combat.whoHitMe = NULL;
-    }
 
     bool animate = (damageTypeWithFlags & 0x200) == 0;
     bool bypassArmor = (damageTypeWithFlags & 0x100) != 0;

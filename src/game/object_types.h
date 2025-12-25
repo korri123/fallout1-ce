@@ -198,10 +198,8 @@ typedef struct CritterCombatData {
     int damageLastTurn; // obj_pud.combat_data.damage_last_turn
     int aiPacket; // obj_pud.combat_data.ai_packet
     int team; // obj_pud.combat_data.team_num
-    union {
-        Object* whoHitMe; // obj_pud.combat_data.who_hit_me
-        int whoHitMeCid;
-    };
+    Object* whoHitMe; // obj_pud.combat_data.who_hit_me
+    int whoHitMeCid; // Serialization only - stores cid during save/load
 } CritterCombatData;
 
 typedef struct CritterObjectData {
