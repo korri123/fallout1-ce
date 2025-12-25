@@ -393,3 +393,4 @@ FodyWeavers.xsd
 /build
 
 **/.DS_Store
+build-ubsan
