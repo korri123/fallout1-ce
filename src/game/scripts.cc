@@ -2555,8 +2555,6 @@ char* scr_get_msg_str_speech(int messageListId, int messageId, int a3)
         if (dialog_active()) {
             if (messageListItem.audio != NULL && messageListItem.audio[0] != '\0') {
                 gdialog_setup_speech(messageListItem.audio);
-            } else {
-                debug_printf("Missing speech name: %d\n", messageListItem.num);
             }
         }
     }
