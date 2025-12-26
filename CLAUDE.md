@@ -196,4 +196,5 @@ All code is in the `fallout` namespace (228 files).
 - When adding features, consider whether they should be backported from Fallout 2 (see README goals)
   - https://github.com/alexbatalov/fallout2-ce
 - Maintain compatibility with original game data files (master.dat, critter.dat)
-- File name case sensitivity matters on Linux/macOS - be consistent
+
+The game files can be found in `/Applications/Fallout/`, including MASTER.DAT
