@@ -38,6 +38,14 @@ if(UBSAN)
     target_link_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=undefined")
 endif()
 
+# Debug symbols for release builds to enable debugging crashes
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -g -fno-omit-frame-pointer)
+    if(APPLE)
+        set_target_properties(${EXECUTABLE_NAME} PROPERTIES XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
+    endif()
+endif()
+
 target_include_directories(${EXECUTABLE_NAME} PUBLIC src)
 
 target_sources(${EXECUTABLE_NAME} PUBLIC
@@ -341,12 +349,12 @@ if(APPLE)
         set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
         set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
 
-        # Copy Debug build to /Applications/Fallout/
+        # Copy build to /Applications/Fallout/
         add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E $<IF:$<CONFIG:Debug>,copy_directory,echo>
-                    "$<$<CONFIG:Debug>:$<TARGET_BUNDLE_DIR:${EXECUTABLE_NAME}>>"
-                    "$<$<CONFIG:Debug>:/Applications/Fallout/Fallout Community Edition Debug.app>"
-            COMMENT "Copying Debug build to /Applications/Fallout/"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "$<TARGET_BUNDLE_DIR:${EXECUTABLE_NAME}>"
+                    "/Applications/Fallout/Fallout Community Edition.app"
+            COMMENT "Copying build to /Applications/Fallout/"
         )
     endif()
 
