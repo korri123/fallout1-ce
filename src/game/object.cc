@@ -710,8 +710,10 @@ int obj_save(DB_FILE* stream)
                 if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
                     combatData = &(object->data.critter.combat);
                     whoHitMe = combatData->whoHitMe;
-                    if (whoHitMe != NULL) {
-                        combatData->whoHitMeCid = whoHitMe->cid;
+                    if (whoHitMe != 0) {
+                        if (combatData->whoHitMeCid != -1) {
+                            combatData->whoHitMeCid = whoHitMe->cid;
+                        }
                     } else {
                         combatData->whoHitMeCid = -1;
                     }
@@ -3262,8 +3264,10 @@ int obj_save_obj(DB_FILE* stream, Object* object)
     if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
         combatData = &(object->data.critter.combat);
         whoHitMe = combatData->whoHitMe;
-        if (whoHitMe != NULL) {
-            combatData->whoHitMeCid = whoHitMe->cid;
+        if (whoHitMe != 0) {
+            if (combatData->whoHitMeCid != -1) {
+                combatData->whoHitMeCid = whoHitMe->cid;
+            }
         } else {
             combatData->whoHitMeCid = -1;
         }

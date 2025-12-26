@@ -591,9 +591,12 @@ static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object**
 // 0x4250C8
 Object* ai_danger_source(Object* critter)
 {
+    Object* who_hit_me;
     Object* targets[4];
-    Object* who_hit_me = critter->data.critter.combat.whoHitMe;
-    if (who_hit_me == nullptr || critter == who_hit_me) {
+    int index;
+
+    who_hit_me = critter->data.critter.combat.whoHitMe;
+    if (who_hit_me == NULL || critter == who_hit_me) {
         targets[0] = NULL;
     } else {
         if ((who_hit_me->data.critter.combat.results & DAM_DEAD) == 0) {
@@ -610,7 +613,7 @@ Object* ai_danger_source(Object* critter)
     ai_find_attackers(critter, &(targets[1]), &(targets[2]), &(targets[3]));
     ai_sort_list(targets, 4, critter);
 
-    for (int index = 0; index < 4; index++) {
+    for (index = 0; index < 4; index++) {
         if (targets[index] != NULL && is_within_perception(critter, targets[index])) {
             return targets[index];
         }
@@ -1333,7 +1336,7 @@ int combatai_switch_team(Object* critter, int team)
 
     critter->data.critter.combat.team = team;
 
-    if (critter->data.critter.combat.whoHitMe == NULL) {
+    if (critter->data.critter.combat.whoHitMeCid == -1) {
         critter_set_who_hit_me(critter, NULL);
         debug_printf("\nError: CombatData found with invalid who_hit_me!");
         return -1;
