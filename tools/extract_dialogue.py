@@ -329,34 +329,14 @@ def filter_npc_dialogue(dialogue: Dict[str, NPCDialogue],
     """
     Filter dialogue to focus on NPC lines.
 
-    In Fallout 1, message files often contain both NPC dialogue and player
-    response options. This function attempts to filter based on common patterns.
+    In Fallout 1, message files contain both NPC dialogue and player
+    response options, but reliably distinguishing them is difficult.
+    The exclude_player flag is currently not used since ID-based
+    filtering was too aggressive and removed valid NPC lines.
     """
-    if not exclude_player:
-        return dialogue
-
-    result = {}
-    for script_name, npc in dialogue.items():
-        filtered_entries = []
-        for entry in npc.entries:
-            if entry.audio_file:
-                filtered_entries.append(entry)
-                continue
-
-            if entry.message_id >= 200:
-                filtered_entries.append(entry)
-            elif entry.message_id < 100:
-                filtered_entries.append(entry)
-
-        if filtered_entries:
-            result[script_name] = NPCDialogue(
-                script_name=npc.script_name,
-                script_index=npc.script_index,
-                dialogue_file=npc.dialogue_file,
-                entries=filtered_entries
-            )
-
-    return result
+    # ID-based filtering was removing valid NPC dialogue (e.g., "Place your
+    # bets" at ID 173 in FALCON1.MSG). Return all entries for now.
+    return dialogue
 
 
 def export_to_json(dialogue: Dict[str, NPCDialogue], output_path: str):
