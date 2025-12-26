@@ -38,6 +38,10 @@ Advanced Usage:
 from .lzss import LZSSDecoder, decompress, decompress_stream
 from .dat import DATArchive, DATEntry
 from .parsers import MessageEntry, MsgParser, ScriptsListParser
+from .script import (
+    Opcode, ValueType, ProcedureFlags,
+    Procedure, Instruction, Script, ScriptIterator
+)
 
 __all__ = [
     # LZSS decompression
@@ -53,6 +57,15 @@ __all__ = [
     'MessageEntry',
     'MsgParser',
     'ScriptsListParser',
+
+    # Script bytecode
+    'Opcode',
+    'ValueType',
+    'ProcedureFlags',
+    'Procedure',
+    'Instruction',
+    'Script',
+    'ScriptIterator',
 
     # Convenience functions
     'read_dat_file',
