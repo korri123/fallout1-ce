@@ -13,8 +13,8 @@ typedef struct DB_DATABASE DB_DATABASE;
 typedef struct dir_entry_s {
     int flags;
     int offset;
-    int length;
-    int field_C;
+    int unpacked_length;
+    int packed_length;
 } dir_entry;
 
 typedef void db_read_callback();

@@ -167,8 +167,9 @@ class DATArchive:
                 if dir_datasize == 16:  # sizeof(dir_entry)
                     flags = self._read_u32_be()
                     offset = self._read_u32_be()
-                    packed_size = self._read_u32_be()
+                    # In C++: de.length = unpacked size, de.field_C = packed size
                     unpacked_size = self._read_u32_be()
+                    packed_size = self._read_u32_be()
 
                     # Build full path
                     if dir_name:

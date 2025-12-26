@@ -308,8 +308,8 @@ int db_dir_entry(const char* name, dir_entry* de)
         if (stream != NULL) {
             de->flags = 4;
             de->offset = 0;
-            de->length = getFileSize(stream);
-            de->field_C = 0;
+            de->unpacked_length = getFileSize(stream);
+            de->packed_length = 0;
             fclose(stream);
             return 0;
         }
@@ -449,11 +449,11 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
 
     switch (de.flags & 0xF0) {
     case 16:
-        lzss_decode_to_buf(current_database->stream, buf, de.field_C);
+        lzss_decode_to_buf(current_database->stream, buf, de.packed_length);
         break;
     case 32:
         if (read_callback != NULL) {
-            remaining_size = de.length;
+            remaining_size = de.unpacked_length;
             chunk_size = read_threshold - read_count;
 
             while (remaining_size >= chunk_size) {
@@ -472,11 +472,11 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
                 read_count += remaining_size;
             }
         } else {
-            fread(buf, 1, de.length, current_database->stream);
+            fread(buf, 1, de.unpacked_length, current_database->stream);
         }
         break;
     case 64:
-        end = buf + de.length;
+        end = buf + de.unpacked_length;
         if (read_callback != NULL) {
             while (buf < end) {
                 if (fread_short(current_database->stream, &v4) == 0) {
@@ -642,18 +642,18 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
 
     switch (de.flags & 0xF0) {
     case 16:
-        buf = (unsigned char*)internal_malloc(de.length);
+        buf = (unsigned char*)internal_malloc(de.unpacked_length);
         if (buf != NULL) {
-            lzss_decode_to_buf(current_database->stream, buf, de.field_C);
-            return db_add_fp_rec(NULL, buf, de.length, flags | 0x10 | 0x8);
+            lzss_decode_to_buf(current_database->stream, buf, de.packed_length);
+            return db_add_fp_rec(NULL, buf, de.unpacked_length, flags | 0x10 | 0x8);
         }
         break;
     case 32:
-        return db_add_fp_rec(current_database->stream, NULL, de.length, flags | 0x20 | 0x8);
+        return db_add_fp_rec(current_database->stream, NULL, de.unpacked_length, flags | 0x20 | 0x8);
     case 64:
         buf = (unsigned char*)internal_malloc(0x4000);
         if (buf != NULL) {
-            return db_add_fp_rec(current_database->stream, buf, de.length, flags | 0x40 | 0x8);
+            return db_add_fp_rec(current_database->stream, buf, de.unpacked_length, flags | 0x40 | 0x8);
         }
         break;
     }
@@ -1781,8 +1781,8 @@ static int db_assoc_load_dir_entry(FILE* stream, void* buffer, size_t size, int 
     de = (dir_entry*)buffer;
     if (db_read_long(stream, &(de->flags)) != 0) return -1;
     if (db_read_long(stream, &(de->offset)) != 0) return -1;
-    if (db_read_long(stream, &(de->length)) != 0) return -1;
-    if (db_read_long(stream, &(de->field_C)) != 0) return -1;
+    if (db_read_long(stream, &(de->unpacked_length)) != 0) return -1;
+    if (db_read_long(stream, &(de->packed_length)) != 0) return -1;
 
     return 0;
 }
@@ -1799,8 +1799,8 @@ static int db_assoc_save_dir_entry(FILE* stream, void* buffer, size_t size, int 
     de = (dir_entry*)buffer;
     if (db_write_long(stream, de->flags) != 0) return -1;
     if (db_write_long(stream, de->offset) != 0) return -1;
-    if (db_write_long(stream, de->length) != 0) return -1;
-    if (db_write_long(stream, de->field_C) != 0) return -1;
+    if (db_write_long(stream, de->unpacked_length) != 0) return -1;
+    if (db_write_long(stream, de->packed_length) != 0) return -1;
 
     return 0;
 }
@@ -1816,8 +1816,8 @@ static int db_assoc_load_db_dir_entry(DB_FILE* stream, void* buffer, size_t size
     de = (dir_entry*)buffer;
     if (db_freadInt32(stream, &(de->flags)) != 0) return -1;
     if (db_freadInt32(stream, &(de->offset)) != 0) return -1;
-    if (db_freadInt32(stream, &(de->length)) != 0) return -1;
-    if (db_freadInt32(stream, &(de->field_C)) != 0) return -1;
+    if (db_freadInt32(stream, &(de->unpacked_length)) != 0) return -1;
+    if (db_freadInt32(stream, &(de->packed_length)) != 0) return -1;
 
     return 0;
 }
@@ -1834,8 +1834,8 @@ static int db_assoc_save_db_dir_entry(DB_FILE* stream, void* buffer, size_t size
     de = (dir_entry*)buffer;
     if (db_fwriteInt32(stream, de->flags) != 0) return -1;
     if (db_fwriteInt32(stream, de->offset) != 0) return -1;
-    if (db_fwriteInt32(stream, de->length) != 0) return -1;
-    if (db_fwriteInt32(stream, de->field_C) != 0) return -1;
+    if (db_fwriteInt32(stream, de->unpacked_length) != 0) return -1;
+    if (db_fwriteInt32(stream, de->packed_length) != 0) return -1;
 
     return 0;
 }

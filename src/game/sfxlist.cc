@@ -351,16 +351,16 @@ static int sfxl_get_sizes()
             return SFXL_ERR;
         }
 
-        if (de.length <= 0) {
+        if (de.unpacked_length <= 0) {
             mem_free(path);
             return SFXL_ERR;
         }
 
-        entry->fileSize = de.length;
+        entry->fileSize = de.unpacked_length;
 
         switch (sfxl_compression) {
         case 0:
-            entry->dataSize = de.length;
+            entry->dataSize = de.unpacked_length;
             break;
         case 1:
             if (1) {
