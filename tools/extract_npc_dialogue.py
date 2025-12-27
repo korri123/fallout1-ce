@@ -2,443 +2,430 @@
 """
 Fallout 1 NPC Dialogue Extractor (Bytecode-based)
 
-Extracts NPC dialogue from Fallout 1, distinguishing NPC speech from player responses.
+Extracts NPC dialogue from Fallout 1 scripts by analyzing bytecode for
+dialogue function calls (gsay_reply, gsay_option, etc.) and looking up
+the corresponding messages in .MSG files.
 
-Fallout 1's dialogue system is largely data-driven rather than script-driven.
-Unlike Fallout 2, most dialogue is stored in .MSG files with the flow controlled
-by the engine based on message ID ranges, not explicit script bytecode calls.
-
-This tool extracts NPC dialogue using heuristics:
-1. NPC dialogue entries typically have audio file references (e.g., "Ara_1g")
-2. Player responses typically have no audio file
-3. "Look at" descriptions (usually ID 100) are filtered out
+This approach extracts ONLY dialogue that is actually used in the game,
+distinguishing:
+- NPC replies (what NPCs say): gsay_reply, gsay_message
+- Player options (what player can choose): gsay_option, giq_option
 
 Usage:
-    python extract_npc_dialogue.py <game_path> [--output dialogue.json]
+    python extract_npc_dialogue.py /Applications/Fallout --output dialogue.txt
 
-    game_path: Path to Fallout 1 directory containing MASTER.DAT
+The messageListId in dialogue calls equals script_index + 1, where
+script_index comes from scripts.lst.
 """
 
 import argparse
 import json
 import struct
 import sys
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
-from fallout_data import DATArchive, MsgParser, ScriptsListParser, MessageEntry
+# Add the tools directory to the path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from fallout_data import (
+    DATArchive, MsgParser, ScriptsListParser, MessageEntry,
+    Opcode
+)
 
 
-# Opcodes relevant to dialogue
-OPCODE_PUSH_INT = 0xC001      # Push integer constant
-OPCODE_PUSH_STRING = 0x9001   # Push static string
-OPCODE_GSAY_REPLY = 0x811E    # gsay_reply(messageListId, msg)
-OPCODE_GSAY_MESSAGE = 0x8122  # gsay_message(messageListId, msg, reaction)
-OPCODE_GSAY_OPTION = 0x811F   # gsay_option(messageListId, msg, proc, reaction)
-OPCODE_GIQ_OPTION = 0x8123    # giq_option(iq_level, messageListId, msg, proc, reaction)
+# Dialogue opcodes from script.py
+DIALOGUE_OPCODES = {
+    Opcode.GSAY_REPLY: ('gsay_reply', 2, 'npc'),      # gsay_reply(messageListId, msg)
+    Opcode.GSAY_MESSAGE: ('gsay_message', 3, 'npc'),  # gsay_message(messageListId, msg, reaction)
+    Opcode.GSAY_OPTION: ('gsay_option', 4, 'player'), # gsay_option(messageListId, msg, proc, reaction)
+    Opcode.GIQ_OPTION: ('giq_option', 5, 'player'),   # giq_option(iq, messageListId, msg, proc, reaction)
+}
+
+# Known NPC names for common scripts
+KNOWN_NPC_NAMES = {
+    'aradesh': 'Aradesh',
+    'tandi': 'Tandi',
+    'seth': 'Seth',
+    'ian': 'Ian',
+    'katrina': 'Katrina',
+    'razlo': 'Razlo',
+    'killian': 'Killian Darkwater',
+    'gizmo': 'Gizmo',
+    'tycho': 'Tycho',
+    'neal': 'Neal',
+    'saul': 'Saul',
+    'lars': 'Lars',
+    'marcelle': 'Marcelle',
+    'doc_morbid': 'Doc Morbid',
+    'ismarc': 'Ismarc',
+    'decker': 'Decker',
+    'hightowe': 'Hightower',
+    'loxley': 'Loxley',
+    'demetre': 'Demetre',
+    'harold': 'Harold',
+    'butch': 'Butch',
+    'lorenzo': 'Lorenzo',
+    'daren': 'Daren Hightower',
+    'beth': 'Beth',
+    'irwin': 'Irwin',
+    'jake': 'Jake',
+    'paladin': 'BoS Paladin',
+    'talus': 'Talus',
+    'cabbot': 'Cabbot',
+    'mathia': 'General Maxson',
+    'rhombus': 'Rhombus',
+    'vree': 'Vree',
+    'sophi': 'Sophia',
+    'razor': 'Razor',
+    'nicole': 'Nicole',
+    'talius': 'Talius',
+    'set': 'Set',
+    'harry': 'Harry',
+    'morpheus': 'Morpheus',
+    'lasher': 'Lasher',
+    'jain': 'Jain',
+    'master': 'The Master',
+    'lieuten': 'The Lieutenant',
+    'garl': 'Garl Death-Hand',
+    'zax': 'ZAX',
+    'dogmeat': 'Dogmeat',
+    'v13elder': 'Vault 13 Overseer',
+}
 
 
 @dataclass
 class DialogueCall:
-    """Represents a dialogue function call found in bytecode"""
-    opcode: int
-    script_offset: int
-    message_list_id: int
-    message_id: int
-    opcode_name: str = ""
-
-    def __post_init__(self):
-        opcode_names = {
-            OPCODE_GSAY_REPLY: "gsay_reply",
-            OPCODE_GSAY_MESSAGE: "gsay_message",
-            OPCODE_GSAY_OPTION: "gsay_option",
-            OPCODE_GIQ_OPTION: "giq_option",
-        }
-        self.opcode_name = opcode_names.get(self.opcode, f"opcode_{self.opcode:04X}")
+    """A dialogue function call found in bytecode."""
+    script_file: str        # Source .INT file
+    offset: int             # Bytecode offset
+    opcode_name: str        # Function name (gsay_reply, etc.)
+    message_list_id: int    # Script index + 1
+    message_id: int         # Message ID within .MSG file
+    call_type: str          # 'npc' or 'player'
 
 
 @dataclass
-class NPCDialogueEntry:
-    """A single dialogue entry with its source information"""
+class DialogueLine:
+    """A resolved dialogue line with text."""
     message_id: int
     text: str
     audio_file: str = ""
-    call_type: str = ""  # reply, message, option
-    script_offset: int = 0
+    call_type: str = ""
+    source_scripts: List[str] = field(default_factory=list)
 
 
 @dataclass
-class NPCDialogueData:
-    """All dialogue for a single NPC/script"""
+class NPCDialogue:
+    """All dialogue for an NPC."""
     script_name: str
     script_index: int
-    script_file: str
-    dialogue_file: str
-    entries: List[NPCDialogueEntry] = field(default_factory=list)
+    npc_name: str = ""
+    npc_lines: List[DialogueLine] = field(default_factory=list)
+    player_options: List[DialogueLine] = field(default_factory=list)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             'script_name': self.script_name,
             'script_index': self.script_index,
-            'script_file': self.script_file,
-            'dialogue_file': self.dialogue_file,
-            'entry_count': len(self.entries),
-            'entries': [
+            'npc_name': self.npc_name,
+            'npc_line_count': len(self.npc_lines),
+            'player_option_count': len(self.player_options),
+            'npc_lines': [
                 {
-                    'id': e.message_id,
-                    'text': e.text,
-                    'audio': e.audio_file,
-                    'type': e.call_type,
+                    'id': line.message_id,
+                    'text': line.text,
+                    'audio': line.audio_file,
                 }
-                for e in sorted(self.entries, key=lambda x: x.message_id)
-            ]
+                for line in sorted(self.npc_lines, key=lambda x: x.message_id)
+            ],
+            'player_options': [
+                {
+                    'id': line.message_id,
+                    'text': line.text,
+                }
+                for line in sorted(self.player_options, key=lambda x: x.message_id)
+            ],
         }
 
 
-class ScriptBytecodeParser:
-    """Parser for Fallout 1 script bytecode (.int files)"""
-
-    def __init__(self, data: bytes):
-        self.data = data
-        self.size = len(data)
-
-    def read_int16_be(self, offset: int) -> int:
-        """Read big-endian 16-bit unsigned integer"""
-        if offset + 2 > self.size:
-            return 0
-        return struct.unpack('>H', self.data[offset:offset+2])[0]
-
-    def read_int32_be(self, offset: int) -> int:
-        """Read big-endian 32-bit unsigned integer"""
-        if offset + 4 > self.size:
-            return 0
-        return struct.unpack('>I', self.data[offset:offset+4])[0]
-
-    def read_int32_be_signed(self, offset: int) -> int:
-        """Read big-endian 32-bit signed integer"""
-        if offset + 4 > self.size:
-            return 0
-        return struct.unpack('>i', self.data[offset:offset+4])[0]
-
-    def get_header_info(self) -> Dict:
-        """Parse script header to find code section"""
-        proc_offset = 42
-        if proc_offset + 4 > self.size:
-            return {'code_start': 42, 'proc_count': 0}
-
-        proc_count = self.read_int32_be(proc_offset)
-        PROCEDURE_SIZE = 24
-
-        identifiers_offset = proc_offset + 4 + proc_count * PROCEDURE_SIZE
-        if identifiers_offset + 4 > self.size:
-            return {'code_start': 42, 'proc_count': proc_count}
-
-        identifiers_size = self.read_int32_be(identifiers_offset)
-
-        strings_offset = identifiers_offset + identifiers_size + 4
-        if strings_offset + 4 > self.size:
-            return {'code_start': identifiers_offset, 'proc_count': proc_count}
-
-        strings_size = self.read_int32_be(strings_offset)
-
-        if strings_size == 0xFFFFFFFF:
-            code_start = strings_offset
-        else:
-            code_start = strings_offset + strings_size + 4
-
-        return {
-            'code_start': code_start,
-            'proc_count': proc_count,
-            'identifiers_offset': identifiers_offset,
-            'strings_offset': strings_offset,
-        }
-
-    def find_dialogue_calls(self) -> List[DialogueCall]:
-        """Find all dialogue-related function calls in the bytecode."""
-        calls = []
-        header = self.get_header_info()
-        scan_start = min(header.get('code_start', 42), 42)
-
-        i = scan_start
-        while i < self.size - 2:
-            opcode = self.read_int16_be(i)
-
-            if opcode == OPCODE_GSAY_REPLY:
-                call = self._try_parse_two_arg_call(i, OPCODE_GSAY_REPLY)
-                if call:
-                    calls.append(call)
-            elif opcode == OPCODE_GSAY_MESSAGE:
-                call = self._try_parse_three_arg_call(i, OPCODE_GSAY_MESSAGE)
-                if call:
-                    calls.append(call)
-            elif opcode == OPCODE_GSAY_OPTION:
-                call = self._try_parse_four_arg_call(i, OPCODE_GSAY_OPTION)
-                if call:
-                    calls.append(call)
-            elif opcode == OPCODE_GIQ_OPTION:
-                call = self._try_parse_five_arg_call(i, OPCODE_GIQ_OPTION)
-                if call:
-                    calls.append(call)
-
-            i += 2
-
-        return calls
-
-    def _try_parse_two_arg_call(self, opcode_offset: int, opcode: int) -> Optional[DialogueCall]:
-        """Parse two-argument call pattern."""
-        if opcode_offset < 12:
-            return None
-
-        push1_offset = opcode_offset - 12
-        push2_offset = opcode_offset - 6
-
-        push1_op = self.read_int16_be(push1_offset)
-        push2_op = self.read_int16_be(push2_offset)
-
-        if push1_op == OPCODE_PUSH_INT and push2_op == OPCODE_PUSH_INT:
-            message_list_id = self.read_int32_be_signed(push1_offset + 2)
-            message_id = self.read_int32_be_signed(push2_offset + 2)
-
-            if 0 < message_list_id < 1000 and 0 <= message_id < 100000:
-                return DialogueCall(
-                    opcode=opcode,
-                    script_offset=opcode_offset,
-                    message_list_id=message_list_id,
-                    message_id=message_id,
-                )
-
-        return None
-
-    def _try_parse_three_arg_call(self, opcode_offset: int, opcode: int) -> Optional[DialogueCall]:
-        """Parse three-argument call."""
-        if opcode_offset < 18:
-            return None
-
-        push1_offset = opcode_offset - 18
-        push2_offset = opcode_offset - 12
-        push3_offset = opcode_offset - 6
-
-        push1_op = self.read_int16_be(push1_offset)
-        push2_op = self.read_int16_be(push2_offset)
-        push3_op = self.read_int16_be(push3_offset)
-
-        if push1_op == OPCODE_PUSH_INT and push2_op == OPCODE_PUSH_INT and push3_op == OPCODE_PUSH_INT:
-            message_list_id = self.read_int32_be_signed(push1_offset + 2)
-            message_id = self.read_int32_be_signed(push2_offset + 2)
-
-            if 0 < message_list_id < 1000 and 0 <= message_id < 100000:
-                return DialogueCall(
-                    opcode=opcode,
-                    script_offset=opcode_offset,
-                    message_list_id=message_list_id,
-                    message_id=message_id,
-                )
-
-        return None
-
-    def _try_parse_four_arg_call(self, opcode_offset: int, opcode: int) -> Optional[DialogueCall]:
-        """Parse four-argument call."""
-        if opcode_offset < 24:
-            return None
-
-        push1_offset = opcode_offset - 24
-        push2_offset = opcode_offset - 18
-
-        push1_op = self.read_int16_be(push1_offset)
-        push2_op = self.read_int16_be(push2_offset)
-
-        if push1_op == OPCODE_PUSH_INT and push2_op == OPCODE_PUSH_INT:
-            message_list_id = self.read_int32_be_signed(push1_offset + 2)
-            message_id = self.read_int32_be_signed(push2_offset + 2)
-
-            if 0 < message_list_id < 1000 and 0 <= message_id < 100000:
-                return DialogueCall(
-                    opcode=opcode,
-                    script_offset=opcode_offset,
-                    message_list_id=message_list_id,
-                    message_id=message_id,
-                )
-
-        return None
-
-    def _try_parse_five_arg_call(self, opcode_offset: int, opcode: int) -> Optional[DialogueCall]:
-        """Parse five-argument call."""
-        if opcode_offset < 30:
-            return None
-
-        push2_offset = opcode_offset - 24
-        push3_offset = opcode_offset - 18
-
-        push2_op = self.read_int16_be(push2_offset)
-        push3_op = self.read_int16_be(push3_offset)
-
-        if push2_op == OPCODE_PUSH_INT and push3_op == OPCODE_PUSH_INT:
-            message_list_id = self.read_int32_be_signed(push2_offset + 2)
-            message_id = self.read_int32_be_signed(push3_offset + 2)
-
-            if 0 < message_list_id < 1000 and 0 <= message_id < 100000:
-                return DialogueCall(
-                    opcode=opcode,
-                    script_offset=opcode_offset,
-                    message_list_id=message_list_id,
-                    message_id=message_id,
-                )
-
-        return None
-
-
-class NPCDialogueExtractor:
-    """Extract NPC dialogue by analyzing script bytecode."""
+class DialogueExtractor:
+    """Extract dialogue from Fallout 1 script bytecode."""
 
     def __init__(self, game_path: str, language: str = 'english'):
         self.game_path = Path(game_path)
         self.language = language
         self.dat: Optional[DATArchive] = None
-        self._msg_cache: Dict[str, List[MessageEntry]] = {}
-        self._script_list: Dict[int, str] = {}
+        self._script_list: Dict[int, str] = {}  # script_index -> script_name
+        self._msg_cache: Dict[str, Dict[int, MessageEntry]] = {}
 
-    def extract(self, reply_only: bool = True) -> Dict[str, NPCDialogueData]:
+    def extract(self, include_player_options: bool = False) -> Dict[str, NPCDialogue]:
         """
-        Extract NPC dialogue from all scripts.
+        Extract all NPC dialogue from scripts.
 
         Args:
-            reply_only: If True, only extract gsay_reply calls (NPC speech).
-        """
-        dat_path = self.game_path / 'MASTER.DAT'
-        if not dat_path.exists():
-            dat_path = self.game_path / 'master.dat'
+            include_player_options: If True, also include player dialogue options.
 
-        if not dat_path.exists():
+        Returns:
+            Dict mapping script_name -> NPCDialogue
+        """
+        dat_path = self._find_dat_file()
+        if not dat_path:
             raise FileNotFoundError(f"Could not find MASTER.DAT in {self.game_path}")
 
-        result: Dict[str, NPCDialogueData] = {}
+        result: Dict[str, NPCDialogue] = {}
+        calls_by_target: Dict[int, List[DialogueCall]] = defaultdict(list)
 
         with DATArchive(str(dat_path)) as self.dat:
             self._load_script_list()
 
+            # Find all script files
             all_files = self.dat.list_files()
-            int_files = [f for f in all_files if f.endswith('.INT') and f.startswith('SCRIPTS\\')]
+            int_files = [f for f in all_files
+                        if f.endswith('.INT') and 'SCRIPTS' in f.upper()]
 
-            print(f"Found {len(int_files)} script files to analyze...")
+            print(f"Found {len(int_files)} script files")
+            print(f"Loaded {len(self._script_list)} script name mappings")
 
+            # Parse each script and find dialogue calls
             for script_path in sorted(int_files):
-                script_data = self.dat.read_file(script_path)
-                if not script_data:
-                    continue
-
-                filename = script_path.split('\\')[-1]
-                script_name = filename.replace('.INT', '').lower()
-
-                parser = ScriptBytecodeParser(script_data)
-                calls = parser.find_dialogue_calls()
-
-                if not calls:
-                    continue
-
-                if reply_only:
-                    calls = [c for c in calls if c.opcode == OPCODE_GSAY_REPLY]
-
-                if not calls:
-                    continue
-
-                calls_by_list: Dict[int, List[DialogueCall]] = {}
+                calls = self._find_dialogue_calls_in_script(script_path)
                 for call in calls:
-                    if call.message_list_id not in calls_by_list:
-                        calls_by_list[call.message_list_id] = []
-                    calls_by_list[call.message_list_id].append(call)
+                    calls_by_target[call.message_list_id].append(call)
 
-                for msg_list_id, list_calls in calls_by_list.items():
-                    msg_script_name = self._script_list.get(msg_list_id - 1, script_name)
-                    msg_entries = self._load_dialogue(msg_script_name)
-                    if not msg_entries:
-                        continue
+            print(f"Found dialogue calls targeting {len(calls_by_target)} different message lists")
 
-                    msg_by_id: Dict[int, MessageEntry] = {}
-                    for entry in msg_entries:
-                        msg_by_id[entry.message_id] = entry
+            # Resolve calls to actual dialogue text
+            for msg_list_id, calls in sorted(calls_by_target.items()):
+                script_index = msg_list_id - 1
+                script_name = self._script_list.get(script_index, f"unknown_{script_index}")
 
-                    unique_msg_ids: Set[int] = set()
-                    for call in list_calls:
-                        unique_msg_ids.add(call.message_id)
+                msg_dict = self._load_messages(script_name)
+                if not msg_dict:
+                    continue
 
-                    entries: List[NPCDialogueEntry] = []
-                    for msg_id in sorted(unique_msg_ids):
-                        if msg_id in msg_by_id:
-                            entry = msg_by_id[msg_id]
-                            call_type = "reply"
-                            for c in list_calls:
-                                if c.message_id == msg_id:
-                                    if c.opcode == OPCODE_GSAY_MESSAGE:
-                                        call_type = "message"
-                                    elif c.opcode in (OPCODE_GSAY_OPTION, OPCODE_GIQ_OPTION):
-                                        call_type = "option"
-                                    break
+                npc_name = self._lookup_npc_name(script_name)
 
-                            entries.append(NPCDialogueEntry(
+                # Collect unique message IDs by type
+                npc_msg_ids: Set[int] = set()
+                player_msg_ids: Set[int] = set()
+
+                for call in calls:
+                    if call.call_type == 'npc':
+                        npc_msg_ids.add(call.message_id)
+                    else:
+                        player_msg_ids.add(call.message_id)
+
+                # Build NPC lines
+                npc_lines = []
+                for msg_id in sorted(npc_msg_ids):
+                    if msg_id in msg_dict:
+                        entry = msg_dict[msg_id]
+                        npc_lines.append(DialogueLine(
+                            message_id=msg_id,
+                            text=entry.text,
+                            audio_file=entry.audio_file,
+                            call_type='npc',
+                        ))
+
+                # Build player options
+                player_options = []
+                if include_player_options:
+                    for msg_id in sorted(player_msg_ids):
+                        if msg_id in msg_dict:
+                            entry = msg_dict[msg_id]
+                            player_options.append(DialogueLine(
                                 message_id=msg_id,
                                 text=entry.text,
                                 audio_file=entry.audio_file,
-                                call_type=call_type,
+                                call_type='player',
                             ))
 
-                    if entries:
-                        key = msg_script_name
-                        if key not in result:
-                            result[key] = NPCDialogueData(
-                                script_name=msg_script_name,
-                                script_index=msg_list_id - 1,
-                                script_file=script_path.lower(),
-                                dialogue_file=f"text\\{self.language}\\dialog\\{msg_script_name}.msg",
-                                entries=entries,
-                            )
-                        else:
-                            existing_ids = {e.message_id for e in result[key].entries}
-                            for e in entries:
-                                if e.message_id not in existing_ids:
-                                    result[key].entries.append(e)
+                if npc_lines or player_options:
+                    result[script_name] = NPCDialogue(
+                        script_name=script_name,
+                        script_index=script_index,
+                        npc_name=npc_name,
+                        npc_lines=npc_lines,
+                        player_options=player_options,
+                    )
 
         return result
 
-    def _load_script_list(self):
-        """Load scripts.lst to map indices to script names"""
-        data = self.dat.read_file('SCRIPTS/SCRIPTS.LST')
-        if data:
-            scripts = ScriptsListParser.parse(data)
-            for idx, name in scripts:
-                self._script_list[idx] = name
+    def _find_dat_file(self) -> Optional[Path]:
+        """Find MASTER.DAT file."""
+        candidates = [
+            self.game_path / 'MASTER.DAT',
+            self.game_path / 'master.dat',
+            self.game_path / 'Master.dat',
+        ]
+        for path in candidates:
+            if path.exists():
+                return path
+        return None
 
-    def _load_dialogue(self, script_name: str) -> List[MessageEntry]:
-        """Load dialogue entries for a script"""
+    def _load_script_list(self):
+        """Load scripts.lst to map indices to script names."""
+        paths_to_try = ['SCRIPTS\\SCRIPTS.LST', 'scripts/scripts.lst']
+        for path in paths_to_try:
+            data = self.dat.read_file(path)
+            if data:
+                scripts = ScriptsListParser.parse(data)
+                for idx, name in scripts:
+                    self._script_list[idx] = name
+                return
+
+    def _load_messages(self, script_name: str) -> Dict[int, MessageEntry]:
+        """Load message file for a script."""
         if script_name in self._msg_cache:
             return self._msg_cache[script_name]
 
-        paths = [
-            f"TEXT/{self.language.upper()}/DIALOG/{script_name.upper()}.MSG",
+        paths_to_try = [
+            f"TEXT\\{self.language.upper()}\\DIALOG\\{script_name.upper()}.MSG",
             f"text/{self.language}/dialog/{script_name}.msg",
         ]
 
-        for path in paths:
+        for path in paths_to_try:
             data = self.dat.read_file(path)
             if data:
                 entries = MsgParser.parse(data)
-                self._msg_cache[script_name] = entries
-                return entries
+                msg_dict = {e.message_id: e for e in entries}
+                self._msg_cache[script_name] = msg_dict
+                return msg_dict
 
-        self._msg_cache[script_name] = []
-        return []
+        self._msg_cache[script_name] = {}
+        return {}
+
+    def _lookup_npc_name(self, script_name: str) -> str:
+        """Look up human-readable NPC name."""
+        name_lower = script_name.lower()
+        if name_lower in KNOWN_NPC_NAMES:
+            return KNOWN_NPC_NAMES[name_lower]
+        # Try partial match
+        for key, name in KNOWN_NPC_NAMES.items():
+            if name_lower.startswith(key) or key.startswith(name_lower):
+                return name
+        return ""
+
+    def _find_dialogue_calls_in_script(self, script_path: str) -> List[DialogueCall]:
+        """Find all dialogue calls in a script file."""
+        data = self.dat.read_file(script_path)
+        if not data:
+            return []
+
+        calls = []
+
+        # Scan bytecode for dialogue opcodes
+        # We look backwards from each dialogue opcode to find the PUSH instructions
+        offset = 0
+        while offset + 2 <= len(data):
+            try:
+                opcode = struct.unpack('>H', data[offset:offset+2])[0]
+            except:
+                offset += 2
+                continue
+
+            if opcode in DIALOGUE_OPCODES:
+                name, arg_count, call_type = DIALOGUE_OPCODES[opcode]
+                call = self._try_extract_dialogue_call(
+                    data, offset, name, arg_count, call_type, script_path
+                )
+                if call:
+                    calls.append(call)
+
+            offset += 2
+
+        return calls
+
+    def _try_extract_dialogue_call(
+        self, data: bytes, opcode_offset: int, name: str, call_type: str, script_path: str
+    ) -> Optional[DialogueCall]:
+        """
+        Try to extract dialogue call arguments by looking backwards.
+
+        The bytecode pushes arguments in order, so for gsay_reply(listId, msgId):
+        - offset-12: PUSH INT listId (6 bytes: 2 opcode + 4 value)
+        - offset-6:  PUSH INT msgId  (6 bytes)
+        - offset-0:  GSAY_REPLY      (2 bytes)
+        """
+        PUSH_INT = 0xC001
+        PUSH_SIZE = 6  # 2 byte opcode + 4 byte value
+
+        # Calculate where to look for arguments based on function signature
+        if name == 'gsay_reply':
+            # gsay_reply(messageListId, msg) - 2 args
+            msg_offset = opcode_offset - PUSH_SIZE
+            list_offset = opcode_offset - 2 * PUSH_SIZE
+        elif name == 'gsay_message':
+            # gsay_message(messageListId, msg, reaction) - 3 args
+            # reaction is at -6, msg at -12, listId at -18
+            msg_offset = opcode_offset - 2 * PUSH_SIZE
+            list_offset = opcode_offset - 3 * PUSH_SIZE
+        elif name == 'gsay_option':
+            # gsay_option(messageListId, msg, proc, reaction) - 4 args
+            # reaction at -6, proc at -12, msg at -18, listId at -24
+            msg_offset = opcode_offset - 3 * PUSH_SIZE
+            list_offset = opcode_offset - 4 * PUSH_SIZE
+        elif name == 'giq_option':
+            # giq_option(iq, messageListId, msg, proc, reaction) - 5 args
+            # reaction at -6, proc at -12, msg at -18, listId at -24, iq at -30
+            msg_offset = opcode_offset - 3 * PUSH_SIZE
+            list_offset = opcode_offset - 4 * PUSH_SIZE
+        else:
+            return None
+
+        # Validate offsets
+        if list_offset < 0 or msg_offset < 0:
+            return None
+        if list_offset + PUSH_SIZE > len(data) or msg_offset + PUSH_SIZE > len(data):
+            return None
+
+        # Check that we have PUSH INT instructions at the expected locations
+        try:
+            list_opcode = struct.unpack('>H', data[list_offset:list_offset+2])[0]
+            msg_opcode = struct.unpack('>H', data[msg_offset:msg_offset+2])[0]
+        except:
+            return None
+
+        if list_opcode != PUSH_INT or msg_opcode != PUSH_INT:
+            return None
+
+        # Extract values
+        try:
+            message_list_id = struct.unpack('>i', data[list_offset+2:list_offset+6])[0]
+            message_id = struct.unpack('>i', data[msg_offset+2:msg_offset+6])[0]
+        except:
+            return None
+
+        # Validate values - must be reasonable
+        if message_list_id <= 0 or message_list_id > 1000:
+            return None
+        if message_id < 0 or message_id > 100000:
+            return None
+
+        return DialogueCall(
+            script_file=script_path,
+            offset=opcode_offset,
+            opcode_name=name,
+            message_list_id=message_list_id,
+            message_id=message_id,
+            call_type=call_type,
+        )
 
 
-def export_to_json(dialogue: Dict[str, NPCDialogueData], output_path: str):
-    """Export dialogue to JSON file"""
-    total_entries = sum(len(d.entries) for d in dialogue.values())
+def export_to_json(dialogue: Dict[str, NPCDialogue], output_path: str):
+    """Export dialogue to JSON file."""
+    total_npc_lines = sum(len(d.npc_lines) for d in dialogue.values())
+    total_player_options = sum(len(d.player_options) for d in dialogue.values())
 
     data = {
         'metadata': {
             'description': 'NPC dialogue extracted from Fallout 1 script bytecode',
-            'method': 'Analyzed gsay_reply opcode calls in .int script files',
             'total_npcs': len(dialogue),
-            'total_dialogue_lines': total_entries,
+            'total_npc_lines': total_npc_lines,
+            'total_player_options': total_player_options,
         },
         'dialogue': {
             name: d.to_dict() for name, d in sorted(dialogue.items())
@@ -451,37 +438,52 @@ def export_to_json(dialogue: Dict[str, NPCDialogueData], output_path: str):
     print(f"Exported to: {output_path}")
 
 
-def export_to_text(dialogue: Dict[str, NPCDialogueData], output_path: str):
-    """Export dialogue to readable text file"""
+def export_to_text(dialogue: Dict[str, NPCDialogue], output_path: str,
+                   include_player_options: bool = False):
+    """Export dialogue to readable text file, grouped by NPC."""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("=" * 80 + "\n")
-        f.write("FALLOUT 1 NPC DIALOGUE (EXTRACTED FROM SCRIPT BYTECODE)\n")
+        f.write("FALLOUT 1 NPC DIALOGUE\n")
+        f.write("Extracted from script bytecode via gsay_reply/gsay_message analysis\n")
         f.write("=" * 80 + "\n\n")
-        f.write("This file contains only dialogue lines that are actually used as NPC\n")
-        f.write("replies in the game's dialogue system (via gsay_reply opcode).\n\n")
 
+        total_lines = 0
         for script_name in sorted(dialogue.keys()):
             npc = dialogue[script_name]
+
+            if not npc.npc_lines and not npc.player_options:
+                continue
+
             f.write("-" * 80 + "\n")
-            f.write(f"NPC Script: {script_name}\n")
+            if npc.npc_name:
+                f.write(f"NPC: {npc.npc_name}\n")
+            f.write(f"Script: {script_name}\n")
             f.write(f"Script Index: {npc.script_index}\n")
-            f.write(f"Script File: {npc.script_file}\n")
-            f.write(f"Dialogue File: {npc.dialogue_file}\n")
-            f.write(f"Reply Lines: {len(npc.entries)}\n")
+            f.write(f"NPC Lines: {len(npc.npc_lines)}\n")
+            if include_player_options:
+                f.write(f"Player Options: {len(npc.player_options)}\n")
             f.write("-" * 80 + "\n\n")
 
-            for entry in sorted(npc.entries, key=lambda e: e.message_id):
-                f.write(f"[{entry.message_id}]")
-                if entry.audio_file:
-                    f.write(f" ({entry.audio_file})")
-                if entry.call_type != "reply":
-                    f.write(f" [{entry.call_type}]")
-                f.write("\n")
-                f.write(f"{entry.text}\n\n")
+            # Write NPC lines
+            if npc.npc_lines:
+                f.write("=== NPC DIALOGUE ===\n\n")
+                for line in sorted(npc.npc_lines, key=lambda x: x.message_id):
+                    f.write(f"[{line.message_id}]")
+                    if line.audio_file:
+                        f.write(f" ({line.audio_file})")
+                    f.write("\n")
+                    f.write(f"{line.text}\n\n")
+                    total_lines += 1
+
+            # Write player options
+            if include_player_options and npc.player_options:
+                f.write("=== PLAYER OPTIONS ===\n\n")
+                for line in sorted(npc.player_options, key=lambda x: x.message_id):
+                    f.write(f"[{line.message_id}] {line.text}\n\n")
 
             f.write("\n")
 
-    print(f"Exported to: {output_path}")
+    print(f"Exported {total_lines} NPC dialogue lines to: {output_path}")
 
 
 def main():
@@ -490,10 +492,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s /path/to/fallout1
+  %(prog)s /Applications/Fallout
   %(prog)s /path/to/fallout1 --output npc_dialogue.json
   %(prog)s /path/to/fallout1 --format text --output npc_dialogue.txt
-  %(prog)s /path/to/fallout1 --include-options
+  %(prog)s /path/to/fallout1 --include-player-options
         """
     )
 
@@ -510,45 +512,56 @@ Examples:
 
     parser.add_argument(
         '--output', '-o',
-        default='fallout1_npc_dialogue.json',
-        help='Output file path (default: fallout1_npc_dialogue.json)'
+        default='fallout1_npc_dialogue',
+        help='Output file path (extension added based on format)'
     )
 
     parser.add_argument(
         '--format', '-f',
-        choices=['json', 'text'],
-        default='json',
-        help='Output format (default: json)'
+        choices=['json', 'text', 'both'],
+        default='text',
+        help='Output format (default: text)'
     )
 
     parser.add_argument(
-        '--include-options',
+        '--include-player-options',
         action='store_true',
-        help='Include player dialogue options (gsay_option) in addition to NPC replies'
+        help='Include player dialogue options in addition to NPC replies'
     )
 
     args = parser.parse_args()
 
     try:
-        extractor = NPCDialogueExtractor(args.game_path, args.language)
+        extractor = DialogueExtractor(args.game_path, args.language)
 
         print("Extracting NPC dialogue from script bytecode...")
-        dialogue = extractor.extract(reply_only=not args.include_options)
+        dialogue = extractor.extract(include_player_options=args.include_player_options)
 
-        output_path = args.output
-        if args.format == 'json' and not output_path.endswith('.json'):
-            output_path += '.json'
-        elif args.format == 'text' and not output_path.endswith('.txt'):
-            output_path += '.txt'
+        if not dialogue:
+            print("No dialogue found!")
+            return 1
 
-        if args.format == 'json':
-            export_to_json(dialogue, output_path)
-        else:
-            export_to_text(dialogue, output_path)
+        # Determine output paths
+        base_path = args.output
+        if base_path.endswith('.json') or base_path.endswith('.txt'):
+            base_path = base_path.rsplit('.', 1)[0]
+
+        if args.format in ('json', 'both'):
+            export_to_json(dialogue, base_path + '.json')
+
+        if args.format in ('text', 'both'):
+            export_to_text(dialogue, base_path + '.txt',
+                          include_player_options=args.include_player_options)
+
+        # Summary
+        total_npc = sum(len(d.npc_lines) for d in dialogue.values())
+        total_player = sum(len(d.player_options) for d in dialogue.values())
 
         print(f"\nSummary:")
         print(f"  NPCs with dialogue: {len(dialogue)}")
-        print(f"  Total dialogue lines: {sum(len(d.entries) for d in dialogue.values())}")
+        print(f"  Total NPC dialogue lines: {total_npc}")
+        if args.include_player_options:
+            print(f"  Total player options: {total_player}")
 
         return 0
 
