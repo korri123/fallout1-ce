@@ -140,6 +140,10 @@ class ScriptsListParser:
         scriptname2.int
 
     One script per line, index is line number (0-based).
+
+    Note: Uses split('\\n') to match the game engine's db_fgets() behavior,
+    which reads lines terminated by \\n only. The file uses CRLF (\\r\\n) line
+    endings, so each line will have a trailing \\r which we strip.
     """
 
     @staticmethod
@@ -154,7 +158,8 @@ class ScriptsListParser:
             List of (index, script_name) tuples
         """
         scripts = []
-        lines = content.decode('ascii', errors='replace').splitlines()
+        # Use split('\n') to match game engine's db_fgets() behavior
+        lines = content.decode('ascii', errors='replace').split('\n')
 
         for index, line in enumerate(lines):
             line = line.strip()

@@ -22,7 +22,6 @@ import argparse
 import json
 import struct
 import sys
-from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set
@@ -37,11 +36,9 @@ from fallout_data import (
 
 
 # Dialogue opcodes from script.py
+# Only gsay_reply with two integer literal arguments is extracted
 DIALOGUE_OPCODES = {
     Opcode.GSAY_REPLY: ('gsay_reply', 2, 'npc'),      # gsay_reply(messageListId, msg)
-    Opcode.GSAY_MESSAGE: ('gsay_message', 3, 'npc'),  # gsay_message(messageListId, msg, reaction)
-    Opcode.GSAY_OPTION: ('gsay_option', 4, 'player'), # gsay_option(messageListId, msg, proc, reaction)
-    Opcode.GIQ_OPTION: ('giq_option', 5, 'player'),   # giq_option(iq, messageListId, msg, proc, reaction)
 }
 
 # Known NPC names for common scripts
@@ -170,16 +167,23 @@ class DialogueExtractor:
 
         Returns:
             Dict mapping script_name -> NPCDialogue
+
+        Note: Due to bugs in original game data, some scripts (e.g., SAUL.INT)
+        have embedded message_list_id values that don't match the current
+        scripts.lst. We use the script filename to determine the MSG file
+        rather than the embedded message_list_id.
         """
         dat_path = self._find_dat_file()
         if not dat_path:
             raise FileNotFoundError(f"Could not find MASTER.DAT in {self.game_path}")
 
         result: Dict[str, NPCDialogue] = {}
-        calls_by_target: Dict[int, List[DialogueCall]] = defaultdict(list)
 
         with DATArchive(str(dat_path)) as self.dat:
             self._load_script_list()
+
+            # Build reverse mapping: script_name -> index
+            name_to_index = {v: k for k, v in self._script_list.items()}
 
             # Find all script files
             all_files = self.dat.list_files()
@@ -189,24 +193,28 @@ class DialogueExtractor:
             print(f"Found {len(int_files)} script files")
             print(f"Loaded {len(self._script_list)} script name mappings")
 
+            scripts_with_dialogue = 0
+
             # Parse each script and find dialogue calls
+            # Group by script FILENAME, not by embedded message_list_id
             for script_path in sorted(int_files):
+                # Extract script name from path (e.g., SCRIPTS\SAUL.INT -> saul)
+                filename = script_path.split('\\')[-1]
+                script_name = filename.replace('.INT', '').lower()
+
                 calls = self._find_dialogue_calls_in_script(script_path)
-                for call in calls:
-                    calls_by_target[call.message_list_id].append(call)
+                if not calls:
+                    continue
 
-            print(f"Found dialogue calls targeting {len(calls_by_target)} different message lists")
-
-            # Resolve calls to actual dialogue text
-            for msg_list_id, calls in sorted(calls_by_target.items()):
-                script_index = msg_list_id - 1
-                script_name = self._script_list.get(script_index, f"unknown_{script_index}")
-
+                # Load messages from MSG file matching the script name
                 msg_dict = self._load_messages(script_name)
                 if not msg_dict:
                     continue
 
+                scripts_with_dialogue += 1
+
                 npc_name = self._lookup_npc_name(script_name)
+                script_index = name_to_index.get(script_name, -1)
 
                 # Collect unique message IDs by type
                 npc_msg_ids: Set[int] = set()
@@ -251,6 +259,8 @@ class DialogueExtractor:
                         npc_lines=npc_lines,
                         player_options=player_options,
                     )
+
+            print(f"Found {scripts_with_dialogue} scripts with dialogue calls")
 
         return result
 
@@ -328,9 +338,9 @@ class DialogueExtractor:
                 continue
 
             if opcode in DIALOGUE_OPCODES:
-                name, arg_count, call_type = DIALOGUE_OPCODES[opcode]
+                name, _arg_count, call_type = DIALOGUE_OPCODES[opcode]
                 call = self._try_extract_dialogue_call(
-                    data, offset, name, arg_count, call_type, script_path
+                    data, offset, name, call_type, script_path
                 )
                 if call:
                     calls.append(call)
@@ -353,28 +363,12 @@ class DialogueExtractor:
         PUSH_INT = 0xC001
         PUSH_SIZE = 6  # 2 byte opcode + 4 byte value
 
-        # Calculate where to look for arguments based on function signature
-        if name == 'gsay_reply':
-            # gsay_reply(messageListId, msg) - 2 args
-            msg_offset = opcode_offset - PUSH_SIZE
-            list_offset = opcode_offset - 2 * PUSH_SIZE
-        elif name == 'gsay_message':
-            # gsay_message(messageListId, msg, reaction) - 3 args
-            # reaction is at -6, msg at -12, listId at -18
-            msg_offset = opcode_offset - 2 * PUSH_SIZE
-            list_offset = opcode_offset - 3 * PUSH_SIZE
-        elif name == 'gsay_option':
-            # gsay_option(messageListId, msg, proc, reaction) - 4 args
-            # reaction at -6, proc at -12, msg at -18, listId at -24
-            msg_offset = opcode_offset - 3 * PUSH_SIZE
-            list_offset = opcode_offset - 4 * PUSH_SIZE
-        elif name == 'giq_option':
-            # giq_option(iq, messageListId, msg, proc, reaction) - 5 args
-            # reaction at -6, proc at -12, msg at -18, listId at -24, iq at -30
-            msg_offset = opcode_offset - 3 * PUSH_SIZE
-            list_offset = opcode_offset - 4 * PUSH_SIZE
-        else:
+        # gsay_reply(messageListId, msg) - 2 args
+        # Both must be integer literals (PUSH INT)
+        if name != 'gsay_reply':
             return None
+        msg_offset = opcode_offset - PUSH_SIZE
+        list_offset = opcode_offset - 2 * PUSH_SIZE
 
         # Validate offsets
         if list_offset < 0 or msg_offset < 0:
