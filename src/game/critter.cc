@@ -184,19 +184,19 @@ char* critter_name(Object* critter)
         return pc_name;
     }
 
-    if (critter->scriptIndex == -1) {
+    if (critter->messageListIndex == -1) {
         if (critter->sid != -1) {
             Script* script;
             if (scr_ptr(critter->sid, &script) != -1) {
-                critter->scriptIndex = script->scr_script_idx;
+                critter->messageListIndex = script->scr_script_idx;
             }
         }
     }
 
     char* name = NULL;
-    if (critter->scriptIndex != -1) {
+    if (critter->messageListIndex != -1) {
         MessageListItem messageListItem;
-        messageListItem.num = 101 + critter->scriptIndex;
+        messageListItem.num = 101 + critter->messageListIndex;
         if (message_search(&critter_scrmsg_file, &messageListItem)) {
             name = messageListItem.text;
         }

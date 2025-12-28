@@ -282,7 +282,7 @@ typedef struct Object {
     int outline; // obj_outline
     int sid; // obj_sid
     Object* owner;
-    int scriptIndex;
+    int messageListIndex;
 } Object;
 
 typedef struct ObjectListNode {
