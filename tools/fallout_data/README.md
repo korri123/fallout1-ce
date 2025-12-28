@@ -136,7 +136,7 @@ with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
     # Find objects with scripts
     scripted = [o for o in map_data.objects if o.has_script]
     for obj in scripted:
-        print(f"Scripted object: PID=0x{obj.pid:08X}, script_index={obj.script_index}")
+        print(f"Scripted object: PID=0x{obj.pid:08X}, script_id={obj.script_id_number}")
 ```
 
 #### MapObject Properties
@@ -162,7 +162,8 @@ obj.rotation         # Facing direction (0-5)
 # Script
 obj.has_script       # True if object has an attached script
 obj.sid              # Script ID (full)
-obj.script_index     # Script index in scripts.lst
+obj.script_id_number # Script index in scripts.lst (extracted from sid)
+obj.message_list_index  # Index for message list lookups
 
 # Type-specific data (depending on object type)
 obj.critter_data     # CritterData for critters (HP, combat data)

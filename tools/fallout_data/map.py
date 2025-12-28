@@ -255,7 +255,7 @@ class MapObject:
     light_distance: int = 0
     light_intensity: int = 0
     sid: int = -1  # Script ID
-    script_index: int = -1  # Message list index / script index
+    message_list_index: int = -1  # Index for message list lookups
 
     # Inventory (common to all types)
     inventory_length: int = 0
@@ -353,7 +353,7 @@ class MapHeader:
     entering_elevation: int = 0
     entering_rotation: int = 0
     local_variables_count: int = 0
-    script_index: int = -1
+    message_list_index: int = -1
     flags: int = 0
     darkness: int = 0
     global_variables_count: int = 0
@@ -362,7 +362,7 @@ class MapHeader:
 
     @property
     def has_map_script(self) -> bool:
-        return self.script_index >= 0
+        return self.message_list_index >= 0
 
 
 @dataclass
@@ -521,7 +521,7 @@ class MapParser:
         entering_elevation = reader.read_int32()
         entering_rotation = reader.read_int32()
         local_vars_count = reader.read_int32()
-        script_index = reader.read_int32()
+        message_list_index = reader.read_int32()
         flags = reader.read_int32()
         darkness = reader.read_int32()
         global_vars_count = reader.read_int32()
@@ -538,7 +538,7 @@ class MapParser:
             entering_elevation=entering_elevation,
             entering_rotation=entering_rotation,
             local_variables_count=local_vars_count,
-            script_index=script_index,
+            message_list_index=message_list_index,
             flags=flags,
             darkness=darkness,
             global_variables_count=global_vars_count,
@@ -792,7 +792,7 @@ class MapParser:
             obj.light_intensity = reader.read_int32()
             _field_74 = reader.read_int32()  # Unused field
             obj.sid = reader.read_int32()
-            obj.script_index = reader.read_int32()
+            obj.message_list_index = reader.read_int32()
 
             # Override elevation from the loop (file stores it but we use loop value)
             obj.elevation = elevation
@@ -911,18 +911,15 @@ class MapParser:
                 rotation=reader.read_int32()
             )
 
-    @classmethod
-    def parse_from_dat(cls, dat: 'DATArchive', path: str,
-                       proto_item_types: Optional[Dict[int, int]] = None,
-                       proto_scenery_types: Optional[Dict[int, int]] = None) -> Map:
+    def parse_from_dat(self, dat: 'DATArchive', path: str) -> Map:
         """
         Parse a map from a DAT archive.
 
+        Uses the proto types configured on this parser instance.
+
         Args:
             dat: Open DATArchive
-            path: Path to map file within archive (e.g., 'maps/junktown.map')
-            proto_item_types: Optional dict mapping item PID -> ItemType
-            proto_scenery_types: Optional dict mapping scenery PID -> SceneryType
+            path: Path to map file within archive (e.g., 'MAPS\\JUNKENT.MAP')
 
         Returns:
             Parsed Map object
@@ -934,8 +931,7 @@ class MapParser:
         if content is None:
             raise FileNotFoundError(f"Map not found in archive: {path}")
 
-        parser = cls(proto_item_types, proto_scenery_types)
-        return parser.parse(content)
+        return self.parse(content)
 
     @staticmethod
     def list_maps(dat: 'DATArchive') -> List[str]:
