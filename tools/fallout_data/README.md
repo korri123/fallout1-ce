@@ -100,6 +100,83 @@ with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
     print(f"aradesh index: {name_to_idx.get('aradesh')}")
 ```
 
+### MapParser
+
+Parse Fallout .MAP files to extract placed objects (NPCs, items, scenery).
+
+```python
+from fallout_data import DATArchive, MapParser, ObjectType
+
+with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
+    # Load prototype types first (required for accurate parsing)
+    item_types, scenery_types = MapParser.load_proto_types(dat)
+    parser = MapParser(proto_item_types=item_types, proto_scenery_types=scenery_types)
+
+    # Read and parse a map file
+    map_bytes = dat.read_file('MAPS\\JUNKENT.MAP')
+    map_data = parser.parse(map_bytes)
+
+    print(f"Map: {map_data.header.name}")
+    print(f"Entry tile: {map_data.header.entering_tile}")
+    print(f"Total objects: {len(map_data.objects)}")
+
+    # Get all critters (NPCs)
+    critters = [obj for obj in map_data.objects if obj.object_type_raw == ObjectType.CRITTER]
+    for critter in critters:
+        print(f"Critter PID=0x{critter.pid:08X} at tile {critter.tile}")
+        if critter.critter_data:
+            print(f"  HP: {critter.critter_data.hp}")
+            print(f"  Team: {critter.critter_data.combat.team}")
+
+    # Get objects by elevation
+    for obj in map_data.objects_by_elevation[0]:
+        if obj.object_type:
+            print(f"{obj.object_type.name}: tile={obj.tile}")
+
+    # Find objects with scripts
+    scripted = [o for o in map_data.objects if o.has_script]
+    for obj in scripted:
+        print(f"Scripted object: PID=0x{obj.pid:08X}, script_index={obj.script_index}")
+```
+
+#### MapObject Properties
+
+```python
+from fallout_data import MapParser, ObjectType
+
+# Each MapObject has these key properties:
+obj = map_data.objects[0]
+
+# Type information
+obj.object_type      # ObjectType enum or None if invalid
+obj.object_type_raw  # Raw type value (0-5 for valid types)
+obj.pid              # Prototype ID (full)
+obj.fid              # Frame/art ID
+
+# Position
+obj.tile             # Hex tile number
+obj.elevation        # Map elevation (0-2)
+obj.x, obj.y         # Pixel coordinates
+obj.rotation         # Facing direction (0-5)
+
+# Script
+obj.has_script       # True if object has an attached script
+obj.sid              # Script ID (full)
+obj.script_index     # Script index in scripts.lst
+
+# Type-specific data (depending on object type)
+obj.critter_data     # CritterData for critters (HP, combat data)
+obj.weapon_data      # WeaponData for weapons
+obj.ammo_data        # AmmoData for ammo
+obj.door_data        # DoorData for doors
+obj.stairs_data      # StairsData for stairs
+obj.exit_grid_data   # ExitGridData for map exits
+
+# Inventory (for containers and critters)
+obj.inventory_length # Number of inventory items
+obj.inventory        # List of InventoryItem
+```
+
 ### Script
 
 Parse and disassemble Fallout .INT script bytecode files.
@@ -274,11 +351,71 @@ for match in matches:
     print(f"{match['script']}: {match['procedure']}")
 ```
 
+## Complete Example: Extract All NPCs From All Maps
+
+```python
+from fallout_data import DATArchive, MapParser, ScriptsListParser
+
+def extract_all_npcs(dat_path: str) -> dict:
+    """Extract all NPCs (critters) from all maps."""
+    all_npcs = {}
+
+    with DATArchive(dat_path) as dat:
+        # Load script name mapping
+        scripts_data = dat.read_file('SCRIPTS\\SCRIPTS.LST')
+        script_names = ScriptsListParser.parse_to_dict(scripts_data) if scripts_data else {}
+
+        # Parse all maps
+        map_files = MapParser.list_maps(dat)
+
+        for map_path in map_files:
+            try:
+                map_data = MapParser.parse_from_dat(dat, map_path)
+                map_name = map_data.header.name or map_path.split('\\')[-1]
+
+                npcs = []
+                for critter in map_data.critters:
+                    script_name = None
+                    if critter.has_script:
+                        script_name = script_names.get(critter.script_id_number)
+
+                    npc_info = {
+                        'pid': critter.pid,
+                        'tile': critter.tile,
+                        'elevation': critter.elevation,
+                        'script_name': script_name,
+                    }
+
+                    if critter.critter_data:
+                        npc_info['hp'] = critter.critter_data.hp
+                        npc_info['team'] = critter.critter_data.combat.team
+
+                    npcs.append(npc_info)
+
+                if npcs:
+                    all_npcs[map_name] = npcs
+
+            except Exception as e:
+                continue  # Skip problematic maps
+
+    return all_npcs
+
+# Extract and display NPCs
+npcs = extract_all_npcs('/Applications/Fallout/MASTER.DAT')
+for map_name, critters in list(npcs.items())[:5]:
+    print(f"\n{map_name}: {len(critters)} NPCs")
+    for npc in critters[:3]:
+        script = npc.get('script_name', 'none')
+        print(f"  PID=0x{npc['pid']:08X}, script={script}, tile={npc['tile']}")
+```
+
 ## Command-Line Usage
 
-The script module can be run directly:
+The script and map modules can be run directly:
 
 ```bash
+# === Script Module ===
+
 # List all scripts in a DAT archive
 python -m fallout_data.script /path/to/MASTER.DAT --list
 
@@ -290,6 +427,26 @@ python -m fallout_data.script /path/to/MASTER.DAT scripts/aradesh.int -p talk_p_
 
 # Disassemble all procedures
 python -m fallout_data.script /path/to/MASTER.DAT scripts/aradesh.int --all
+
+# === Map Module ===
+
+# List all maps in a DAT archive
+python -m fallout_data.map /path/to/MASTER.DAT --list
+
+# Parse a map and show summary
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map
+
+# Show only critters (NPCs)
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --critters
+
+# Show only objects with scripts
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripted
+
+# Show detailed object info
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --critters --verbose
+
+# Filter by elevation
+python -m fallout_data.map /path/to/MASTER.DAT maps/vault13.map --elevation 1
 ```
 
 ## File Formats
@@ -308,6 +465,19 @@ python -m fallout_data.script /path/to/MASTER.DAT scripts/aradesh.int --all
 - Compiled bytecode for Fallout's VM
 - Stack-based virtual machine with 340+ opcodes
 - Contains procedures, identifiers, and static strings
+
+### MAP Files
+- Binary map format containing placed objects
+- Structure:
+  - Header (184 bytes): version, name, entry point, variable counts
+  - Tile data: floor/roof tiles per elevation (10000 tiles * 4 bytes each)
+  - Scripts section: script metadata
+  - Objects section: all placed objects by elevation
+- Object format (per object):
+  - 18 int32s: id, tile, position, fid, flags, pid, sid, etc.
+  - Type-specific data based on PID type (critter HP, door flags, etc.)
+  - Inventory items (recursive object data)
+- All integers are big-endian
 
 ### scripts.lst
 - Plain text index of script files

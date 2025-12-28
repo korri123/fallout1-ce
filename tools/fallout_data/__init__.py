@@ -42,6 +42,11 @@ from .script import (
     Opcode, ValueType, ProcedureFlags,
     Procedure, Instruction, Script, ScriptIterator
 )
+from .map import (
+    ObjectType, ItemType, SceneryType, ObjectFlags,
+    CombatData, CritterData, InventoryItem, MapObject, MapHeader, Map,
+    MapParser
+)
 
 __all__ = [
     # LZSS decompression
@@ -68,6 +73,19 @@ __all__ = [
     'Instruction',
     'Script',
     'ScriptIterator',
+
+    # Map parser
+    'ObjectType',
+    'ItemType',
+    'SceneryType',
+    'ObjectFlags',
+    'CombatData',
+    'CritterData',
+    'InventoryItem',
+    'MapObject',
+    'MapHeader',
+    'Map',
+    'MapParser',
 
     # Convenience functions
     'read_dat_file',
