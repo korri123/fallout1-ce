@@ -198,3 +198,4 @@ All code is in the `fallout` namespace (228 files).
 - Maintain compatibility with original game data files (master.dat, critter.dat)
 
 The game files can be found in `/Applications/Fallout/`, including MASTER.DAT
+The game .app is located in `/Applications/Fallout/Fallout Community Edition.app`
