@@ -31,8 +31,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from fallout_data import (
     DATArchive, MsgParser, ScriptsListParser, MessageEntry,
-    Opcode
+    Opcode, ProtoParser
 )
+import re
 
 
 # Dialogue opcodes from script.py
@@ -114,20 +115,62 @@ class DialogueLine:
     source_scripts: List[str] = field(default_factory=list)
 
 
+# Kill types from proto_types.h - indicates creature type for voice
+KILL_TYPES = {
+    0: 'Human (Male)',
+    1: 'Human (Female)',
+    2: 'Child',
+    3: 'Super Mutant',
+    4: 'Ghoul',
+    5: 'Brahmin',
+    6: 'Radscorpion',
+    7: 'Rat',
+    8: 'Floater',
+    9: 'Centaur',
+    10: 'Robot',
+    11: 'Dog',
+    12: 'Mantis',
+    13: 'Deathclaw',
+    14: 'Plant',
+}
+
+
 @dataclass
 class NPCDialogue:
     """All dialogue for an NPC."""
     script_name: str
     script_index: int
     npc_name: str = ""
+    gender: str = ""
+    description: str = ""
+    creature_type: str = ""  # From kill_type: Human, Super Mutant, Ghoul, Robot, etc.
+    age: int = 0  # Base age stat
+    appearance: str = ""  # "You see..." description
+    speaking_style: str = ""  # AI personality type
     npc_lines: List[DialogueLine] = field(default_factory=list)
     player_options: List[DialogueLine] = field(default_factory=list)
 
     def to_dict(self) -> dict:
+        # Get sample lines for voice characterization (first 3 unique lines)
+        sample_lines = []
+        for line in sorted(self.npc_lines, key=lambda x: x.message_id):
+            if len(sample_lines) < 3 and line.text:
+                sample_lines.append(line.text[:200])  # Truncate long lines
+
         return {
             'script_name': self.script_name,
             'script_index': self.script_index,
             'npc_name': self.npc_name,
+            # Voice generation fields
+            'voice_info': {
+                'gender': self.gender,
+                'creature_type': self.creature_type,
+                'age': self.age if self.age > 0 else None,
+                'appearance': self.appearance,
+                'speaking_style': self.speaking_style,
+                'sample_lines': sample_lines,
+            },
+            'description': self.description,
             'npc_line_count': len(self.npc_lines),
             'player_option_count': len(self.player_options),
             'npc_lines': [
@@ -157,6 +200,10 @@ class DialogueExtractor:
         self.dat: Optional[DATArchive] = None
         self._script_list: Dict[int, str] = {}  # script_index -> script_name
         self._msg_cache: Dict[str, Dict[int, MessageEntry]] = {}
+        # Proto data: name -> (proto, full_name, description, kill_type, age, ai_packet)
+        self._name_to_proto: Dict[str, tuple] = {}
+        # AI packet names: packet_num -> name
+        self._ai_packets: Dict[int, str] = {}
 
     def extract(self, include_player_options: bool = False) -> Dict[str, NPCDialogue]:
         """
@@ -181,6 +228,8 @@ class DialogueExtractor:
 
         with DATArchive(str(dat_path)) as self.dat:
             self._load_script_list()
+            self._load_ai_packets()
+            self._load_proto_data()
 
             # Build reverse mapping: script_name -> index
             name_to_index = {v: k for k, v in self._script_list.items()}
@@ -252,10 +301,19 @@ class DialogueExtractor:
                             ))
 
                 if npc_lines or player_options:
+                    # Look up voice-relevant info from proto data
+                    proto_info = self._lookup_proto_info(script_name, msg_dict)
+
                     result[script_name] = NPCDialogue(
                         script_name=script_name,
                         script_index=script_index,
                         npc_name=npc_name,
+                        gender=proto_info['gender'],
+                        description=proto_info['description'],
+                        creature_type=proto_info['creature_type'],
+                        age=proto_info['age'],
+                        appearance=proto_info['appearance'],
+                        speaking_style=proto_info['speaking_style'],
                         npc_lines=npc_lines,
                         player_options=player_options,
                     )
@@ -318,6 +376,164 @@ class DialogueExtractor:
             if name_lower.startswith(key) or key.startswith(name_lower):
                 return name
         return ""
+
+    def _load_ai_packets(self):
+        """Load AI packet names from AI.TXT."""
+        ai_content = self.dat.read_file('DATA\\AI.TXT')
+        if not ai_content:
+            return
+
+        text = ai_content.decode('utf-8', errors='replace')
+        current_name = None
+
+        for line in text.split('\n'):
+            line = line.strip()
+            if line.startswith('[') and line.endswith(']'):
+                current_name = line[1:-1]
+            elif line.startswith('packet_num=') and current_name:
+                try:
+                    packet_num = int(line.split('=')[1].split(';')[0].strip())
+                    self._ai_packets[packet_num] = current_name
+                except:
+                    pass
+
+    def _load_proto_data(self):
+        """Load all critter prototypes and build name-to-proto mapping."""
+        # Load ALL critter protos
+        critters_lst = self.dat.read_file('PROTO\\CRITTERS\\CRITTERS.LST')
+        if not critters_lst:
+            return
+
+        lines = critters_lst.decode('utf-8', errors='replace').strip().split('\n')
+
+        # Extended proto data: msg_id -> (proto, kill_type, age, ai_packet)
+        all_protos = {}
+        for line in lines:
+            pro_file = line.strip()
+            if not pro_file:
+                continue
+            content = self.dat.read_file(f'PROTO\\CRITTERS\\{pro_file}')
+            if not content or len(content) < 412:
+                continue
+
+            proto = ProtoParser.parse_critter(content)
+            if proto:
+                # Extract additional fields
+                # AI packet is at offset 36 in header
+                ai_packet = struct.unpack('>i', content[36:40])[0]
+                all_protos[proto.message_id] = (proto, proto.kill_type, proto.body_type, ai_packet)
+
+        # Load critter messages (name, description)
+        critter_messages = ProtoParser.load_critter_messages(self.dat, self.language)
+
+        # Build name -> proto mapping with extended data
+        for msg_id, (proto, kill_type, body_type, ai_packet) in all_protos.items():
+            name, desc = critter_messages.get(msg_id, ('', ''))
+            if name:
+                name_lower = name.lower()
+                # Store: (proto, full_name, description, kill_type, ai_packet)
+                self._name_to_proto[name_lower] = (proto, name, desc, kill_type, ai_packet)
+
+    def _extract_name_from_yousee(self, text: str) -> str:
+        """Extract NPC name from 'You see X.' message."""
+        if not text:
+            return ''
+        match = re.match(r"You see (?:a |an )?(.+?)[.]?$", text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        return ''
+
+    def _find_best_proto_match(self, extracted_name: str, script_name: str,
+                               min_name_len: int = 4) -> Optional[tuple]:
+        """Find best matching proto for extracted name or script name."""
+        if not extracted_name:
+            extracted_lower = ''
+        else:
+            extracted_lower = extracted_name.lower()
+
+        # First: exact match with extracted name
+        if extracted_lower and extracted_lower in self._name_to_proto:
+            return self._name_to_proto[extracted_lower]
+
+        # Second: script name exact match
+        if script_name and script_name in self._name_to_proto:
+            return self._name_to_proto[script_name]
+
+        # Third: extracted name starts with proto name (handles "Gizmo, the casino owner")
+        # Or proto name starts with extracted name (handles "Killian" -> "Killian Darkwater")
+        candidates = []
+        for proto_name in self._name_to_proto:
+            if len(proto_name) >= min_name_len:
+                # Check if extracted starts with proto name
+                if extracted_lower and (
+                    extracted_lower.startswith(proto_name + ' ') or
+                    extracted_lower.startswith(proto_name + ',') or
+                    extracted_lower == proto_name
+                ):
+                    candidates.append((len(proto_name), proto_name, 'extracted_starts'))
+                # Check if proto name starts with extracted (with word boundary)
+                elif len(extracted_lower) >= min_name_len and (
+                    proto_name.startswith(extracted_lower + ' ') or
+                    proto_name == extracted_lower
+                ):
+                    candidates.append((len(proto_name), proto_name, 'proto_starts'))
+
+        if candidates:
+            # Prefer exact matches, then longest
+            candidates.sort(key=lambda x: (x[2] == 'extracted_starts', x[0]), reverse=True)
+            return self._name_to_proto[candidates[0][1]]
+
+        # Fourth: proto name starts with script_name
+        if script_name:
+            for proto_name in self._name_to_proto:
+                if proto_name.startswith(script_name + ' ') or proto_name == script_name:
+                    return self._name_to_proto[proto_name]
+
+        return None
+
+    def _lookup_proto_info(self, script_name: str,
+                           msg_dict: Dict[int, MessageEntry]) -> dict:
+        """
+        Look up voice-relevant info from proto data.
+
+        Returns:
+            Dict with gender, description, creature_type, age, appearance, speaking_style
+        """
+        result = {
+            'gender': '',
+            'description': '',
+            'creature_type': '',
+            'age': 0,
+            'appearance': '',
+            'speaking_style': '',
+        }
+
+        # Get "You see..." text from message 100 for appearance
+        yousee_entry = msg_dict.get(100)
+        if yousee_entry:
+            result['appearance'] = yousee_entry.text
+
+        extracted_name = self._extract_name_from_yousee(
+            yousee_entry.text if yousee_entry else ''
+        )
+
+        # Try to find matching proto
+        match = self._find_best_proto_match(extracted_name, script_name)
+
+        if match:
+            proto, full_name, description, kill_type, ai_packet = match
+            result['gender'] = proto.gender_str
+            result['description'] = description
+            result['creature_type'] = KILL_TYPES.get(kill_type, '')
+            # Get age from proto base stats (index 33)
+            # The age is stored in the proto, accessible via proto object
+            # For now, use a reasonable default based on creature type
+            result['age'] = 25  # Default adult age
+            # Get AI personality name
+            if ai_packet in self._ai_packets:
+                result['speaking_style'] = self._ai_packets[ai_packet]
+
+        return result
 
     def _find_dialogue_calls_in_script(self, script_path: str) -> List[DialogueCall]:
         """Find all dialogue calls in a script file."""
@@ -453,6 +669,21 @@ def export_to_text(dialogue: Dict[str, NPCDialogue], output_path: str,
                 f.write(f"NPC: {npc.npc_name}\n")
             f.write(f"Script: {script_name}\n")
             f.write(f"Script Index: {npc.script_index}\n")
+
+            # Voice-relevant info
+            if npc.gender or npc.creature_type:
+                f.write(f"Voice Info:\n")
+                if npc.gender:
+                    f.write(f"  Gender: {npc.gender}\n")
+                if npc.creature_type:
+                    f.write(f"  Creature Type: {npc.creature_type}\n")
+                if npc.speaking_style:
+                    f.write(f"  Speaking Style: {npc.speaking_style}\n")
+                if npc.appearance:
+                    f.write(f"  Appearance: {npc.appearance}\n")
+
+            if npc.description:
+                f.write(f"Description: {npc.description}\n")
             f.write(f"NPC Lines: {len(npc.npc_lines)}\n")
             if include_player_options:
                 f.write(f"Player Options: {len(npc.player_options)}\n")
