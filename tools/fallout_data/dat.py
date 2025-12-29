@@ -253,6 +253,8 @@ class DATArchive:
                 self._decoder.update_ring_buffer(chunk_data)
             else:
                 # LZSS compressed chunk - header is compressed input byte count
+                # Reset decoder before each chunk (C++ resets ring buffer per chunk)
+                self._decoder.reset()
                 compressed_size = chunk_header
                 decompressed, _ = self._decoder.decode_stream(
                     self._file, compressed_size
