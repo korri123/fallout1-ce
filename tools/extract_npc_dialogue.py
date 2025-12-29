@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from fallout_data import (
     DATArchive, MsgParser, ScriptsListParser, MessageEntry,
-    Opcode, ProtoParser
+    Opcode, ProtoParser, MapParser
 )
 import re
 
@@ -144,7 +144,6 @@ class NPCDialogue:
     gender: str = ""
     description: str = ""
     creature_type: str = ""  # From kill_type: Human, Super Mutant, Ghoul, Robot, etc.
-    age: int = 0  # Base age stat
     appearance: str = ""  # "You see..." description
     speaking_style: str = ""  # AI personality type
     npc_lines: List[DialogueLine] = field(default_factory=list)
@@ -165,7 +164,6 @@ class NPCDialogue:
             'voice_info': {
                 'gender': self.gender,
                 'creature_type': self.creature_type,
-                'age': self.age if self.age > 0 else None,
                 'appearance': self.appearance,
                 'speaking_style': self.speaking_style,
                 'sample_lines': sample_lines,
@@ -177,7 +175,7 @@ class NPCDialogue:
                 {
                     'id': line.message_id,
                     'text': line.text,
-                    'audio': line.audio_file,
+                    **(({'audio': line.audio_file}) if line.audio_file else {}),
                 }
                 for line in sorted(self.npc_lines, key=lambda x: x.message_id)
             ],
@@ -202,8 +200,12 @@ class DialogueExtractor:
         self._msg_cache: Dict[str, Dict[int, MessageEntry]] = {}
         # Proto data: name -> (proto, full_name, description, kill_type, age, ai_packet)
         self._name_to_proto: Dict[str, tuple] = {}
+        # Proto data by PID: pid -> (proto, full_name, description, kill_type, ai_packet)
+        self._pid_to_proto: Dict[int, tuple] = {}
         # AI packet names: packet_num -> name
         self._ai_packets: Dict[int, str] = {}
+        # Script index -> list of critter PIDs from placed critters on maps
+        self._script_to_critter_pids: Dict[int, List[int]] = {}
 
     def extract(self, include_player_options: bool = False) -> Dict[str, NPCDialogue]:
         """
@@ -230,6 +232,7 @@ class DialogueExtractor:
             self._load_script_list()
             self._load_ai_packets()
             self._load_proto_data()
+            self._build_script_to_critter_pid_map()
 
             # Build reverse mapping: script_name -> index
             name_to_index = {v: k for k, v in self._script_list.items()}
@@ -302,7 +305,7 @@ class DialogueExtractor:
 
                 if npc_lines or player_options:
                     # Look up voice-relevant info from proto data
-                    proto_info = self._lookup_proto_info(script_name, msg_dict)
+                    proto_info = self._lookup_proto_info(script_name, script_index, msg_dict)
 
                     result[script_name] = NPCDialogue(
                         script_name=script_name,
@@ -311,7 +314,6 @@ class DialogueExtractor:
                         gender=proto_info['gender'],
                         description=proto_info['description'],
                         creature_type=proto_info['creature_type'],
-                        age=proto_info['age'],
                         appearance=proto_info['appearance'],
                         speaking_style=proto_info['speaking_style'],
                         npc_lines=npc_lines,
@@ -427,12 +429,57 @@ class DialogueExtractor:
         critter_messages = ProtoParser.load_critter_messages(self.dat, self.language)
 
         # Build name -> proto mapping with extended data
+        # Also build pid -> proto mapping for direct PID lookup
         for msg_id, (proto, kill_type, body_type, ai_packet) in all_protos.items():
             name, desc = critter_messages.get(msg_id, ('', ''))
+            # Store by PID for direct lookup from placed critters
+            self._pid_to_proto[proto.pid] = (proto, name, desc, kill_type, ai_packet)
             if name:
                 name_lower = name.lower()
                 # Store: (proto, full_name, description, kill_type, ai_packet)
                 self._name_to_proto[name_lower] = (proto, name, desc, kill_type, ai_packet)
+
+    def _build_script_to_critter_pid_map(self):
+        """
+        Parse all maps to build a mapping from script index to critter PIDs.
+
+        This allows us to get accurate proto data for placed critters that use
+        generic templates (e.g., "Man in Leather Armor") by looking up the
+        actual PID of the placed critter rather than trying to match by name.
+        """
+        print("Scanning maps for placed critters...")
+
+        # Load proto types for complete map parsing
+        item_types, scenery_types = MapParser.load_proto_types(self.dat)
+        parser = MapParser(proto_item_types=item_types, proto_scenery_types=scenery_types)
+
+        # Get all map files
+        map_files = MapParser.list_maps(self.dat)
+        maps_parsed = 0
+        critters_found = 0
+
+        for map_path in map_files:
+            try:
+                map_data = parser.parse_from_dat(self.dat, map_path)
+
+                # Find all critters and their scripts
+                for critter in map_data.critters:
+                    # Find the script for this critter
+                    script = map_data.get_script_for_object(critter)
+                    if script and script.scr_script_idx >= 0:
+                        script_idx = script.scr_script_idx
+                        if script_idx not in self._script_to_critter_pids:
+                            self._script_to_critter_pids[script_idx] = []
+                        # Store the critter's PID
+                        if critter.pid not in self._script_to_critter_pids[script_idx]:
+                            self._script_to_critter_pids[script_idx].append(critter.pid)
+                            critters_found += 1
+
+                maps_parsed += 1
+            except Exception:
+                continue  # Skip problematic maps
+
+        print(f"Parsed {maps_parsed} maps, found {critters_found} script-to-critter mappings")
 
     def _extract_name_from_yousee(self, text: str) -> str:
         """Extract NPC name from 'You see X.' message."""
@@ -491,19 +538,26 @@ class DialogueExtractor:
 
         return None
 
-    def _lookup_proto_info(self, script_name: str,
+    def _lookup_proto_info(self, script_name: str, script_index: int,
                            msg_dict: Dict[int, MessageEntry]) -> dict:
         """
         Look up voice-relevant info from proto data.
 
+        First checks for placed critters using this script (from map parsing),
+        then falls back to name-based matching for NPCs using generic templates.
+
+        Args:
+            script_name: Name of the script (e.g., 'saul')
+            script_index: Index of the script in scripts.lst
+            msg_dict: Message dictionary for this script's MSG file
+
         Returns:
-            Dict with gender, description, creature_type, age, appearance, speaking_style
+            Dict with gender, description, creature_type, appearance, speaking_style
         """
         result = {
             'gender': '',
             'description': '',
             'creature_type': '',
-            'age': 0,
             'appearance': '',
             'speaking_style': '',
         }
@@ -513,22 +567,39 @@ class DialogueExtractor:
         if yousee_entry:
             result['appearance'] = yousee_entry.text
 
-        extracted_name = self._extract_name_from_yousee(
-            yousee_entry.text if yousee_entry else ''
-        )
+        match = None
 
-        # Try to find matching proto
-        match = self._find_best_proto_match(extracted_name, script_name)
+        # First: Try to find proto via placed critter PID from map data
+        # This is the most accurate method for NPCs using generic templates
+        if script_index >= 0 and script_index in self._script_to_critter_pids:
+            critter_pids = self._script_to_critter_pids[script_index]
+            if critter_pids:
+                # Use the first placed critter's PID
+                pid = critter_pids[0]
+                if pid in self._pid_to_proto:
+                    match = self._pid_to_proto[pid]
+
+        # Fallback: Try name-based matching
+        if not match:
+            extracted_name = self._extract_name_from_yousee(
+                yousee_entry.text if yousee_entry else ''
+            )
+            match = self._find_best_proto_match(extracted_name, script_name)
 
         if match:
             proto, full_name, description, kill_type, ai_packet = match
             result['gender'] = proto.gender_str
             result['description'] = description
-            result['creature_type'] = KILL_TYPES.get(kill_type, '')
-            # Get age from proto base stats (index 33)
-            # The age is stored in the proto, accessible via proto object
-            # For now, use a reasonable default based on creature type
-            result['age'] = 25  # Default adult age
+
+            # For creature_type, use kill_type but correct for humans
+            # The original data has some inconsistencies where female characters
+            # have kill_type=0 (Human Male) despite being female
+            if kill_type in (0, 1):  # Human Male or Human Female kill types
+                # Use the actual gender from proto for humans
+                result['creature_type'] = f'Human ({proto.gender_str})'
+            else:
+                result['creature_type'] = KILL_TYPES.get(kill_type, '')
+
             # Get AI personality name
             if ai_packet in self._ai_packets:
                 result['speaking_style'] = self._ai_packets[ai_packet]
@@ -623,6 +694,32 @@ class DialogueExtractor:
             message_id=message_id,
             call_type=call_type,
         )
+
+
+def filter_unvoiced(dialogue: Dict[str, NPCDialogue]) -> Dict[str, NPCDialogue]:
+    """Filter dialogue to only include lines without existing audio files."""
+    filtered = {}
+    for script_name, npc in dialogue.items():
+        # Filter NPC lines - keep only those without audio
+        unvoiced_npc_lines = [line for line in npc.npc_lines if not line.audio_file]
+        # Filter player options - keep only those without audio
+        unvoiced_player_options = [line for line in npc.player_options if not line.audio_file]
+
+        # Only include NPC if it has any unvoiced lines
+        if unvoiced_npc_lines or unvoiced_player_options:
+            filtered[script_name] = NPCDialogue(
+                script_name=npc.script_name,
+                script_index=npc.script_index,
+                npc_name=npc.npc_name,
+                gender=npc.gender,
+                description=npc.description,
+                creature_type=npc.creature_type,
+                appearance=npc.appearance,
+                speaking_style=npc.speaking_style,
+                npc_lines=unvoiced_npc_lines,
+                player_options=unvoiced_player_options,
+            )
+    return filtered
 
 
 def export_to_json(dialogue: Dict[str, NPCDialogue], output_path: str):
@@ -721,6 +818,7 @@ Examples:
   %(prog)s /path/to/fallout1 --output npc_dialogue.json
   %(prog)s /path/to/fallout1 --format text --output npc_dialogue.txt
   %(prog)s /path/to/fallout1 --include-player-options
+  %(prog)s /path/to/fallout1 --unvoiced-only  # Only lines needing voice generation
         """
     )
 
@@ -754,6 +852,12 @@ Examples:
         help='Include player dialogue options in addition to NPC replies'
     )
 
+    parser.add_argument(
+        '--unvoiced-only',
+        action='store_true',
+        help='Only include dialogue lines without existing audio files'
+    )
+
     args = parser.parse_args()
 
     try:
@@ -765,6 +869,15 @@ Examples:
         if not dialogue:
             print("No dialogue found!")
             return 1
+
+        # Apply unvoiced filter if requested
+        if args.unvoiced_only:
+            original_count = len(dialogue)
+            original_lines = sum(len(d.npc_lines) for d in dialogue.values())
+            dialogue = filter_unvoiced(dialogue)
+            filtered_lines = sum(len(d.npc_lines) for d in dialogue.values())
+            print(f"Filtered to unvoiced only: {len(dialogue)}/{original_count} NPCs, "
+                  f"{filtered_lines}/{original_lines} lines")
 
         # Determine output paths
         base_path = args.output
