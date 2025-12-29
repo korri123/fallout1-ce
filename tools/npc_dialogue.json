@@ -14,7 +14,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see Abel.",
-        "speaking_style": "Super Mutant",
+        "faction": "Super Mutant",
         "sample_lines": [
           "You are not supposed to be here.",
           "Oh, yeah? Your momma!",
@@ -56,7 +56,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see an aged woman.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "It is a terrible thing when our youth are threatened. The loss of Tandi would be a terrible thing.",
           "Aradesh loves his daughter very much. It is that love that makes him the man that he is and a pillar of this community. Without that love he would be lost, and Shady Sands would surely follow . . .",
@@ -110,7 +110,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see a super mutant. He is guarding the airlock door.",
-        "speaking_style": "Nightkin",
+        "faction": "Nightkin",
         "sample_lines": [
           "Normals cannot carry weapons here! Halt and identify yourself!",
           "Halt! What is your business here, 'child'.",
@@ -160,7 +160,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see: Alex, the night watch Regulator.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Halt! Who goes there?",
           "No strangers are allowed within the walls of Adytum, by order of the mayor.",
@@ -194,7 +194,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Mitch of the All-N-One store.",
-        "speaking_style": "Guard Gung-Ho",
+        "faction": "Guard Gung-Ho",
         "sample_lines": [
           "How may I help you today?"
         ]
@@ -218,7 +218,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Alya, a desert raider.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "I am Alya of the Khans. How might I help you today?",
           "We do not attack those of Shady Sands. We are from the same place they are. It is only right that they share with us!",
@@ -256,7 +256,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Amber, a teacher for the Followers.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Welcome noble traveler. Have you come here to study?",
           "I am skilled in many of the languages and arts. Perhaps you would like to learn one of those?",
@@ -302,7 +302,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Andrew, the jail guard.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Can I help you?",
           "I'm Andrew. My job is to guard the jail.",
@@ -340,7 +340,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Kalnor, a Junktown guard.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "You'd better put that away. Junktown is a friendly place, friend, and we want to keep it that way.",
           "Your weapon, idiot. Killian won't take your arms away, but you'd better damn well keep them in your holster.",
@@ -402,7 +402,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Ton.",
-        "speaking_style": "Children True",
+        "faction": "Children True",
         "sample_lines": [
           "Why would I want to talk with someone who goes around killing kids? Get out of my face!",
           "I hear you're pretty tough. But tough don't impress Ton. You got something to say or you wanna get it on? Let's do it!",
@@ -640,7 +640,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Jade.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "These are sleeping quarters. Now get out of here before I kick your butt."
         ]
@@ -664,7 +664,7 @@
         "gender": "Male",
         "creature_type": "Child",
         "appearance": "You see Billy.",
-        "speaking_style": "Little Kids",
+        "faction": "Little Kids",
         "sample_lines": [
           "Hi there.",
           "Why would you want a brahmin? Do you have a caravan? Well, it doesn't matter. I only take care of them. Dan is the one that owns them; he won't sell them though.",
@@ -726,7 +726,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Bob, proprietor of Bob's Iguana Bits.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "Ok, Ok, I've got your money.",
           "I'm sorry.  I ain't payin' no more.  Do what you want with me.",
@@ -836,7 +836,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see the Brotherhood's Doctor.",
-        "speaking_style": "Brotherhood Scribe",
+        "faction": "Brotherhood Scribe",
         "sample_lines": [
           "Hello, how can I help you?",
           "But of course, but it's very costly and time consuming.",
@@ -906,7 +906,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a stern, young initiate with a book.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Good day. How may I be of assistance?",
           "Master Scribe Vree is on level three, in the computer lab.",
@@ -972,7 +972,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a Bulletin Board.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "NEED WORK?  The Far Go Traders are currently filling the following positions:",
           "1. Caravan Guards.  Must be in good physical condition and dependable.",
@@ -1006,7 +1006,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a very beautiful young woman.",
-        "speaking_style": "Sellbabies",
+        "faction": "Sellbabies",
         "sample_lines": [
           "C D E D B D Ducks",
           "O S M R                                                                   C D E D B D Wings"
@@ -1035,7 +1035,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a man, he quickly stares intensely into your eyes and then away.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Jumpy, I'm not jumpy.  Just careful.  They all say I'm paranoid, but I'm the one that's gonna be here when they come to get us.",
           "Well they are...You know don't you...The disease was just the start.  Now they're going to come and take as all.  But you are just like all the rest.  You won't believe me, and you'll be doomed.  You ",
@@ -1069,7 +1069,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see an intense young man.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Thank you for helping us clean out the Regulators from Adytum.  Here are is what we can spare to help you further on your travels."
         ]
@@ -1093,7 +1093,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a teenager.",
-        "speaking_style": "Loser",
+        "faction": "Loser",
         "sample_lines": [
           "You! You did it! When I grow up I'm gonna get you! I'm gonna hunt you down and kill you! You killed them all! Aaaaaalllll! [Uncontrolled sobbing].",
           "I heard about you. You run around the Wastes killing kids! Help! Nightkin!",
@@ -1183,7 +1183,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "This is Caleb, leader of the Regulators.",
-        "speaking_style": "Regulators",
+        "faction": "Regulators",
         "sample_lines": [
           "Nice enough town. Me an' the Regulators work hard to keep it that way. Anyone in particular you want to know about?",
           "You'll find him in the big building to the southwest. He might be able to put enough sentences together to let you know that we're looking for some help with the Blades.",
@@ -1217,7 +1217,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see the caravan leader.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I don't know if you'll understand this, but we leave in two hours or whenever you're ready.",
           "We usually leave two hours after arrival.  There's nothing here we haven't seen before, though, so if you want to leave earlier we're ready whenever you are.",
@@ -1263,7 +1263,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a shopkeeper.",
-        "speaking_style": "Children True",
+        "faction": "Children True",
         "sample_lines": [
           "The Holy Flame does not appreciate thieves and scoundrels in his house of worship.  You will be punished!",
           "I'm sorry the shop is closed.",
@@ -1325,7 +1325,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a clerk from the Crimson Caravans.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hello. Are you looking for a job?",
           "Great. We have space for another guard. Are you interested?",
@@ -1359,7 +1359,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a Chanter of the Children.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hello, friend! The Master's vision has made me truly alive for the first time. May I share my wonderful story with you?"
         ]
@@ -1383,7 +1383,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see before you a gruff guard.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Who goes there?",
           "Meme? Well, get out of here! This is the property of the Children of the Cathedral.",
@@ -1473,7 +1473,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see before you an alert scout.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Who goes there?",
           "Meme? Well, get out of here! This is the property of the Children of the Cathedral.",
@@ -1563,7 +1563,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a Child with a real attitude.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What in the Hell do you want?",
           "In Hell, loser.",
@@ -1609,7 +1609,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see before you a Nightkin.",
-        "speaking_style": "Nightkin",
+        "faction": "Nightkin",
         "sample_lines": [
           "Leave me or die!",
           "It is unwise to play games with the Nightkin. Get out of here!",
@@ -1659,7 +1659,7 @@
         "gender": "Male",
         "creature_type": "Child",
         "appearance": "You see a small child.",
-        "speaking_style": "Little Kids",
+        "faction": "Little Kids",
         "sample_lines": [
           "Hi!",
           "Hey, are you gonna kill someone?"
@@ -1688,7 +1688,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a devout Children of the Cathedral Member.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "We offer healing of the body to heal the spirit. Can I help you?",
           "The Children do not haggle. Now, will you accept our price?",
@@ -1738,7 +1738,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a Children of the Cathedral technician.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "You have no right to be here. What do you want?",
           "This is the birthplace of the superior race! This is the womb from which the armies of god will strike from! From the flesh of the weak comes the next race of man. Those who survive the dip will becom",
@@ -1780,7 +1780,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a dark-skinned man adorned with bright scarves and trinkets.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hello, stranger. May I be of service?",
           "And what do you think of our town?",
@@ -1898,7 +1898,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Cindy.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Oh . . . you don't understand me. I guess we really don't have much hope after all. Excuse me while I cry.",
           "I am afraid of what is happening. Someone has been stealing water and now everyone is on edge.",
@@ -1944,7 +1944,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a citizen of Shady Sands.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Welcome to Shady Sands, stranger!"
         ]
@@ -1968,7 +1968,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Cleo.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What do you want?",
           "Hey! What's happening?",
@@ -2034,7 +2034,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a busy cook preparing a meal.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I'm too busy to talk right now. I've got to get this meal ready!"
         ]
@@ -2058,7 +2058,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Doc Morbid's assistant, Cougar.",
-        "speaking_style": "Rippers",
+        "faction": "Rippers",
         "sample_lines": [
           "How's it going?",
           "The Cougar is always fine."
@@ -2087,7 +2087,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "[You are in your room. Do you want to rest here until tomorrow morning?]",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "[You are in your room. Do you want to rest here until tomorrow morning?]"
         ]
@@ -2111,7 +2111,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a weather-beaten farmer.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Good day.",
           "Hello again.",
@@ -2161,7 +2161,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Dan.",
-        "speaking_style": "Hub Peasants",
+        "faction": "Hub Peasants",
         "sample_lines": [
           "Why hello there, m'friend and welcome to the Hub. Let me introduce m'self, they call me 'Dan The Brahmin Man!' I wheel and deal with all the merchants around here, offer'n my humble services for a low",
           "Why, I manage the care for perddy much all of the Caravan's wagons and Brahmin in these parts. If they ever need anything for their caravans, I'm the one they talk to. Hell, the Big Three deal with me",
@@ -2263,7 +2263,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a big, strong, burly man.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Didn't we just meet? Have you come to kill me?",
           "I know fathers aren't supposed to hug their sons, but I love you, dad!",
@@ -2537,7 +2537,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Darrel.",
-        "speaking_style": "Brotherhood Paladin",
+        "faction": "Brotherhood Paladin",
         "sample_lines": [
           "Greetings, and welcome to the Brotherhood of Steel.",
           "[Laughs at you] Friend, I don't think you have a chance of getting in here. The Elders have a minimum IQ requirement for new Initiates.",
@@ -2683,7 +2683,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see a dying mutant.",
-        "speaking_style": "Super Mutant, Normal",
+        "faction": "Super Mutant, Normal",
         "sample_lines": [
           "It was so fast... My brothers were gone... Could not help...",
           "I, I'm... I can't remember... Was the leader of... It... Maybe my holodisk... [The mutant weakly hands you a bloody Holodisk]",
@@ -2717,7 +2717,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a Hubbian.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "I can't believe I'm alive and I CAN'T believe you took them all out! Wait, what am I saying?  I'm alive, aren't I? I'll believe anything you tell me right now.",
           "Okay.  (He gives you 20 hub bucks.)  Can I go now?",
@@ -2759,7 +2759,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Hi! Welcome to my previously owned car lot. Which one of these beauties interests you today?",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hi! Welcome to my previously owned car lot. Which one of these beauties interests you today?",
           "But, sir, these are fine examples of motor vehicles.",
@@ -2813,7 +2813,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Demetre.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "That's just what we're lookin' for! You like the thrill and excitement of battle don't you?!  Bullets flying everywhere, whippin' by your head, blowin' your enemy in two, seein' the fear in their eyes",
           "We pay 600 hub bucks a job! That's each way! Hell, people say we take all the dangerous routes but I say they're the most excitin'! You need a little excitement in your life, am I right? Of course I a",
@@ -2915,7 +2915,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a peasant.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "It won't let us back into our house, that's why.",
           "It was the 'pet' of a traveler. When the traveler died, this damn dog just plopped its furry ass down on my doorstep and wouldn't leave. It's been there for days.",
@@ -2953,7 +2953,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Diana, a desert raider.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "I am Diana. How might I help you today?",
           "If she is one of those women from Shady Sands, maybe you should look there. I just work here.",
@@ -2995,7 +2995,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "[More]",
-        "speaking_style": "Children True",
+        "faction": "Children True",
         "sample_lines": [
           "What do you want?! Will you assholes never learn? I'm tired of using my talents on losers. Shoot straight next time! Don't let them shoot you.",
           "Incompetent son of a bitch! You need healing AGAIN! I hope they kill you next time!",
@@ -3137,7 +3137,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Snake.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Great job on hacking those Rippers. What can I do for you?",
           "Sure thing. But it will take most of the day for a little improvement. You still want that?",
@@ -3171,7 +3171,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Dragon.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What are ya doing roaming around out here?",
           "Your looking's cost you dearly. What's the story? Tell me the truth, and you may live.",
@@ -3209,7 +3209,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a wandering merchant of Asian descent.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Well hello, wanderer. My name's Duc, and I'm headed into Shady Sands to do some trading. Perhaps I can interest you in some goods?",
           "Let me show you.",
@@ -3255,7 +3255,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Dugan, craver of Nuka-Cola.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Yes?",
           "I pontificate on life a lot, and help the Blades understand the true meaning of Nuka-Cola.",
@@ -3297,7 +3297,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see the Elder.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "I am pleased to meet you. I hope you have found this little village pleasing so far.",
           "Excellent. I have a favor to ask of you. I promise that you will be well-rewarded for your services to this community.",
@@ -3343,7 +3343,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see the Bar Tender.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Yeah, whadda ya want?",
           "That'll be two caps.",
@@ -3381,7 +3381,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Paladin Farli.",
-        "speaking_style": "Brotherhood Paladin",
+        "faction": "Brotherhood Paladin",
         "sample_lines": [
           "Greetings.",
           "Katja chu nee ka Chak'ra Farli."
@@ -3410,7 +3410,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see the Fargo Traders Caravan Driver.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "So you signed up.  Good to hear it.  So ya know, we leave just about every ten days. That's the 8th, 18th, and 28th of each month.  Right now we're making runs to The Brotherhood, Junktown and the LA ",
           "I'll still give you a job, even though... never mind.  Are you interested?",
@@ -3456,7 +3456,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Fire.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Whatcha want, loser?",
           "Great. Another stupid one. You have the sound of a Ripper.",
@@ -3506,7 +3506,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a weary fisherman.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Howdy sir. I don't often see strangers in this spot. Is there something I can do for you?",
           "Howdy ma'am. I don't often see strangers in this spot. Is there something I can do for you?",
@@ -3620,7 +3620,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a lean and unkempt boy.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hi. Wha'cha want?",
           "Hi. Aren't you that person who goes around helping people? You must got lots of interesting stories to tell!",
@@ -3698,7 +3698,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Watch yourself around the Doc, and I won't have to get medieval on your face.",
-        "speaking_style": "Rippers",
+        "faction": "Rippers",
         "sample_lines": [
           "We're closed. Come back later.",
           "What do you want now?",
@@ -3744,7 +3744,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see Flip.",
-        "speaking_style": "Super Mutant, Sgt.",
+        "faction": "Super Mutant, Sgt.",
         "sample_lines": [
           "So, a human. This is very interesting. You will come with me to the Lieutenant, or you will perish right here.",
           "Excellent. Come with me if you want to live."
@@ -3773,7 +3773,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Savil of the Follower's Guards.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Who travels the halls of the Followers?",
           "OK. I can see that you are a little slow. Who you?",
@@ -3859,7 +3859,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Jerry of the Follower's Scouts.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Who travels the halls of the Followers?",
           "OK. I can see that you are a little slow. Who you?",
@@ -3945,7 +3945,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Sister Francis.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Hi. I'm meditating. Did you notice? Can I help you?",
           "Hello, brother. Can I help you?",
@@ -3987,7 +3987,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Deputy Fry.",
-        "speaking_style": "Hub Police",
+        "faction": "Hub Police",
         "sample_lines": [
           "I’ve been hoping to run into you, child killer. I hope your stay isn’t long. I’ll be playing close attention to you while you’re here. Keep your nose clean in my city, I’m just dying for an excuse to ",
           "Hello friend, Deputy Tony Fry at your service.",
@@ -4081,7 +4081,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a large well armed man.",
-        "speaking_style": "Gunrunner Leader",
+        "faction": "Gunrunner Leader",
         "sample_lines": [
           "It's not often that we get visitors, how can I help you?",
           "This place isn't very accessible with a nest of those damn Deathclaws right outside our factory.",
@@ -4223,7 +4223,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a seedy-looking Mexican man with slick hair.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Oye, muchacho, allow me to introduce myself. I am Hernandez, a man of mucho gusto! You look like you are new here. Please, allow me to be your informant to the casino.",
           "Perhaps you can spare a few caps? I guarantee success.",
@@ -4273,7 +4273,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see a ghoul gang member.",
-        "speaking_style": "Ghoul, Brave",
+        "faction": "Ghoul, Brave",
         "sample_lines": [
           "What are you doing here? Answer wisely - this could be your only chance . . .",
           "Set ain't here, so git.",
@@ -4331,7 +4331,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see before you, Garl, leader of the Raiders.",
-        "speaking_style": "Raider Leader",
+        "faction": "Raider Leader",
         "sample_lines": [
           "I killed you!",
           "I killed you!",
@@ -4429,7 +4429,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see Garret.",
-        "speaking_style": "Ghoul Nasty",
+        "faction": "Ghoul Nasty",
         "sample_lines": [
           "You shouldn't be here during the day. It makes Set unhappy. Come back at night",
           "You had better leave now."
@@ -4458,7 +4458,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a chanter from the Children",
-        "speaking_style": "Brainwashed Children",
+        "faction": "Brainwashed Children",
         "sample_lines": [
           "Hello friend! Will you sing a song of Praise with me? . . . Once I was wandering blind, In a land that was so unkind . . .",
           "He finds you when and where you least expect it! Praise the Master! Praise the Holy Flame! Praise the world!",
@@ -4504,7 +4504,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "Hello! What can I do for you?",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hello! What can I do for you?"
         ]
@@ -4528,7 +4528,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "Stop!",
-        "speaking_style": "Super Mutant, Sgt.",
+        "faction": "Super Mutant, Sgt.",
         "sample_lines": [
           "You are not supposed to be armed in this area, little brother. Explain yourself.",
           "You are not supposed to be armed in this area, little sister. Explain yourself.",
@@ -4582,7 +4582,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "Die, you dog!",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hold, initiate! What do you have to report?",
           "Hold! I recognize you -- you've visited the Brotherhood. Some may trust you, but I do not. State your business!",
@@ -4632,7 +4632,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "The Raider is too frightened of Garl to speak to you anymore.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What do you want?",
           "Nah. I ain't seen her. Why are you asking?",
@@ -4666,7 +4666,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "The Raider is too frightened of Garl to speak to you anymore.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What do you want?",
           "Nah. I ain't seen her. Why are you asking?",
@@ -4700,7 +4700,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "Stop!",
-        "speaking_style": "Nightkin",
+        "faction": "Nightkin",
         "sample_lines": [
           "You are not supposed to be armed in this area, little brother. Explain yourself.",
           "You are not supposed to be armed in this area, little sister. Explain yourself.",
@@ -4754,7 +4754,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "Command, this is Guardhouse. All clear. Out.",
-        "speaking_style": "Super Mutant, Normal",
+        "faction": "Super Mutant, Normal",
         "sample_lines": [
           "Good. Come with me, no laugh-type stuff."
         ]
@@ -4778,7 +4778,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see a ghoul guard.",
-        "speaking_style": "Ghoul, Brave",
+        "faction": "Ghoul, Brave",
         "sample_lines": [
           "Go away! You're not wanted here.",
           "The door is locked. You'll have to come back later when it's dark.",
@@ -4816,7 +4816,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see a ghoul guard.",
-        "speaking_style": "Ghoul, Normal",
+        "faction": "Ghoul, Normal",
         "sample_lines": [
           "You shouldn't be here . . .",
           "That doesn't sound right. You'd better come along with me.",
@@ -4854,7 +4854,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see the Ghoul Manager.",
-        "speaking_style": "Ghoul, Coward",
+        "faction": "Ghoul, Coward",
         "sample_lines": [
           "Whatta you doing here?",
           "Whad' you say?",
@@ -4888,7 +4888,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see a ghoul refugee.",
-        "speaking_style": "Ghoul, Coward",
+        "faction": "Ghoul, Coward",
         "sample_lines": [
           "Please don't kill me.",
           "Ah, oh. OK.",
@@ -4970,7 +4970,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Gideon, a normal looking human. He is wearing a crown.",
-        "speaking_style": "Careful",
+        "faction": "Careful",
         "sample_lines": [
           "Jason is a living god! Only the nullified may pass!",
           "The walls also have minds . . . I saw you . . . tomorrow?",
@@ -5028,7 +5028,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Hey!",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What?",
           "I'm on duty. Make it quick."
@@ -5057,7 +5057,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "System:                                                         Primary Power:                  OFF-LINE                           Secondary Power:               ON-LINE",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "System:                                                         Primary Power:                  OFF-LINE                           Secondary Power:               ON-LINE",
           "Power Systems Management",
@@ -5139,7 +5139,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a rotund midget.",
-        "speaking_style": "Bouncer",
+        "faction": "Bouncer",
         "sample_lines": [
           "What you down here for?",
           "I know you . . . right?",
@@ -5197,7 +5197,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Gunther.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Welcome to my humble house.  What can I do for you?",
           "Sure, what else would you like to know?",
@@ -5259,7 +5259,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Sorry, no boxing today.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Sorry, no boxing today.",
           "Try again tomorrow. Saul will be boxing then.",
@@ -5333,7 +5333,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Gwen, a desert bandit.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "I am Gwen. I'm one of Garl's advisors. Who are you?",
           "As an advisor, I make sure that no low-lifes cause any trouble for Garl.",
@@ -5367,7 +5367,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Beth, owner of the Weapon Shop.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hi there.  How can I help you?",
           "Well, I'm not one to gossip, but I heard that Decker's death is somehow related to the assassination hit on Jain.",
@@ -5621,7 +5621,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a guard for the Children.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What do you want?",
           "I'm a hired hand. If anyone bothers these space cadets, I kill em. You got a problem with that?",
@@ -5671,7 +5671,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Heather of the Follower's Scouts.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What are you doing here?",
           "Really? And what might you be looking for?",
@@ -5765,7 +5765,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see an Elder of the Brotherhood.",
-        "speaking_style": "BoS Elders",
+        "faction": "BoS Elders",
         "sample_lines": [
           "Greetings Initiate. I need to speak with you. (He motions for you to come closer.)",
           "Good. First go talk to Maxson if you haven't already. Report back to me when you've checked the northern territory. After that, we'll decide what to do with Maxson.",
@@ -5851,7 +5851,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Daren Hightower.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "Who are you?!?  And who let you in?",
           "I have no friends.  What is your message?",
@@ -5889,7 +5889,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see George, the door guard.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Can I help you?",
           "Mr. Hightower doesn't see just anyone."
@@ -5918,7 +5918,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Leon, a guard.",
-        "speaking_style": "Stranger",
+        "faction": "Stranger",
         "sample_lines": [
           "What is your business here?",
           "Ok.  But I'm watching you.  He's in his office.",
@@ -5976,7 +5976,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Rick, a guard.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Whadda' ya' want?",
           "Get back over to the Eastside, you hop head!",
@@ -6030,7 +6030,7 @@
         "gender": "Male",
         "creature_type": "Child",
         "appearance": "You see a flower child.",
-        "speaking_style": "Little Kids",
+        "faction": "Little Kids",
         "sample_lines": [
           "Would you like a flower, mister?",
           "Would you like a flower, madam?",
@@ -6084,7 +6084,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Jacob, the arms dealer.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "Hi!  Welcome to Jake's.  I've got some great merchandise in stock.  Feel free to look around.",
           "I deal with high end arms.  The best stuff you can find this side of the Brotherhood, and since the Brotherhood doesn't deal with outsiders, I've gotta' say I'm the best.  I have a Sniper Rifle, and y",
@@ -6158,7 +6158,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a burly bounty hunter with a button that reads, 'I'm Christopher and you're meat.'",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "What do you want?"
         ]
@@ -6182,7 +6182,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a Hub guard.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Can I help you?",
           "You're in the south end of the Hub.  If you look around you'll find the Water Merchants and a small hospital.",
@@ -6220,7 +6220,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a short, stocky man.",
-        "speaking_style": "Ian",
+        "faction": "Ian",
         "sample_lines": [
           "Hello, stranger. You look like you're new here. What's your name?",
           "Good to meet you. I'm Ian.",
@@ -6298,7 +6298,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Irwin.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Oh boy, can't you leave me alone? I have enough problems on my hands already.",
           "This is a tragedy, believe me. Nothing is the way it used to be. I have a small farm outside town and a few days ago a bunch of Raiders appeared out of nowhere and now use my home as their camp. They ",
@@ -6332,7 +6332,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a thin, angry-looking man.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "What?",
           "Yeah, what do you want?",
@@ -6394,7 +6394,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Jain",
-        "speaking_style": "CoC Jain",
+        "faction": "CoC Jain",
         "sample_lines": [
           "Relax, I didn't mean it!"
         ]
@@ -6418,7 +6418,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Jake of the Followers.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Welcome, my friend! How might I help you today?",
           "I would love to fight you, but I am much too busy helping Nicole right now.",
@@ -6472,7 +6472,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "The man tosses about fitfully.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Thank you so much for helping me. My name is Jarvis, and I'm Seth's younger brother. Please, if there's anything you need to know, just ask.",
           "Hello again. Can I help you with something?",
@@ -6510,7 +6510,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Jasmine.",
-        "speaking_style": "Hub Thief",
+        "faction": "Hub Thief",
         "sample_lines": [
           "Welcome to the Circle of Thieves. I'm Jasmine. I'm here to help make your infiltration of the Daren Hightower estate as painless as possible. Hightower's estate is located in the Heights. It has a min"
         ]
@@ -6534,7 +6534,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a young man with sharp features.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hey, are you from really far away? Have you had a lot of adventures?",
           "Lorraine says that there was a Vault south of here, where a lot of my grandparents lived. What's it like living in a Vault?",
@@ -6592,7 +6592,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "We offer healing of the body to heal the spirit. Can I help you?",
-        "speaking_style": "Children True",
+        "faction": "Children True",
         "sample_lines": [
           "We offer healing of the body to heal the spirit. Can I help you?",
           "The Children do not haggle. Now, will you accept our price?",
@@ -6662,7 +6662,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Jennifer.",
-        "speaking_style": "Brotherhood Paladin",
+        "faction": "Brotherhood Paladin",
         "sample_lines": [
           "Good day, Initiate. How may I help you?",
           "You can ask one of the guards on that level; they should know where he is at the moment.",
@@ -6764,7 +6764,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Jeremiah, a messenger for the Children.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Excuse me, brother. You startled me. How may I serve the Master?",
           "If you do not know, it is none of your concern. If you are inquiring about something you should not know, then I will have to report you to our supervisors. You should know better.",
@@ -6874,7 +6874,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a traveller.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What do you want, stranger?",
           "I'm a scout.",
@@ -6912,7 +6912,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "What do you want?",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "What do you want?",
           "I might . . . Have you ever dealt with a vicious murdering band of thieves before?",
@@ -7010,7 +7010,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see the haggard shape of Bob.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Please don't kill me! I swear I'll get you your money.!",
           "You mean you're not here to kill me?",
@@ -7076,7 +7076,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "He looks like an experienced guardsman.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "You'd better put that away. Junktown is a friendly place, friend, and we want to keep it that way.",
           "Your weapon, idiot. Killian won't take your arms away, but you'd better damn well keep them in your holster.",
@@ -7118,7 +7118,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a raider who seems crazed.",
-        "speaking_style": "Rippers",
+        "faction": "Rippers",
         "sample_lines": [
           "That's it! Don't come any closer. I'll off her. I swear.",
           "Any why not? She's just a whore.",
@@ -7204,7 +7204,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Julianna.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hello.",
           "I'm Julianna.",
@@ -7254,7 +7254,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Sheriff Justin Greene.",
-        "speaking_style": "Hub Police",
+        "faction": "Hub Police",
         "sample_lines": [
           "Hello sir! The name's Justin Greene. I'm the sheriff of this fine city. Is there something I can do for you this fine day?",
           "Hello ma'am! The name's Justin Greene. I'm the sheriff of this fine city. Is there something I can do for you this fine day?",
@@ -7352,7 +7352,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Kane.",
-        "speaking_style": "Cain",
+        "faction": "Cain",
         "sample_lines": [
           "It's not skag work. You'll need to do 'it' quick and clean.  The boss'll give you details, but it's more money than you'll make in a month working for the caravans, but only if you're good enough. We ",
           "I hope for your sake that that was an attempt at humor.  Do not cross us, you will regret it.",
@@ -7538,7 +7538,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a slender young woman with a smudged face and dark clothing.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "You're not from around here. Who're you?",
           "And what, may I ask, are you doing in the Boneyards?",
@@ -7656,7 +7656,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Keri.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "So, that old bastard gave you the okay to work for us, eh?  Well you must be one tough bitch. I'm impressed, but we'll see how you do.  We leave only twice a month, on the 3rd and 17th.  Can you handl",
           "So, that old bastard gave you the okay to work for us, eh?  Well you must have balls of steel. I'm impressed, but we'll see how you do.  We leave only twice a month, on the 3rd and 17th.  Can you hand",
@@ -7710,7 +7710,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see huge mutant.",
-        "speaking_style": "Super Mutant",
+        "faction": "Super Mutant",
         "sample_lines": [
           "You should not be here. This area off limits to Children.",
           "This prisoner cell block. Here we hold humans until you dip them. Good stuff, huh?"
@@ -7739,7 +7739,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Kyle.",
-        "speaking_style": "Brotherhood Knight",
+        "faction": "Brotherhood Knight",
         "sample_lines": [
           "Ahh...So you're the one, huh?",
           "Nothing. It's just that no one has ever made it back from the Ancient Order.",
@@ -7849,7 +7849,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a weary traveler.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Just stay where you are. We've heard about you in Shady Sands and we want no part of you.",
           "Yeah? What d'ya want this time?",
@@ -7951,7 +7951,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a heavily muscled, scarred man with a mustache.",
-        "speaking_style": "Guard Humorous",
+        "faction": "Guard Humorous",
         "sample_lines": [
           "Can I help you, stranger?",
           "Plenty, so long as you stay on our good side. We got Killian Darkwaters' store, where you can do some trading. And there's Gizmo's Casino, if you're a gambler. Or if you just want a drink, you can hea",
@@ -8033,7 +8033,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a Knight.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hello Initiate. I'm Larry, how may I help you?"
         ]
@@ -8057,7 +8057,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Lasher of the Children.",
-        "speaking_style": "CoC Lasher",
+        "faction": "CoC Lasher",
         "sample_lines": [
           "I know who you are. You are a wicked, evil man and you must be punished.",
           "I know who you are. You are the devil in woman’s form, but your shape will not save you.",
@@ -8155,7 +8155,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see the ghoul leader.",
-        "speaking_style": "Ghoul, Brave",
+        "faction": "Ghoul, Brave",
         "sample_lines": [
           "Thank you for not shooting first. Can I help you with anything?",
           "Ahh, if you like you may rest here, we will not harm you.",
@@ -8289,7 +8289,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a shifty looking character.",
-        "speaking_style": "Loser",
+        "faction": "Loser",
         "sample_lines": [
           "So'a, whatcha doin' in the Hub?",
           "Not really sure big fella.  I'll see ya around.",
@@ -8379,7 +8379,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "Just because you've got a weapon drawn doesn't mean that I'm gonna give you what you want . . .",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "I don't know who you are, but I'll give you a fair warning: anyone who messes with the Khans, dies messy.",
           "You are an enemy of the Khans! You attack our warriors and take our women! Give me a reason why I shouldn't cut out your heart!",
@@ -8421,7 +8421,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Lorenzo.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "You're overdue on your loan. Please pay it now or I will become very upset.  I dislike being upset.",
           "Hi. So you've come to pay off your loan?",
@@ -8527,7 +8527,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Lyle.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Not so good. Ever since I had one of my water rations stolen the other day, things have been going downhill. Everybody is getting scared and nobody knows what to do."
         ]
@@ -8551,7 +8551,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a strong, stout man with a bushy beard.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "Well, I'm MacRae.  I help the Blades some against the Deathclaws and that Regulator bunch.  Teach'em a bit about protectin 'emselves against those nasties.",
           "Well m' specialty is fightin with my fists, and takin a punch or two more than the guy throwin 'em at me.",
@@ -8597,7 +8597,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a mad scientist. He is working diligently on something.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Good evening, brother. What brings you to our little corner of heaven?",
           "Good evening, sister. What brings you to our little corner of heaven?",
@@ -8671,7 +8671,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see the Ghoul Manager.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Whatta you doing here?",
           "Whad you say?",
@@ -8709,7 +8709,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Marcelles.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Thank god you're here! Some crazy guy has Sinthia held hostage. He's threatening to kill her! You've got to help.",
           "You are an incredibly cold person. She could die without your help.",
@@ -8799,7 +8799,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Dr. Solone, M.D.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Welcome. How might I help you today?",
           "Yes, I see that you are suffering from some damage. This may take some time. Would you like me to try to mend your wounds?",
@@ -8837,7 +8837,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Mathia.",
-        "speaking_style": "Brotherhood Paladin",
+        "faction": "Brotherhood Paladin",
         "sample_lines": [
           "Hello, Initiate. So, you are the one who made it out of the Ancient Order alive.",
           "The name is Mathia. I am officially Maxson's assistant, but I am also here to make sure no one messes with the old man.",
@@ -8895,7 +8895,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "I can't believe the things that you have done.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I can't believe the things that you have done.",
           "What can I do for you?",
@@ -8945,7 +8945,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Michelle.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What are you doing here?",
           "A moron. I think that you'd best get out of here. Otherwise, you may become target practice.",
@@ -8995,7 +8995,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Mike, the Old Town guard.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Yeah, whatta' you want?",
           "Yeah. You must be lost. Most people wouldn't be caught dead in this part of town. This is the Eastside, or some call it Old Town. The Wastes of the Wastes.",
@@ -9029,7 +9029,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Miles, the chemist of Adytum.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I don't believe we've met. I'm Miles. What can I do for you?",
           "Yes, although Smitty is the one who actually casts the bullets. I just refill the brass casings.",
@@ -9091,7 +9091,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a battered man.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Thank you stranger! I don't know how many weeks, perhaps months, those thugs have had me here. I'm very grateful for your help, and I'm sure the Brotherhood of Steel is also.",
           "You haven't heard of us? I'm really surprised. You must not leave the Hub very often. You should get out more. We're northwest of here, on the west side of the mountain range.",
@@ -9145,7 +9145,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a dirty, grubby prisoner.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Your kind is repugnant. Do not speak to me.",
           "I refuse to tell you any information. Leave me alone.",
@@ -9183,7 +9183,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a guard.",
-        "speaking_style": "Brotherhood Knight",
+        "faction": "Brotherhood Knight",
         "sample_lines": [
           "What is your business here?"
         ]
@@ -9207,7 +9207,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Doc Morbid.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I'm Doc Morbid, can I help you?",
           "Well, if not today, then perhaps sometime in the near future.",
@@ -9309,7 +9309,7 @@
         "gender": "Male",
         "creature_type": "Robot",
         "appearance": "The robot is non-functional. The layer of dust on it suggests that it hasn't been active recently.",
-        "speaking_style": "Robots",
+        "faction": "Robots",
         "sample_lines": [
           "Unit #462 online. Self-test. Adjusting unit location data. Fixed. Rebuilding memory file. Fixed. Error - task incomplete.",
           "Unit #462 is a cleaning model. Must finish cleaning and maintenance of this level.",
@@ -9343,7 +9343,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a Master Merchant",
-        "speaking_style": "Sellbabies",
+        "faction": "Sellbabies",
         "sample_lines": [
           "...I don't care what they say.  We need new parts... Oh, yes.  Sorry. What can I do for you?",
           "Sure, great.  You're hired.  Wait.  What position?  Oh, caravan guard right?  Yeah, sure. You can work for us.  You look okay.  Anything else?",
@@ -9413,7 +9413,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Neal, the bartender.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Welcome to the Skum Pitt. What can I do ya for?",
           "Great. Whaddya want?",
@@ -9475,7 +9475,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Neil, the head of the guard for the Followers.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Why are you here?",
           "I am sorry, but I can't understand you. Now, what are you doing here?",
@@ -9573,7 +9573,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You! Stop right there and face the law!",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Good to see you again. Is there anything that I can do for you?",
           "Hmmm. I think you should be somewhere else besides here. Have a nice day.",
@@ -9643,7 +9643,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Orfeo, a Senior Member of the Children of the Cathedral.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Ah. A new convert. Welcome."
         ]
@@ -9667,7 +9667,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a man in studded leather armor with an odd assortment of knick-knacks.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Greetings, traveler. What brings you out this far?",
           "I see. Much like myself, then.",
@@ -9769,7 +9769,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Knight Paul.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Ahhh, so you’re the new initiate.  Welcome aboard.  What can I do for you?",
           "I’m Paul, head of Energy Weapons Development.",
@@ -9843,7 +9843,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "Get out of here!",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I hope you're not going to kick me out of here.",
           "Well, it's true. After what happened to my friends, I gotta protect my turf. I just hope you're not gonna kill me."
@@ -9872,7 +9872,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Peter, leader of the Follower Scouts.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What are you doing around here? Can't you see we are busy?",
           "Sure. You can start by getting out of my way.",
@@ -9910,7 +9910,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Petrox, a desert bandit.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Greetings! I am Petrox. I am one of Garl's lead raiders. Who are you?",
           "As a raider, I get to travel to many parts of the wasteland. In my travels, I get supplies for the camp.",
@@ -9960,7 +9960,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a peasant.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "It won't let us back into our house, that's why.",
           "It was the 'pet' of a traveller. When the traveller died, this damn dog just plopped its furry ass down on my doorstep and wouldn't leave. It's been there for days.",
@@ -9998,7 +9998,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see a ghoul prisoner.",
-        "speaking_style": "Ghoul, Brave",
+        "faction": "Ghoul, Brave",
         "sample_lines": [
           "Wha-what do you want.",
           "I stole some water. Hey, I was thirsty! It wasn't like I hurt somebody.",
@@ -10044,7 +10044,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "radio",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "[There is a squeal of static, then you hear a deep voice over the radio.] Command to patrol, command to patrol. What is your status? Over.",
           "Who is this? What is your purpose?",
@@ -10086,7 +10086,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Rae.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "You don't belong here.",
           "(sigh) What do you want now?",
@@ -10160,7 +10160,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "The Raider is too frightened of Garl to speak to you any more.",
-        "speaking_style": "Rippers",
+        "faction": "Rippers",
         "sample_lines": [
           "What do you want?",
           "Nah. I ain't seen her. Why are you asking?",
@@ -10194,7 +10194,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a dejected prisoner of the Raiders.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hey, you! Get me out of here!",
           "My name is Jack. I'm from Junktown. These monsters killed the rest of my caravan and put me here."
@@ -10223,7 +10223,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Razlo.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "You look distraught. Are you in need of assistance?",
           "Hmm, Tandi is gone? I find this hard to believe, but maybe she ran away with Seth. I know that they have been eyeing each other lately. Aradesh was always a little bit of a prude, perhaps it was too m",
@@ -10317,7 +10317,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "Hello, what can I do for you?",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Hello, what can I do for you?",
           "Razor's the name.  I'm the closest thing we have to a leader.",
@@ -10483,7 +10483,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Jerry, a young Initiate.",
-        "speaking_style": "Brotherhood Initiate",
+        "faction": "Brotherhood Initiate",
         "sample_lines": [
           "Yea, being a Knight would be great, they see lots of action and get to build all the stuff. I haven't decided yet, but I'm leaning towards a Knight myself. Am I boring you? Some people say I talk a lo",
           "Yea, Scribes have such a creative position. It would be great to think up new weapons, modify old ones, and keep records of every  detail of every item in the Brotherhood. Am I boring you? Some people",
@@ -10517,7 +10517,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see: Vault Dweller.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hello! How goes the search?",
           "Well, that's good to hear. Keep up the good work, I guess.",
@@ -10571,7 +10571,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Richie.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "You're not supposed to be here. Do you realize I'm supposed to kill you?",
           "Man, you're stupid. Oh, sorry, I didn't mean to offend you. Now let's try this again. \"Yes\" means I blow your head off. \"No\" means you get your butt out of here. Which is it going to be?",
@@ -10605,7 +10605,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a hapless prisoner.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "These people are crazy here. Help me get out of here!",
           "Oh, thank you. Thank you. Good bye!"
@@ -10634,7 +10634,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "This looks like a robot control terminal.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Reprogramming complete. Initializing voice communication subsystems. Initializing personality subsystem. [Click!] How may this terminal be of service?",
           "Input error. Command not in set. Please restate.",
@@ -10736,7 +10736,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Romero.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Stand down!",
           "I ask the questions here. What are you doing here?",
@@ -10790,7 +10790,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Rutger.",
-        "speaking_style": "Merchant",
+        "faction": "Merchant",
         "sample_lines": [
           "Hello and welcome to the Far Go Traders. How may we help you?",
           "Well, we 'can' transport water, but it will cost you. How much do you need and where is it going?",
@@ -10988,7 +10988,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Sammael, one of the Scavs from Adytum.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Hey, I don't believe we've met. You are?",
           "The pleasure's mine. I'm called Sammael.",
@@ -11034,7 +11034,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "Oh, my god! You killed him!",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Oh, my god! You killed him!",
           "He was my lover. He was my best friend. I can't believe that you did that to him.",
@@ -11080,7 +11080,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Saul, the boxer.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What do you want?",
           "Yes?",
@@ -11194,7 +11194,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see a scout for the Nightkin.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What have we here? A normal. I think you will come with me.",
           "It is really quite simple. If you come with me, I can help you."
@@ -11223,7 +11223,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Seth, leader of the guards of Shady Sands.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Not very bright, eh? Well, watch out for the Radscorpions, and stay out of trouble.",
           "You look like one of those raiders. We keep a close watch here in Shady Sands. What do you want?",
@@ -11313,7 +11313,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Shark.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Hey, fresh bait! So, what brings you in to our territory, chum? Here for a little fun? At your expense, of course.",
           "Well, for this evening's entertainment, we've decided to thrash this place! Heh. Grab what you can carry and let's see some blood run, eh?",
@@ -11347,7 +11347,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Sherry.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Who are you and what are you doing here?",
           "Apparently so, since everyone knows that this is the territory of the Skulz. You'd better beat it before someone decides to hurt you.",
@@ -11445,7 +11445,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Sinthia, the seductive sellbaby.",
-        "speaking_style": "Sellbabies",
+        "faction": "Sellbabies",
         "sample_lines": [
           "Hey, darling, how you doing?",
           "Maybe I can help you with that.",
@@ -11539,7 +11539,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Slappy.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Oooh, pretty, pretty stuff.  Why is the moon?",
           "All bright, it's all bright, the bright comes down, and then we are doomed.",
@@ -11597,7 +11597,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a zombie.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "Hello my child. Why do you hold a weapon? Perhaps you need instruction in the ways of peace?",
           "Hello. Nice weather, isn't it?",
@@ -11763,7 +11763,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Smitty.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "So you found yourself a plasma rifle!"
         ]
@@ -11787,7 +11787,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Sophia, an instructor for the Brotherhood Initiates.",
-        "speaking_style": "Brotherhood Scribe",
+        "faction": "Brotherhood Scribe",
         "sample_lines": [
           "Greetings.  I have not seen you here before, are you lost? May I be of service?",
           "This is the library.  Here we keep records of all technical data on weaponry and technology, and, of course, the history of the Brotherhood.",
@@ -11877,7 +11877,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Katrina. She has a very pretty smile.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "I am unarmed, please put your weapon away.",
           "Normally, I would agree with you.  It is very dangerous to travel unarmed.  But this is Shady Sands, and we are a peaceful people.  There is no need for weapons here.",
@@ -11935,7 +11935,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Mrs. Stapleton, the librarian.",
-        "speaking_style": "Sellbabies",
+        "faction": "Sellbabies",
         "sample_lines": [
           "Hi, Welcome to the Library.  I don't think I have seen you around these parts before.   What might you be looking for in the way of knowledge?",
           "Good to see you again.  What might you be looking for today?",
@@ -11985,7 +11985,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "It's some kind of huge super mutant creature! And it has a very large gun!",
-        "speaking_style": "Super Mutant",
+        "faction": "Super Mutant",
         "sample_lines": [
           "You're on Unity soil. I'd better take you in."
         ]
@@ -12009,7 +12009,7 @@
         "gender": "Male",
         "creature_type": "Ghoul",
         "appearance": "You see before you Talius, a member of the Followers.",
-        "speaking_style": "Follower Guard",
+        "faction": "Follower Guard",
         "sample_lines": [
           "Greetings sister. My name is Talius. How might I assist you today?",
           "Greetings brother. My name is Talius. How might I assist you today?",
@@ -12139,7 +12139,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Talus.",
-        "speaking_style": "Brotherhood Paladin",
+        "faction": "Brotherhood Paladin",
         "sample_lines": [
           "Hello, you must be the outsider initiate. Nice to meet you. What can I do for you?",
           "That would be the council of elders. More specifically, the High Elder, Maxson. The elders make all the major decisions around here. If you need to speak with them, you'll find them on the fourth floo",
@@ -12257,7 +12257,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a cheery man with close-cropped hair.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "We don't get many strangers around here. What do you want?",
           "Hello, stranger! What can I do for you today?",
@@ -12319,7 +12319,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see one of Shady Sands' guards.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Welcome, stranger. We don't see your kind often.",
           "Not so fast! This is a small community. We don't see strangers often, and we don't really need them if you get my meaning. If you don't have a good reason to be here, you'd better just keep moving.",
@@ -12369,7 +12369,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Theresa.",
-        "speaking_style": "Careful",
+        "faction": "Careful",
         "sample_lines": [
           "It's good to hear that. I knew that the outside world couldn't be as bad as everyone says. I mean, our ancestors lived outside, right? But that paranoid Overseer won't let us leave.",
           "Oh, I'm sorry to hear that. I hope that you're able to find the chip soon.",
@@ -12455,7 +12455,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Brother Thomas.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Why, hello there. You must be the new Initiate Talus told me about. It's awfully late for a social call, what can I do for you?",
           "What could you possibly want at this hour?",
@@ -12509,7 +12509,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Thorndyke.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Sir, I am a healer. You have no need for my services.",
           "Madam, I am a healer. You have no need for my services.",
@@ -12599,7 +12599,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Therax, a Thinker Nightkin.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Welcome Oh Punt One. You are just in time to help us.",
           "Are you not the one who seeks to bring peace to the wastelands?",
@@ -12637,7 +12637,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Tolya, a desert bandit.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Hello, I am Tolya. Looks like you just wandered in from the desert. Who are you?",
           "As a raider, I explore the lands in search of new supplies. There have been some towns which have been graced by our presence.",
@@ -12687,7 +12687,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "Stay away from me! Leave me alone!",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Hello stranger. You shouldn't be out here. There's only death out here!",
           "What do you want! Leave me alone!",
@@ -12729,7 +12729,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see Trish, a waitress from the Skum Pitt.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "What the hell are you doing in my room?",
           "What the hell are you doing in my room?",
@@ -12819,7 +12819,7 @@
         "gender": "Male",
         "creature_type": "Super Mutant",
         "appearance": "You see Troy.",
-        "speaking_style": "Nightkin",
+        "faction": "Nightkin",
         "sample_lines": [
           "Congratulations, human. You've been selected to join an elite band of worshippers. Follow me.",
           "Follow me and you will find out. Or, to put it another way, follow me and live, fool!",
@@ -12865,7 +12865,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a man in dusty leather armor with a trenchcoat and gas mask.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "Another new face. Travelers here are a dime a dozen. But you have the look of someone different. Care to join me for a drink?",
           "Delightful. I hope you don't mind your drink well-watered - they treat beer here like it's a potted plant.",
@@ -12963,7 +12963,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "Security Station",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "This terminal, 'Tylier', controls Special Forces Operations. Please present voice authorization.",
           "I am the security system for Blue Level. All systems armed.",
@@ -13005,7 +13005,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see before you Uthern, leader of the Super Mutants.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Normie! How dare you enter the confines of your betters?",
           "You only prove my point by using inane comments as such. I personally would not wish you in my sight, but my master would have words with you.",
@@ -13051,7 +13051,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a citizen of Vault 13.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "We didn't think that you were coming back. You have such a nice room, and we were a little crowded with her parents. I hope you don't mind.",
           "Look, we could really use the space. I hope you will reconsider.",
@@ -13085,7 +13085,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Vance.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "What can I do for you?",
           "The name's Vance, and that's all you need to know. Can I get you anything?",
@@ -13155,7 +13155,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Vasquez, the mercenary desperado.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "What do you want?",
           "You have not heard of me? I am hurt! My name is Vasquez Villanova Hernandez Ortega. I am a famous desperado, my friend. And, if you have need, I am a gun for hire.",
@@ -13197,7 +13197,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see the Vats Control Computer.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "Access granted. Command?",
           "[You have successfully hacked into the encryption table.] Command?",
@@ -13311,7 +13311,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Victor.",
-        "speaking_style": "Guard",
+        "faction": "Guard",
         "sample_lines": [
           "New blood. Heh. Heh heh.",
           "Why do you say that? I'm quite happy. I'm very happy because there are lots of things that bleed.",
@@ -13345,7 +13345,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Vinnie from the Skulz gang.",
-        "speaking_style": "Skulz",
+        "faction": "Skulz",
         "sample_lines": [
           "You're on Skulz turf, stranger. You'd better talk quick.",
           "We are the one and only Junktown gang. We have the run of the streets, and we rule the city at night.",
@@ -13415,7 +13415,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You see a woman.",
-        "speaking_style": "Brainwashed Children",
+        "faction": "Brainwashed Children",
         "sample_lines": [
           "I do not wish to die, sir. I am not a soldier.",
           "I do not wish to die, ma'am. I am not a soldier.",
@@ -13545,7 +13545,7 @@
         "gender": "Female",
         "creature_type": "Human (Female)",
         "appearance": "You look distraught. Are you in need of assistance?",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "You look distraught. Are you in need of assistance?"
         ]
@@ -13569,7 +13569,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a caravan driver.",
-        "speaking_style": "Guard Gung-Ho",
+        "faction": "Guard Gung-Ho",
         "sample_lines": [
           "Good, you got the okay.  I knew it wouldn't be a problem.  She's so swamped lately, ever since Daren Hightower started hiding in his office.  Strange man. We leave just about every five days. That's t",
           "I'll still give you a job, even though… never mind.  Are you interested?",
@@ -13615,7 +13615,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see the water guard.",
-        "speaking_style": "Careful",
+        "faction": "Careful",
         "sample_lines": [
           "Well Gahh! back to you . . . I'm sorry that you never learned to speak. We might have been good friends.",
           "I'm not feeling very well. Someone cracked my head with a big pipe. I went to the medic but my head still hurts. Sure hope someone catches the jerk that hit me.",
@@ -13657,7 +13657,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a sleepy vault dweller.",
-        "speaking_style": "Berzerker",
+        "faction": "Berzerker",
         "sample_lines": [
           "I was worried about the vault and had a nightmare. I couldn't get back to sleep so I thought I'd take a walk to relax.",
           "Yeah, some guy was acting suspicious back near the water ration room. He scared me. I hope he didn't see me.",
@@ -13711,7 +13711,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see Zack.",
-        "speaking_style": "Guard Gung-Ho",
+        "faction": "Guard Gung-Ho",
         "sample_lines": [
           "Hi, I'm Zack. You want to buy weapons? Let me see what you have to trade.",
           "You want to buy weapons? Let me see what you have to trade.",
@@ -13753,7 +13753,7 @@
         "gender": "Male",
         "creature_type": "Human (Male)",
         "appearance": "You see a thug.",
-        "speaking_style": "Peasant",
+        "faction": "Peasant",
         "sample_lines": [
           "Hey, aren't you the bastard who's been screwing us over? Man, did you come to the wrong place!",
           "Hey aren't you the bitch who's been screwing us over? You're in the wrong place, lady, and it's gonna cost you!",
@@ -13891,7 +13891,7 @@
         "gender": "",
         "creature_type": "",
         "appearance": "You see Zax, the machine intelligence controlling the Glow.",
-        "speaking_style": "",
+        "faction": "",
         "sample_lines": [
           "You see Zax, the machine intelligence controlling the Glow.",
           "How may I be of assistance?",

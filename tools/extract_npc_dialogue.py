@@ -145,7 +145,7 @@ class NPCDialogue:
     description: str = ""
     creature_type: str = ""  # From kill_type: Human, Super Mutant, Ghoul, Robot, etc.
     appearance: str = ""  # "You see..." description
-    speaking_style: str = ""  # AI personality type
+    faction: str = ""  # AI personality type
     npc_lines: List[DialogueLine] = field(default_factory=list)
     player_options: List[DialogueLine] = field(default_factory=list)
 
@@ -165,7 +165,7 @@ class NPCDialogue:
                 'gender': self.gender,
                 'creature_type': self.creature_type,
                 'appearance': self.appearance,
-                'speaking_style': self.speaking_style,
+                'faction': self.faction,
                 'sample_lines': sample_lines,
             },
             'description': self.description,
@@ -315,7 +315,7 @@ class DialogueExtractor:
                         description=proto_info['description'],
                         creature_type=proto_info['creature_type'],
                         appearance=proto_info['appearance'],
-                        speaking_style=proto_info['speaking_style'],
+                        faction=proto_info['faction'],
                         npc_lines=npc_lines,
                         player_options=player_options,
                     )
@@ -552,14 +552,14 @@ class DialogueExtractor:
             msg_dict: Message dictionary for this script's MSG file
 
         Returns:
-            Dict with gender, description, creature_type, appearance, speaking_style
+            Dict with gender, description, creature_type, appearance, faction
         """
         result = {
             'gender': '',
             'description': '',
             'creature_type': '',
             'appearance': '',
-            'speaking_style': '',
+            'faction': '',
         }
 
         # Get "You see..." text from message 100 for appearance
@@ -602,7 +602,7 @@ class DialogueExtractor:
 
             # Get AI personality name
             if ai_packet in self._ai_packets:
-                result['speaking_style'] = self._ai_packets[ai_packet]
+                result['faction'] = self._ai_packets[ai_packet]
 
         return result
 
@@ -715,7 +715,7 @@ def filter_unvoiced(dialogue: Dict[str, NPCDialogue]) -> Dict[str, NPCDialogue]:
                 description=npc.description,
                 creature_type=npc.creature_type,
                 appearance=npc.appearance,
-                speaking_style=npc.speaking_style,
+                faction=npc.faction,
                 npc_lines=unvoiced_npc_lines,
                 player_options=unvoiced_player_options,
             )
@@ -774,8 +774,8 @@ def export_to_text(dialogue: Dict[str, NPCDialogue], output_path: str,
                     f.write(f"  Gender: {npc.gender}\n")
                 if npc.creature_type:
                     f.write(f"  Creature Type: {npc.creature_type}\n")
-                if npc.speaking_style:
-                    f.write(f"  Speaking Style: {npc.speaking_style}\n")
+                if npc.faction:
+                    f.write(f"  Speaking Style: {npc.faction}\n")
                 if npc.appearance:
                     f.write(f"  Appearance: {npc.appearance}\n")
 

@@ -7,10 +7,38 @@ based on character descriptions and optional web research.
 
 import asyncio
 import json
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from claude_code_sdk import query, ClaudeCodeOptions, AssistantMessage, TextBlock
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+
+def extract_voice_prompt(text: str) -> str:
+    """
+    Extract just the voice design prompt from LLM output,
+    stripping preamble, explanations, and source citations.
+    """
+    # Remove common preamble patterns
+    preamble_patterns = [
+        r"^.*?voice design prompt[:\.]?\s*",  # "Here's the voice design prompt:"
+        r"^.*?I'll search.*?\.\s*",  # "I'll search for more information..."
+        r"^.*?Based on.*?:\s*",  # "Based on the wiki information:"
+        r"^.*?Here is.*?:\s*",  # "Here is the voice prompt:"
+    ]
+
+    result = text.strip()
+
+    for pattern in preamble_patterns:
+        result = re.sub(pattern, "", result, flags=re.IGNORECASE | re.DOTALL)
+
+    # Remove Sources section at the end
+    result = re.split(r"\n\s*Sources?:", result, flags=re.IGNORECASE)[0]
+
+    # Remove any trailing markdown links
+    result = re.sub(r"\n\s*-?\s*\[.*?\]\(.*?\)\s*$", "", result, flags=re.MULTILINE)
+
+    return result.strip()
 
 # Default cache file location
 DEFAULT_CACHE_FILE = Path(__file__).parent / "voice_cache.json"
@@ -25,7 +53,7 @@ class CharacterInfo:
     gender: str = ""
     creature_type: str = ""
     appearance: str = ""
-    speaking_style: str = ""
+    faction: str = ""
 
     @classmethod
     def from_npc_entry(cls, npc_key: str, entry: dict) -> "CharacterInfo":
@@ -60,7 +88,7 @@ class CharacterInfo:
             gender=voice_info.get("gender", ""),
             creature_type=voice_info.get("creature_type", ""),
             appearance=voice_info.get("appearance", ""),
-            speaking_style=voice_info.get("speaking_style", ""),
+            faction=voice_info.get("faction", ""),
         )
 
     def cache_key(self) -> str:
@@ -81,8 +109,8 @@ class CharacterInfo:
         if self.appearance:
             parts.append(f"Appearance: {self.appearance}")
 
-        if self.speaking_style:
-            parts.append(f"Speaking Style: {self.speaking_style}")
+        if self.faction:
+            parts.append(f"Faction: {self.faction}")
 
         if self.description:
             parts.append(f"Description: {self.description}")
@@ -132,8 +160,8 @@ SYSTEM_PROMPT = """You are a voice design specialist creating prompts for Eleven
 Your task: Given a Fallout 1 character, generate a concise voice design prompt.
 
 PROCESS:
-1. If a wiki page might exist for this character, search for "Fallout 1 [character name] wiki" to learn more
-2. Analyze the character's role, personality, and dialogue style
+1. Analyze the character's role, personality, and dialogue style
+2. To make sure that the generated voice provides realistic delivery, 
 3. Generate a voice design prompt using ONLY these characteristics (include only what's relevant):
 
 CHARACTERISTICS TO CONSIDER:
@@ -141,15 +169,21 @@ CHARACTERISTICS TO CONSIDER:
 - Accent: "thick" Scottish, "slight" Asian-American, Southern American, etc.
 - Gender: Male, female, gender-neutral, ambiguous
 - Tone/Timbre: Deep, warm, gravelly, smooth, shrill, buttery, raspy, nasally, throaty, harsh, robotic, ethereal
-- Pacing: Normal cadence, fast-paced, slowly, drawn out, calm pace, conversational
+- Pacing: Normal cadence, fast-paced, conversational
 - Audio Quality: Perfect audio quality (for clear voices), slightly degraded (for radio/intercom)
 - Character/Profession: Soldier, merchant, scientist, raider, tribal elder, etc.
 - Emotion: Energetic, excited, sad, sarcastic, dry, weary, menacing
 - Pitch: Low-pitched, high-pitched, normal pitch
 
+OTHER THINGS TO REMEMBER:
+- The voice prompt SHOULD NEVER BE SLOW, we do not want slow boring dialogue. Add to the prompt that the voice should be at least modestly fast paced.
+- ALWAYS add delivery info, so that we do not end up with NARRATOR like voices, we want VOICE ACTING
+- Don't confuse the model by including "Peasant" or "Berserker", these are Fallout specific terms it doesn't know.
+- "Children" usually means Children of the Cathedral, a faction, rather than actual child speaking. There might be child characters though, just don't get them confused. 
+
 OUTPUT FORMAT:
-Return ONLY the voice design prompt as a single paragraph, 2-4 sentences max.
-Example: "A gravelly, deep male voice in his 50s. Speaks slowly with a weary, battle-worn tone. Slight Western American accent with dry, sardonic delivery."
+Return the voice design prompt as a single paragraph, 2-4 sentences max.
+Example: "A gravelly, deep male voice in his 50s. Speaks with a weary, battle-worn tone. Slight Western American accent with dry, sardonic delivery."
 
 Do NOT include explanations, just the voice prompt."""
 
@@ -178,18 +212,15 @@ async def generate_voice_prompt(
         if cached:
             return cached
 
-    options = ClaudeCodeOptions(
+    options = ClaudeAgentOptions(
         model="haiku",
-        allowed_tools=["WebSearch"],
+        allowed_tools=[],
         system_prompt=SYSTEM_PROMPT,
-        permission_mode="acceptEdits",
     )
 
     user_prompt = f"""Generate a voice design prompt for this Fallout 1 character:
 
-{character.to_prompt()}
-
-Search the Fallout wiki if you need more context about this character."""
+{character.to_prompt()}"""
 
     result_text = ""
 
@@ -199,7 +230,7 @@ Search the Fallout wiki if you need more context about this character."""
                 if isinstance(block, TextBlock):
                     result_text += block.text
 
-    result = result_text.strip()
+    result = extract_voice_prompt(result_text)
 
     # Save to cache
     if cache:
