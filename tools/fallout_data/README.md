@@ -102,10 +102,10 @@ with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
 
 ### MapParser
 
-Parse Fallout .MAP files to extract placed objects (NPCs, items, scenery).
+Parse Fallout .MAP files to extract placed objects (NPCs, items, scenery) and scripts.
 
 ```python
-from fallout_data import DATArchive, MapParser, ObjectType
+from fallout_data import DATArchive, MapParser, ObjectType, ScriptType
 
 with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
     # Load prototype types first (required for accurate parsing)
@@ -119,6 +119,7 @@ with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
     print(f"Map: {map_data.header.name}")
     print(f"Entry tile: {map_data.header.entering_tile}")
     print(f"Total objects: {len(map_data.objects)}")
+    print(f"Total scripts: {len(map_data.scripts)}")
 
     # Get all critters (NPCs)
     critters = [obj for obj in map_data.objects if obj.object_type_raw == ObjectType.CRITTER]
@@ -133,10 +134,15 @@ with DATArchive('/Applications/Fallout/MASTER.DAT') as dat:
         if obj.object_type:
             print(f"{obj.object_type.name}: tile={obj.tile}")
 
-    # Find objects with scripts
-    scripted = [o for o in map_data.objects if o.has_script]
-    for obj in scripted:
-        print(f"Scripted object: PID=0x{obj.pid:08X}, script_id={obj.script_id_number}")
+    # Access scripts by type
+    for script in map_data.critter_scripts:
+        print(f"Critter script: idx={script.scr_script_idx}, owner_id={script.scr_oid}")
+
+    # Find the script for a specific object
+    for critter in map_data.critters:
+        script = map_data.get_script_for_object(critter)
+        if script:
+            print(f"Critter {critter.id} uses script idx={script.scr_script_idx}")
 ```
 
 #### MapObject Properties
@@ -176,6 +182,61 @@ obj.exit_grid_data   # ExitGridData for map exits
 # Inventory (for containers and critters)
 obj.inventory_length # Number of inventory items
 obj.inventory        # List of InventoryItem
+```
+
+#### MapScript Properties
+
+```python
+from fallout_data import MapParser, ScriptType
+
+# Each MapScript has these key properties:
+script = map_data.scripts[0]
+
+# Type and identification
+script.scr_id           # Full script ID (type in high byte)
+script.script_type      # ScriptType enum (SYSTEM, SPATIAL, TIMED, ITEM, CRITTER)
+script.script_type_raw  # Raw type value (0-4)
+script.scr_script_idx   # Index in scripts.lst (use to look up script name)
+script.scr_oid          # Owner object ID (matches MapObject.id)
+
+# Spatial script properties (for trigger zones)
+script.is_spatial       # True if this is a spatial trigger script
+script.built_tile       # Raw tile data (includes elevation)
+script.tile             # Tile number (extracted from built_tile)
+script.elevation        # Elevation (extracted from built_tile)
+script.radius           # Trigger radius in tiles
+
+# Timed script properties
+script.is_timed         # True if this is a timed script
+script.time             # Execution time
+
+# Other properties
+script.scr_flags        # Script flags
+script.fixed_param      # Fixed parameter passed to script
+script.scr_local_var_offset  # Offset into map's local variables
+script.scr_num_local_vars    # Number of local variables
+
+# Helper properties
+script.is_critter       # True if CRITTER type
+script.is_item          # True if ITEM type
+script.script_id_number # Lower 24 bits of scr_id
+```
+
+#### Map Script Access
+
+```python
+# Access scripts grouped by type
+map_data.scripts              # All scripts (list)
+map_data.scripts_by_type      # Dict[int, List[MapScript]]
+map_data.critter_scripts      # Critter scripts (convenience property)
+map_data.item_scripts         # Item scripts
+map_data.spatial_scripts      # Spatial trigger scripts
+
+# Find script for an object
+script = map_data.get_script_for_object(critter)  # By object reference
+
+# Find scripts by scripts.lst index
+scripts = map_data.get_scripts_by_index(36)  # All scripts using index 36
 ```
 
 ### Script
@@ -358,7 +419,7 @@ for match in matches:
 from fallout_data import DATArchive, MapParser, ScriptsListParser
 
 def extract_all_npcs(dat_path: str) -> dict:
-    """Extract all NPCs (critters) from all maps."""
+    """Extract all NPCs (critters) from all maps with their script info."""
     all_npcs = {}
 
     with DATArchive(dat_path) as dat:
@@ -366,25 +427,36 @@ def extract_all_npcs(dat_path: str) -> dict:
         scripts_data = dat.read_file('SCRIPTS\\SCRIPTS.LST')
         script_names = ScriptsListParser.parse_to_dict(scripts_data) if scripts_data else {}
 
+        # Load proto types for complete parsing
+        item_types, scenery_types = MapParser.load_proto_types(dat)
+        parser = MapParser(proto_item_types=item_types, proto_scenery_types=scenery_types)
+
         # Parse all maps
         map_files = MapParser.list_maps(dat)
 
         for map_path in map_files:
             try:
-                map_data = MapParser.parse_from_dat(dat, map_path)
+                map_data = parser.parse_from_dat(dat, map_path)
                 map_name = map_data.header.name or map_path.split('\\')[-1]
 
                 npcs = []
                 for critter in map_data.critters:
+                    # Find the script for this critter using the new API
+                    script = map_data.get_script_for_object(critter)
                     script_name = None
-                    if critter.has_script:
-                        script_name = script_names.get(critter.script_id_number)
+                    script_param = None
+
+                    if script:
+                        script_name = script_names.get(script.scr_script_idx)
+                        script_param = script.fixed_param
 
                     npc_info = {
+                        'id': critter.id,
                         'pid': critter.pid,
                         'tile': critter.tile,
                         'elevation': critter.elevation,
                         'script_name': script_name,
+                        'script_param': script_param,
                     }
 
                     if critter.critter_data:
@@ -407,7 +479,9 @@ for map_name, critters in list(npcs.items())[:5]:
     print(f"\n{map_name}: {len(critters)} NPCs")
     for npc in critters[:3]:
         script = npc.get('script_name', 'none')
-        print(f"  PID=0x{npc['pid']:08X}, script={script}, tile={npc['tile']}")
+        param = npc.get('script_param')
+        param_str = f" (param={param})" if param else ""
+        print(f"  PID=0x{npc['pid']:08X}, script={script}{param_str}, tile={npc['tile']}")
 ```
 
 ## Command-Line Usage
@@ -443,6 +517,12 @@ python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --critters
 # Show only objects with scripts
 python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripted
 
+# Show all scripts on a map (grouped by type)
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripts
+
+# Show detailed script info
+python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripts --verbose
+
 # Show detailed object info
 python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --critters --verbose
 
@@ -468,12 +548,20 @@ python -m fallout_data.map /path/to/MASTER.DAT maps/vault13.map --elevation 1
 - Contains procedures, identifiers, and static strings
 
 ### MAP Files
-- Binary map format containing placed objects
+- Binary map format containing placed objects and scripts
 - Structure:
-  - Header (184 bytes): version, name, entry point, variable counts
-  - Tile data: floor/roof tiles per elevation (10000 tiles * 4 bytes each)
-  - Scripts section: script metadata
+  - Header (236 bytes): version, name, entry point, variable counts, flags
+  - Global variables (count * 4 bytes)
+  - Local variables (count * 4 bytes)
+  - Tile data: floor/roof tiles per elevation (10000 tiles * 4 bytes each, skipped if elevation empty)
+  - Scripts section: script metadata grouped by type
   - Objects section: all placed objects by elevation
+- Script section format:
+  - 5 script types (SYSTEM, SPATIAL, TIMED, ITEM, CRITTER)
+  - For each type: count, then extents of 16 scripts each
+  - Per script: scr_id, flags, script_idx, owner_object_id, local vars, etc.
+  - Spatial scripts include tile and trigger radius
+  - Timed scripts include execution time
 - Object format (per object):
   - 18 int32s: id, tile, position, fid, flags, pid, sid, etc.
   - Type-specific data based on PID type (critter HP, door flags, etc.)

@@ -32,8 +32,8 @@ if TYPE_CHECKING:
     from .dat import DATArchive
 
 __all__ = [
-    'ObjectType', 'ItemType', 'SceneryType', 'ObjectFlags',
-    'CombatData', 'InventoryItem', 'MapObject', 'MapHeader',
+    'ObjectType', 'ItemType', 'SceneryType', 'ObjectFlags', 'ScriptType',
+    'CombatData', 'InventoryItem', 'MapObject', 'MapHeader', 'MapScript',
     'MapParser',
 ]
 
@@ -109,8 +109,21 @@ class Rotation(IntEnum):
     NW = 5
 
 
+class ScriptType(IntEnum):
+    """Script types, extracted from SID high byte."""
+    SYSTEM = 0   # Map scripts
+    SPATIAL = 1  # Location-triggered scripts
+    TIMED = 2    # Time-based scripts
+    ITEM = 3     # Item scripts
+    CRITTER = 4  # Critter scripts
+
+
 # Elevation count
 ELEVATION_COUNT = 3
+# Scripts per extent in the file format
+SCRIPTS_PER_EXTENT = 16
+# Number of script types
+SCRIPT_TYPE_COUNT = 5
 
 
 # =============================================================================
@@ -228,6 +241,90 @@ class InventoryItem:
     """An item in an object's inventory."""
     quantity: int
     item: 'MapObject'
+
+
+@dataclass
+class MapScript:
+    """
+    A script entry from a map file.
+
+    Scripts are attached to objects (critters, items) or locations (spatial)
+    or triggered by time (timed) or are map-level (system).
+    """
+    # Core identification
+    scr_id: int = 0           # Script ID (type in high byte, number in low bytes)
+    scr_next: int = 0         # Unused chain pointer
+
+    # Type-specific data (union in C)
+    # For SPATIAL scripts:
+    built_tile: int = 0       # Tile location for spatial scripts
+    radius: int = 0           # Trigger radius for spatial scripts
+    # For TIMED scripts:
+    time: int = 0             # Execution time for timed scripts
+
+    # Common fields
+    scr_flags: int = 0        # Script flags
+    scr_script_idx: int = 0   # Index into scripts.lst
+    scr_oid: int = -1         # Object ID that owns this script
+    scr_local_var_offset: int = 0  # Offset into map's local variables
+    scr_num_local_vars: int = 0    # Number of local variables
+    field_28: int = 0         # Return value or similar
+    action: int = 0           # Current action
+    fixed_param: int = 0      # Parameter passed to script
+    action_being_used: int = 0
+    script_overrides: int = 0
+    field_48: int = 0
+    how_much: int = 0
+    run_info_flags: int = 0
+
+    @property
+    def script_type(self) -> Optional[ScriptType]:
+        """Get the script type from the SID."""
+        type_val = (self.scr_id >> 24) & 0xFF
+        try:
+            return ScriptType(type_val)
+        except ValueError:
+            return None
+
+    @property
+    def script_type_raw(self) -> int:
+        """Get the raw script type value."""
+        return (self.scr_id >> 24) & 0xFF
+
+    @property
+    def script_id_number(self) -> int:
+        """Get the script ID number (lower 24 bits)."""
+        return self.scr_id & 0x00FFFFFF
+
+    @property
+    def is_spatial(self) -> bool:
+        return self.script_type_raw == ScriptType.SPATIAL
+
+    @property
+    def is_timed(self) -> bool:
+        return self.script_type_raw == ScriptType.TIMED
+
+    @property
+    def is_critter(self) -> bool:
+        return self.script_type_raw == ScriptType.CRITTER
+
+    @property
+    def is_item(self) -> bool:
+        return self.script_type_raw == ScriptType.ITEM
+
+    @property
+    def tile(self) -> int:
+        """Get tile from built_tile (for spatial scripts)."""
+        return self.built_tile & 0x3FFFFFF
+
+    @property
+    def elevation(self) -> int:
+        """Get elevation from built_tile (for spatial scripts)."""
+        return (self.built_tile >> 29) & 0x7
+
+    def __repr__(self) -> str:
+        type_name = self.script_type.name if self.script_type else f"UNKNOWN({self.script_type_raw})"
+        return f"MapScript({type_name}, idx={self.scr_script_idx}, oid={self.scr_oid})"
 
 
 @dataclass
@@ -371,6 +468,8 @@ class Map:
     header: MapHeader
     objects: List[MapObject]
     objects_by_elevation: Dict[int, List[MapObject]]
+    scripts: List[MapScript] = field(default_factory=list)
+    scripts_by_type: Dict[int, List[MapScript]] = field(default_factory=dict)
 
     @property
     def critters(self) -> List[MapObject]:
@@ -387,10 +486,36 @@ class Map:
         """Get all scenery objects."""
         return [obj for obj in self.objects if obj.is_scenery]
 
+    @property
+    def critter_scripts(self) -> List[MapScript]:
+        """Get all critter scripts."""
+        return self.scripts_by_type.get(ScriptType.CRITTER, [])
+
+    @property
+    def item_scripts(self) -> List[MapScript]:
+        """Get all item scripts."""
+        return self.scripts_by_type.get(ScriptType.ITEM, [])
+
+    @property
+    def spatial_scripts(self) -> List[MapScript]:
+        """Get all spatial scripts."""
+        return self.scripts_by_type.get(ScriptType.SPATIAL, [])
+
     def get_objects_at_tile(self, tile: int, elevation: int = 0) -> List[MapObject]:
         """Get all objects at a specific tile."""
         return [obj for obj in self.objects_by_elevation.get(elevation, [])
                 if obj.tile == tile]
+
+    def get_script_for_object(self, obj: MapObject) -> Optional[MapScript]:
+        """Find the script associated with a map object by matching scr_oid to object id."""
+        for script in self.scripts:
+            if script.scr_oid == obj.id:
+                return script
+        return None
+
+    def get_scripts_by_index(self, script_idx: int) -> List[MapScript]:
+        """Get all scripts with a given scripts.lst index."""
+        return [s for s in self.scripts if s.scr_script_idx == script_idx]
 
 
 # =============================================================================
@@ -412,7 +537,8 @@ class MapParser:
         from fallout_data import DATArchive, MapParser
 
         with DATArchive('/path/to/MASTER.DAT') as dat:
-            map_data = MapParser.parse_from_dat(dat, 'maps/junktown.map')
+            parser = MapParser()
+            map_data = parser.parse_from_dat(dat, 'maps/junktown.map')
 
             print(f"Map: {map_data.header.name}")
             print(f"Objects: {len(map_data.objects)}")
@@ -496,21 +622,15 @@ class MapParser:
         # Parse header
         header = self._read_header(reader)
 
-        # Skip tile data (we're only interested in objects)
-        # Tile data size: 2 * SQUARE_GRID_SIZE * enabled_elevations
-        # SQUARE_GRID_SIZE = 10000 (100x100 tiles)
-        # Each tile is 4 bytes (2 int16s packed)
-        # This is complex to calculate without knowing flags, so we search for objects
-
-        # Find the objects section
-        # Objects start after: header + tiles + scripts
-        # We'll scan for the object count pattern
-        objects, objects_by_elevation = self._read_objects_section(data, header)
+        # Read scripts and objects sections
+        scripts, scripts_by_type, objects, objects_by_elevation = self._read_map_data(data, header)
 
         return Map(
             header=header,
             objects=objects,
-            objects_by_elevation=objects_by_elevation
+            objects_by_elevation=objects_by_elevation,
+            scripts=scripts,
+            scripts_by_type=scripts_by_type
         )
 
     def _read_header(self, reader: '_BinaryReader') -> MapHeader:
@@ -546,29 +666,17 @@ class MapParser:
             last_visit_time=last_visit_time,
         )
 
-    def _read_objects_section(self, data: bytes,
-                               header: MapHeader) -> Tuple[List[MapObject], Dict[int, List[MapObject]]]:
+    def _read_map_data(self, data: bytes, header: MapHeader) -> Tuple[
+            List[MapScript], Dict[int, List[MapScript]],
+            List[MapObject], Dict[int, List[MapObject]]]:
         """
-        Find and read the objects section of the map.
+        Read the scripts and objects sections of the map.
 
-        The objects section format is:
-        - int32: total object count
-        - For each elevation (0, 1, 2):
-          - int32: object count at this elevation
-          - object data for each object
+        Returns:
+            Tuple of (scripts, scripts_by_type, objects, objects_by_elevation)
         """
-        # Calculate where objects should start
-        # Header: 184 bytes
-        # Tiles: depends on map flags (which elevations are enabled)
-        # Scripts: variable size
-        # We need to scan for the objects section
-
-        # Try to find the objects section by looking for valid object data
-        # The pattern we're looking for:
-        # - total_count (reasonable number, < 10000)
-        # - elev0_count (<= total_count)
-        # - first object data (id, tile, x, y, ...)
-
+        scripts: List[MapScript] = []
+        scripts_by_type: Dict[int, List[MapScript]] = {i: [] for i in range(SCRIPT_TYPE_COUNT)}
         objects: List[MapObject] = []
         objects_by_elevation: Dict[int, List[MapObject]] = {0: [], 1: [], 2: []}
 
@@ -599,18 +707,17 @@ class MapParser:
             if not (header.flags & elevation_flags[elev]):
                 offset += 10000 * 4  # SQUARE_GRID_SIZE * sizeof(int32)
 
-        # Skip scripts section
-        # Format: 5 script types, each with count + script data
-        offset = self._skip_scripts_section(data, offset)
+        # Read scripts section
+        scripts, scripts_by_type, offset = self._read_scripts_section(data, offset)
         if offset < 0:
-            return objects, objects_by_elevation
+            return scripts, scripts_by_type, objects, objects_by_elevation
 
         reader = _BinaryReader(data, offset)
 
         try:
             total_count = reader.read_int32()
             if total_count < 0 or total_count > 50000:
-                return objects, objects_by_elevation
+                return scripts, scripts_by_type, objects, objects_by_elevation
 
             # Format: total_count, then for each elevation:
             #   elev_count, then elev_count objects
@@ -628,11 +735,11 @@ class MapParser:
         except (struct.error, IndexError):
             pass  # Partial parse is OK
 
-        return objects, objects_by_elevation
+        return scripts, scripts_by_type, objects, objects_by_elevation
 
-    def _skip_scripts_section(self, data: bytes, offset: int) -> int:
+    def _read_scripts_section(self, data: bytes, offset: int) -> Tuple[List[MapScript], Dict[int, List[MapScript]], int]:
         """
-        Skip the scripts section and return the offset where objects begin.
+        Read the scripts section and return scripts plus the offset where objects begin.
 
         Script section format:
         - 5 script types (SCRIPT_TYPE_COUNT)
@@ -642,21 +749,24 @@ class MapParser:
             - numExtents = ceil(scripts_count / 16)
             - Each extent contains:
               - 16 scripts (SCRIPT_LIST_EXTENT_SIZE)
-              - int32: length
-              - int32: next (pointer, stored as int)
+              - int32: length (actual count of valid scripts in this extent)
+              - int32: next (pointer, stored as int, ignored)
 
         Each script's size depends on its SID_TYPE (from scr_id >> 24):
         - SPATIAL (1): 18 int32s = 72 bytes
         - TIMED (2): 17 int32s = 68 bytes
         - Other (0, 3, 4): 16 int32s = 64 bytes
+
+        Returns:
+            Tuple of (all_scripts, scripts_by_type, next_offset)
         """
-        SCRIPT_TYPE_COUNT = 5
-        SCRIPTS_PER_EXTENT = 16
+        all_scripts: List[MapScript] = []
+        scripts_by_type: Dict[int, List[MapScript]] = {i: [] for i in range(SCRIPT_TYPE_COUNT)}
 
         try:
             for script_type in range(SCRIPT_TYPE_COUNT):
                 if offset + 4 > len(data):
-                    return -1
+                    return all_scripts, scripts_by_type, -1
 
                 scripts_count = struct.unpack('>i', data[offset:offset+4])[0]
                 offset += 4
@@ -666,36 +776,70 @@ class MapParser:
 
                 # Calculate number of extents
                 num_extents = (scripts_count + SCRIPTS_PER_EXTENT - 1) // SCRIPTS_PER_EXTENT
+                scripts_read = 0
 
-                for _ in range(num_extents):
-                    # Read 16 scripts
-                    for _ in range(SCRIPTS_PER_EXTENT):
+                for extent_idx in range(num_extents):
+                    # Read 16 script slots (some may be unused in last extent)
+                    extent_scripts: List[MapScript] = []
+
+                    for slot_idx in range(SCRIPTS_PER_EXTENT):
                         if offset + 8 > len(data):
-                            return -1
+                            return all_scripts, scripts_by_type, -1
 
-                        # First two fields: scr_id, scr_next
-                        scr_id = struct.unpack('>i', data[offset:offset+4])[0]
-                        offset += 8  # scr_id + scr_next
+                        script = MapScript()
+
+                        # Read scr_id and scr_next
+                        script.scr_id = struct.unpack('>i', data[offset:offset+4])[0]
+                        script.scr_next = struct.unpack('>i', data[offset+4:offset+8])[0]
+                        offset += 8
 
                         # Determine script type from SID
-                        sid_type = (scr_id >> 24) & 0xFF
+                        sid_type = (script.scr_id >> 24) & 0xFF
 
                         # Type-specific extra fields
-                        if sid_type == 1:  # SPATIAL
-                            offset += 8  # built_tile + radius
-                        elif sid_type == 2:  # TIMED
-                            offset += 4  # time
+                        if sid_type == ScriptType.SPATIAL:
+                            script.built_tile = struct.unpack('>i', data[offset:offset+4])[0]
+                            script.radius = struct.unpack('>i', data[offset+4:offset+8])[0]
+                            offset += 8
+                        elif sid_type == ScriptType.TIMED:
+                            script.time = struct.unpack('>i', data[offset:offset+4])[0]
+                            offset += 4
 
-                        # Remaining 14 common fields
+                        # Read 14 common fields
+                        script.scr_flags = struct.unpack('>i', data[offset:offset+4])[0]
+                        script.scr_script_idx = struct.unpack('>i', data[offset+4:offset+8])[0]
+                        # Skip program pointer (offset+8 to offset+12)
+                        script.scr_oid = struct.unpack('>i', data[offset+12:offset+16])[0]
+                        script.scr_local_var_offset = struct.unpack('>i', data[offset+16:offset+20])[0]
+                        script.scr_num_local_vars = struct.unpack('>i', data[offset+20:offset+24])[0]
+                        script.field_28 = struct.unpack('>i', data[offset+24:offset+28])[0]
+                        script.action = struct.unpack('>i', data[offset+28:offset+32])[0]
+                        script.fixed_param = struct.unpack('>i', data[offset+32:offset+36])[0]
+                        script.action_being_used = struct.unpack('>i', data[offset+36:offset+40])[0]
+                        script.script_overrides = struct.unpack('>i', data[offset+40:offset+44])[0]
+                        script.field_48 = struct.unpack('>i', data[offset+44:offset+48])[0]
+                        script.how_much = struct.unpack('>i', data[offset+48:offset+52])[0]
+                        script.run_info_flags = struct.unpack('>i', data[offset+52:offset+56])[0]
                         offset += 14 * 4  # 56 bytes
 
-                    # After 16 scripts: length + next pointer
+                        extent_scripts.append(script)
+
+                    # Read extent length and next pointer
+                    extent_length = struct.unpack('>i', data[offset:offset+4])[0]
+                    # next pointer at offset+4 is ignored
                     offset += 8
 
-            return offset
+                    # Only add valid scripts from this extent
+                    for i in range(min(extent_length, SCRIPTS_PER_EXTENT)):
+                        script = extent_scripts[i]
+                        all_scripts.append(script)
+                        scripts_by_type[script_type].append(script)
+                        scripts_read += 1
+
+            return all_scripts, scripts_by_type, offset
 
         except (struct.error, IndexError):
-            return -1
+            return all_scripts, scripts_by_type, -1
 
     def _find_objects_offset(self, data: bytes, start_offset: int) -> int:
         """
@@ -1008,6 +1152,9 @@ Examples:
 
   # Show all objects with scripts
   python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripted
+
+  # Show all scripts on a map
+  python -m fallout_data.map /path/to/MASTER.DAT maps/junktown.map --scripts
 """
     )
     parser.add_argument('dat_file', help='Path to MASTER.DAT')
@@ -1016,8 +1163,9 @@ Examples:
     parser.add_argument('-c', '--critters', action='store_true', help='Show only critters')
     parser.add_argument('-i', '--items', action='store_true', help='Show only items')
     parser.add_argument('-s', '--scripted', action='store_true', help='Show only objects with scripts')
+    parser.add_argument('-S', '--scripts', action='store_true', help='Show scripts instead of objects')
     parser.add_argument('-e', '--elevation', type=int, help='Filter by elevation (0-2)')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed object info')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed object/script info')
 
     args = parser.parse_args()
 
@@ -1036,7 +1184,8 @@ Examples:
                 parser.error("map_path is required unless using --list")
 
             # Parse the map
-            map_data = MapParser.parse_from_dat(dat, args.map_path)
+            map_parser = MapParser()
+            map_data = map_parser.parse_from_dat(dat, args.map_path)
 
             print(f"Map: {map_data.header.name}")
             print(f"Version: {map_data.header.version}")
@@ -1044,7 +1193,27 @@ Examples:
                   f"elevation={map_data.header.entering_elevation}, "
                   f"rotation={map_data.header.entering_rotation}")
             print(f"Total objects: {len(map_data.objects)}")
+            print(f"Total scripts: {len(map_data.scripts)}")
             print()
+
+            # Show scripts mode
+            if args.scripts:
+                for script_type in range(SCRIPT_TYPE_COUNT):
+                    type_scripts = map_data.scripts_by_type.get(script_type, [])
+                    if not type_scripts:
+                        continue
+
+                    type_name = ScriptType(script_type).name
+                    print(f"=== {type_name} Scripts ({len(type_scripts)}) ===")
+
+                    for script in type_scripts:
+                        if args.verbose:
+                            _print_script_verbose(script)
+                        else:
+                            _print_script_brief(script)
+
+                    print()
+                return
 
             # Filter objects
             objects = map_data.objects
@@ -1074,7 +1243,7 @@ Examples:
 
                 for obj in elev_objects:
                     if args.verbose:
-                        _print_object_verbose(obj)
+                        _print_object_verbose(obj, map_data)
                     else:
                         _print_object_brief(obj)
 
@@ -1088,6 +1257,33 @@ Examples:
         sys.exit(1)
 
 
+def _print_script_brief(script: MapScript) -> None:
+    """Print brief script info."""
+    type_name = script.script_type.name if script.script_type else "UNKNOWN"
+    oid_info = f" oid={script.scr_oid}" if script.scr_oid >= 0 else ""
+    tile_info = ""
+    if script.is_spatial:
+        tile_info = f" tile={script.tile} elev={script.elevation} radius={script.radius}"
+    print(f"  {type_name:8} idx={script.scr_script_idx:3}{oid_info}{tile_info}")
+
+
+def _print_script_verbose(script: MapScript) -> None:
+    """Print detailed script info."""
+    print(f"  {script}")
+    print(f"    scr_id=0x{script.scr_id:08X}, flags=0x{script.scr_flags:08X}")
+    if script.is_spatial:
+        print(f"    Spatial: tile={script.tile}, elev={script.elevation}, radius={script.radius}")
+    elif script.is_timed:
+        print(f"    Timed: time={script.time}")
+    if script.scr_oid >= 0:
+        print(f"    Owner object ID: {script.scr_oid}")
+    if script.scr_num_local_vars > 0:
+        print(f"    Local vars: offset={script.scr_local_var_offset}, count={script.scr_num_local_vars}")
+    if script.fixed_param != 0:
+        print(f"    Fixed param: {script.fixed_param}")
+    print()
+
+
 def _print_object_brief(obj: MapObject) -> None:
     """Print brief object info."""
     type_name = obj.object_type.name
@@ -1095,7 +1291,7 @@ def _print_object_brief(obj: MapObject) -> None:
     print(f"  {type_name:8} PID=0x{obj.pid:08X} tile={obj.tile:5}{script_info}")
 
 
-def _print_object_verbose(obj: MapObject) -> None:
+def _print_object_verbose(obj: MapObject, map_data: Optional[Map] = None) -> None:
     """Print detailed object info."""
     print(f"  {obj}")
     print(f"    FID=0x{obj.fid:08X}, flags=0x{obj.flags:08X}")
@@ -1103,6 +1299,12 @@ def _print_object_verbose(obj: MapObject) -> None:
 
     if obj.has_script:
         print(f"    Script: type={obj.script_type}, index={obj.script_id_number}")
+        # Try to find the script details
+        if map_data:
+            script = map_data.get_script_for_object(obj)
+            if script:
+                print(f"    Script details: idx={script.scr_script_idx}, "
+                      f"flags=0x{script.scr_flags:08X}, param={script.fixed_param}")
 
     if obj.critter_data:
         cd = obj.critter_data

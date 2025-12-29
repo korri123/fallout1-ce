@@ -43,8 +43,8 @@ from .script import (
     Procedure, Instruction, Script, ScriptIterator
 )
 from .map import (
-    ObjectType, ItemType, SceneryType, ObjectFlags,
-    CombatData, CritterData, InventoryItem, MapObject, MapHeader, Map,
+    ObjectType, ItemType, SceneryType, ObjectFlags, ScriptType,
+    CombatData, CritterData, InventoryItem, MapObject, MapHeader, MapScript, Map,
     MapParser
 )
 
@@ -79,11 +79,13 @@ __all__ = [
     'ItemType',
     'SceneryType',
     'ObjectFlags',
+    'ScriptType',
     'CombatData',
     'CritterData',
     'InventoryItem',
     'MapObject',
     'MapHeader',
+    'MapScript',
     'Map',
     'MapParser',
 
