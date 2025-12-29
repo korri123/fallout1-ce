@@ -180,6 +180,7 @@ OTHER THINGS TO REMEMBER:
 - ALWAYS add delivery info, so that we do not end up with NARRATOR like voices, we want VOICE ACTING
 - Don't confuse the model by including "Peasant" or "Berserker", these are Fallout specific terms it doesn't know.
 - "Children" usually means Children of the Cathedral, a faction, rather than actual child speaking. There might be child characters though, just don't get them confused. 
+- For adult male characters specifying pitch is important
 
 OUTPUT FORMAT:
 Return the voice design prompt as a single paragraph, 2-4 sentences max.

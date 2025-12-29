@@ -1,0 +1,570 @@
+"""
+Voice Synthesizer for Fallout 1 Characters
+
+Uses ElevenLabs API to:
+1. Create voices from text descriptions (voice_cache.json)
+2. Generate speech for dialogue lines (npc_dialogue.json)
+"""
+
+import base64
+import json
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterator
+
+from elevenlabs import ElevenLabs
+
+from audio_effects import apply_fade_out, DEFAULT_FADE_DURATION_MS
+
+# Default paths
+DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
+DEFAULT_NPC_DIALOGUE = Path(__file__).parent.parent / "tools" / "npc_dialogue.json"
+DEFAULT_OUTPUT_DIR = Path(__file__).parent / "output"
+DEFAULT_VOICE_IDS_FILE = Path(__file__).parent / "voice_ids.json"
+
+
+@dataclass
+class VoiceConfig:
+    """Configuration for a character's voice."""
+    name: str
+    description: str
+    voice_id: str | None = None
+    generated_voice_id: str | None = None  # Temporary preview ID
+
+
+@dataclass
+class DialogueLine:
+    """A single dialogue line to be synthesized."""
+    npc_key: str
+    line_id: int
+    text: str
+
+
+class VoiceIDCache:
+    """Persistent cache mapping character names to ElevenLabs voice IDs."""
+
+    def __init__(self, cache_file: Path = DEFAULT_VOICE_IDS_FILE):
+        self.cache_file = cache_file
+        self._cache: dict[str, str] = {}
+        self._load()
+
+    def _load(self):
+        if self.cache_file.exists():
+            with open(self.cache_file, 'r') as f:
+                self._cache = json.load(f)
+
+    def _save(self):
+        with open(self.cache_file, 'w') as f:
+            json.dump(self._cache, f, indent=2)
+
+    def get(self, name: str) -> str | None:
+        return self._cache.get(name.lower())
+
+    def set(self, name: str, voice_id: str):
+        self._cache[name.lower()] = voice_id
+        self._save()
+
+    def __contains__(self, name: str) -> bool:
+        return name.lower() in self._cache
+
+    def items(self):
+        return self._cache.items()
+
+
+class VoiceSynthesizer:
+    """
+    Synthesizes voices and speech using ElevenLabs API.
+
+    Workflow:
+    1. Load voice descriptions from voice_cache.json
+    2. Create voices using the Voice Design API
+    3. Load dialogue from npc_dialogue.json
+    4. Generate speech using Text-to-Speech API
+    """
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        voice_cache_file: Path = DEFAULT_VOICE_CACHE,
+        npc_dialogue_file: Path = DEFAULT_NPC_DIALOGUE,
+        output_dir: Path = DEFAULT_OUTPUT_DIR,
+        tts_model_id: str = "eleven_v3",
+        voice_design_model_id: str = "eleven_ttv_v3",
+        output_format: str = "mp3_44100_128",
+    ):
+        self.api_key = api_key or os.environ.get("ELEVENLABS_API_KEY")
+        if not self.api_key:
+            raise ValueError("ElevenLabs API key required. Set ELEVENLABS_API_KEY env var or pass api_key.")
+
+        self.client = ElevenLabs(api_key=self.api_key)
+        self.voice_cache_file = voice_cache_file
+        self.npc_dialogue_file = npc_dialogue_file
+        self.output_dir = output_dir
+        self.tts_model_id = tts_model_id
+        self.voice_design_model_id = voice_design_model_id
+        self.output_format = output_format
+        self.fade_out_ms = DEFAULT_FADE_DURATION_MS
+
+        # Voice ID persistence
+        self.voice_ids = VoiceIDCache()
+
+        # Loaded data
+        self._voice_descriptions: dict[str, str] = {}
+        self._dialogue_data: dict = {}
+
+    def load_voice_descriptions(self) -> dict[str, str]:
+        """Load voice descriptions from voice_cache.json."""
+        if not self._voice_descriptions:
+            with open(self.voice_cache_file, 'r') as f:
+                self._voice_descriptions = json.load(f)
+        return self._voice_descriptions
+
+    def load_dialogue(self) -> dict:
+        """Load dialogue data from npc_dialogue.json."""
+        if not self._dialogue_data:
+            with open(self.npc_dialogue_file, 'r') as f:
+                data = json.load(f)
+                self._dialogue_data = data.get("dialogue", data)
+        return self._dialogue_data
+
+    def get_npc_lines(self, npc_key: str) -> list[DialogueLine]:
+        """Get all dialogue lines for an NPC."""
+        dialogue = self.load_dialogue()
+        if npc_key not in dialogue:
+            raise KeyError(f"NPC '{npc_key}' not found in dialogue data")
+
+        npc_data = dialogue[npc_key]
+        lines = []
+        for line in npc_data.get("npc_lines", []):
+            lines.append(DialogueLine(
+                npc_key=npc_key,
+                line_id=line["id"],
+                text=line["text"],
+            ))
+        return lines
+
+    def get_sample_text(self, npc_key: str, min_length: int = 200, max_length: int = 500) -> str | None:
+        """
+        Get sample dialogue text for voice design.
+
+        ElevenLabs Voice Design API requires 3-5 sentences, 200-500 characters.
+        Combines sample_lines and npc_lines as needed to reach the target length.
+
+        Args:
+            npc_key: NPC identifier
+            min_length: Minimum text length (API requires ~200)
+            max_length: Maximum text length (API recommends ~500)
+
+        Returns:
+            Combined sample text, or None if not enough dialogue
+        """
+        dialogue = self.load_dialogue()
+        if npc_key.lower() not in dialogue:
+            return None
+
+        npc_data = dialogue[npc_key.lower()]
+        voice_info = npc_data.get("voice_info", {})
+
+        # Get sample_lines from voice_info
+        sample_lines = voice_info.get("sample_lines", [])
+
+        # Get all npc_lines as backup/supplement
+        npc_lines = [line["text"] for line in npc_data.get("npc_lines", [])]
+
+        # Build combined text, starting with sample_lines then adding npc_lines if needed
+        combined = ""
+        used_texts = set()
+
+        # First pass: use sample_lines
+        for line in sample_lines:
+            if line in used_texts:
+                continue
+            used_texts.add(line)
+
+            if combined:
+                combined += " "
+            combined += line
+
+            # Stop if we've reached max length
+            if len(combined) >= max_length:
+                break
+
+        # Second pass: if still too short, add from npc_lines
+        if len(combined) < min_length:
+            for line in npc_lines:
+                if line in used_texts:
+                    continue
+                used_texts.add(line)
+
+                if combined:
+                    combined += " "
+                combined += line
+
+                # Stop once we reach target range
+                if len(combined) >= min_length:
+                    break
+
+                # Hard stop at max
+                if len(combined) >= max_length:
+                    break
+
+        # Truncate if too long, try to break at word boundary
+        if len(combined) > max_length:
+            combined = combined[:max_length]
+            # Find last space to avoid cutting mid-word
+            last_space = combined.rfind(" ")
+            if last_space > min_length:
+                combined = combined[:last_space]
+
+        # Return None if still too short
+        if len(combined) < min_length:
+            return None
+
+        return combined
+
+    def design_voice(
+        self,
+        name: str,
+        description: str,
+    ) -> dict:
+        """
+        Design a voice from a text description.
+
+        Returns dict with 'generated_voice_id' and 'preview_audio' (base64).
+        """
+        print(f"[design] Designing voice for {name}...")
+
+        response = self.client.text_to_voice.create_previews(
+            voice_description=description,
+            auto_generate_text=True,
+            output_format="mp3_22050_32",
+        )
+
+        # Get the first preview
+        if response.previews and len(response.previews) > 0:
+            preview = response.previews[0]
+            return {
+                "generated_voice_id": preview.generated_voice_id,
+                "preview_audio": preview.audio_base_64,
+            }
+
+        raise RuntimeError(f"No voice previews generated for {name}")
+
+    def create_voice_from_preview(
+        self,
+        name: str,
+        description: str,
+        generated_voice_id: str,
+    ) -> str:
+        """
+        Create a permanent voice from a preview.
+
+        Returns the permanent voice_id.
+        """
+        print(f"[create] Creating permanent voice for {name}...")
+
+        response = self.client.text_to_voice.create(
+            voice_name=name,
+            voice_description=description,
+            generated_voice_id=generated_voice_id,
+        )
+
+        voice_id = response.voice_id
+        self.voice_ids.set(name, voice_id)
+        print(f"[created] Voice ID: {voice_id}")
+        return voice_id
+
+    def get_or_create_voice(
+        self,
+        name: str,
+        description: str | None = None,
+        force_recreate: bool = False,
+    ) -> str:
+        """
+        Get existing voice ID or create a new voice.
+
+        Args:
+            name: Character name (key in voice_cache.json)
+            description: Voice description (loaded from cache if not provided)
+            force_recreate: If True, create new voice even if one exists
+
+        Returns:
+            ElevenLabs voice_id
+        """
+        # Check if we already have a voice ID
+        if not force_recreate and name in self.voice_ids:
+            voice_id = self.voice_ids.get(name)
+            print(f"[cached] Using existing voice for {name}: {voice_id}")
+            return voice_id
+
+        # Load description if not provided
+        if not description:
+            descriptions = self.load_voice_descriptions()
+            if name.lower() not in descriptions:
+                raise KeyError(f"No voice description found for '{name}'")
+            description = descriptions[name.lower()]
+
+        # Design and create the voice
+        preview = self.design_voice(name, description)
+        voice_id = self.create_voice_from_preview(
+            name=name,
+            description=description,
+            generated_voice_id=preview["generated_voice_id"],
+        )
+
+        return voice_id
+
+    def synthesize_line(
+        self,
+        text: str,
+        voice_id: str,
+        output_path: Path | None = None,
+    ) -> bytes:
+        """
+        Synthesize a single line of dialogue.
+
+        Args:
+            text: The text to speak
+            voice_id: ElevenLabs voice ID
+            output_path: Optional path to save the audio file
+
+        Returns:
+            Audio data as bytes
+        """
+        audio = self.client.text_to_speech.convert(
+            voice_id=voice_id,
+            text=text,
+            model_id=self.tts_model_id,
+            output_format=self.output_format,
+            language_code='en',
+        )
+
+        # Convert generator to bytes
+        audio_bytes = b"".join(audio)
+
+        # Apply fade-out effect
+        if self.fade_out_ms > 0:
+            audio_bytes = apply_fade_out(audio_bytes, self.fade_out_ms)
+
+        if output_path:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_path, 'wb') as f:
+                f.write(audio_bytes)
+            print(f"[saved] {output_path}")
+
+        return audio_bytes
+
+    def synthesize_line_streaming(
+        self,
+        text: str,
+        voice_id: str,
+    ) -> Iterator[bytes]:
+        """
+        Synthesize a line with streaming output.
+
+        Yields audio chunks as they're generated.
+        """
+        return self.client.text_to_speech.stream(
+            voice_id=voice_id,
+            text=text,
+            model_id=self.tts_model_id,
+            output_format=self.output_format,
+        )
+
+    def synthesize_npc_dialogue(
+        self,
+        npc_key: str,
+        voice_id: str | None = None,
+        max_lines: int | None = None,
+    ) -> list[Path]:
+        """
+        Synthesize all dialogue for an NPC.
+
+        Args:
+            npc_key: NPC identifier (e.g., "abel", "agatha")
+            voice_id: Optional voice ID (will look up or create if not provided)
+            max_lines: Optional limit on number of lines to synthesize
+
+        Returns:
+            List of output file paths
+        """
+        # Get or create voice
+        if not voice_id:
+            voice_id = self.get_or_create_voice(npc_key)
+
+        # Get dialogue lines
+        lines = self.get_npc_lines(npc_key)
+        if max_lines:
+            lines = lines[:max_lines]
+
+        # Create output directory for this NPC
+        npc_output_dir = self.output_dir / npc_key
+        npc_output_dir.mkdir(parents=True, exist_ok=True)
+
+        output_files = []
+        for i, line in enumerate(lines):
+            output_path = npc_output_dir / f"{line.line_id}.mp3"
+
+            print(f"[{i+1}/{len(lines)}] Synthesizing line {line.line_id}: {line.text[:50]}...")
+
+            self.synthesize_line(
+                text=line.text,
+                voice_id=voice_id,
+                output_path=output_path,
+            )
+            output_files.append(output_path)
+
+        return output_files
+
+    def synthesize_all_npcs(
+        self,
+        npc_keys: list[str] | None = None,
+        max_lines_per_npc: int | None = None,
+    ) -> dict[str, list[Path]]:
+        """
+        Synthesize dialogue for multiple NPCs.
+
+        Args:
+            npc_keys: List of NPC keys to process (defaults to all in voice_cache)
+            max_lines_per_npc: Optional limit per NPC
+
+        Returns:
+            Dict mapping NPC keys to their output file lists
+        """
+        if npc_keys is None:
+            # Use all NPCs that have voice descriptions
+            descriptions = self.load_voice_descriptions()
+            npc_keys = list(descriptions.keys())
+
+        results = {}
+        for npc_key in npc_keys:
+            try:
+                print(f"\n=== Processing {npc_key} ===")
+                results[npc_key] = self.synthesize_npc_dialogue(
+                    npc_key=npc_key,
+                    max_lines=max_lines_per_npc,
+                )
+            except Exception as e:
+                print(f"[error] Failed to process {npc_key}: {e}")
+                results[npc_key] = []
+
+        return results
+
+    def list_available_npcs(self) -> list[str]:
+        """List NPCs that have both voice descriptions and dialogue."""
+        descriptions = self.load_voice_descriptions()
+        dialogue = self.load_dialogue()
+
+        # NPCs with both voice descriptions and dialogue
+        available = []
+        for npc_key in descriptions.keys():
+            if npc_key in dialogue:
+                line_count = len(dialogue[npc_key].get("npc_lines", []))
+                available.append((npc_key, line_count))
+
+        return available
+
+    def list_voices(self) -> list[dict]:
+        """List all voices in the ElevenLabs account."""
+        response = self.client.voices.get_all()
+        return [
+            {"voice_id": v.voice_id, "name": v.name, "category": v.category}
+            for v in response.voices
+        ]
+
+
+# CLI interface
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Synthesize Fallout 1 NPC voices using ElevenLabs"
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # list-npcs command
+    list_parser = subparsers.add_parser("list-npcs", help="List available NPCs")
+
+    # list-voices command
+    voices_parser = subparsers.add_parser("list-voices", help="List ElevenLabs voices")
+
+    # create-voice command
+    create_parser = subparsers.add_parser("create-voice", help="Create a voice for an NPC")
+    create_parser.add_argument("npc", help="NPC name/key")
+    create_parser.add_argument("--force", action="store_true", help="Recreate even if exists")
+
+    # synthesize command
+    synth_parser = subparsers.add_parser("synthesize", help="Synthesize dialogue for an NPC")
+    synth_parser.add_argument("npc", help="NPC name/key")
+    synth_parser.add_argument("--voice-id", help="Override voice ID")
+    synth_parser.add_argument("--max-lines", type=int, help="Max lines to synthesize")
+
+    # synthesize-all command
+    all_parser = subparsers.add_parser("synthesize-all", help="Synthesize all NPCs")
+    all_parser.add_argument("--max-lines", type=int, help="Max lines per NPC")
+
+    # preview command
+    preview_parser = subparsers.add_parser("preview", help="Preview a voice design")
+    preview_parser.add_argument("npc", help="NPC name/key")
+    preview_parser.add_argument("--save", help="Save preview to file")
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return
+
+    synth = VoiceSynthesizer()
+
+    if args.command == "list-npcs":
+        npcs = synth.list_available_npcs()
+        print(f"Available NPCs ({len(npcs)}):")
+        for npc_key, line_count in sorted(npcs):
+            print(f"  {npc_key}: {line_count} lines")
+
+    elif args.command == "list-voices":
+        voices = synth.list_voices()
+        print(f"ElevenLabs Voices ({len(voices)}):")
+        for v in voices:
+            print(f"  {v['name']}: {v['voice_id']} ({v['category']})")
+
+    elif args.command == "create-voice":
+        voice_id = synth.get_or_create_voice(args.npc, force_recreate=args.force)
+        print(f"Voice ID for {args.npc}: {voice_id}")
+
+    elif args.command == "synthesize":
+        files = synth.synthesize_npc_dialogue(
+            npc_key=args.npc,
+            voice_id=args.voice_id,
+            max_lines=args.max_lines,
+        )
+        print(f"\nSynthesized {len(files)} files for {args.npc}")
+
+    elif args.command == "synthesize-all":
+        results = synth.synthesize_all_npcs(max_lines_per_npc=args.max_lines)
+        print("\n=== Summary ===")
+        for npc, files in results.items():
+            print(f"  {npc}: {len(files)} files")
+
+    elif args.command == "preview":
+        descriptions = synth.load_voice_descriptions()
+        if args.npc.lower() not in descriptions:
+            print(f"Error: No voice description for '{args.npc}'")
+            return
+
+        description = descriptions[args.npc.lower()]
+        print(f"Description: {description}\n")
+
+        preview = synth.design_voice(args.npc, description)
+        print(f"Generated Voice ID: {preview['generated_voice_id']}")
+
+        if args.save:
+            audio_data = base64.b64decode(preview["preview_audio"])
+            with open(args.save, 'wb') as f:
+                f.write(audio_data)
+            print(f"Saved preview to: {args.save}")
+
+
+if __name__ == "__main__":
+    main()

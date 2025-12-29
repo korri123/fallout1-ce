@@ -195,9 +195,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see Mitch of the All-N-One store.",
         "faction": "Guard Gung-Ho",
-        "sample_lines": [
-          "How may I help you today?"
-        ]
+        "sample_lines": ["How may I help you today?"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -1660,10 +1658,7 @@
         "creature_type": "Child",
         "appearance": "You see a small child.",
         "faction": "Little Kids",
-        "sample_lines": [
-          "Hi!",
-          "Hey, are you gonna kill someone?"
-        ]
+        "sample_lines": ["Hi!", "Hey, are you gonna kill someone?"]
       },
       "description": "",
       "npc_line_count": 2,
@@ -1945,9 +1940,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see a citizen of Shady Sands.",
         "faction": "Peasant",
-        "sample_lines": [
-          "Welcome to Shady Sands, stranger!"
-        ]
+        "sample_lines": ["Welcome to Shady Sands, stranger!"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -2059,10 +2052,7 @@
         "creature_type": "Human (Male)",
         "appearance": "Doc Morbid's assistant, Cougar.",
         "faction": "Rippers",
-        "sample_lines": [
-          "How's it going?",
-          "The Cougar is always fine."
-        ]
+        "sample_lines": ["How's it going?", "The Cougar is always fine."]
       },
       "description": "",
       "npc_line_count": 2,
@@ -2112,11 +2102,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see a weather-beaten farmer.",
         "faction": "Peasant",
-        "sample_lines": [
-          "Good day.",
-          "Hello again.",
-          "What can I do for you?"
-        ]
+        "sample_lines": ["Good day.", "Hello again.", "What can I do for you?"]
       },
       "description": "",
       "npc_line_count": 7,
@@ -3382,10 +3368,7 @@
         "creature_type": "Human (Female)",
         "appearance": "You see Paladin Farli.",
         "faction": "Brotherhood Paladin",
-        "sample_lines": [
-          "Greetings.",
-          "Katja chu nee ka Chak'ra Farli."
-        ]
+        "sample_lines": ["Greetings.", "Katja chu nee ka Chak'ra Farli."]
       },
       "description": "",
       "npc_line_count": 2,
@@ -4505,9 +4488,7 @@
         "creature_type": "",
         "appearance": "Hello! What can I do for you?",
         "faction": "",
-        "sample_lines": [
-          "Hello! What can I do for you?"
-        ]
+        "sample_lines": ["Hello! What can I do for you?"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -4755,9 +4736,7 @@
         "creature_type": "Super Mutant",
         "appearance": "Command, this is Guardhouse. All clear. Out.",
         "faction": "Super Mutant, Normal",
-        "sample_lines": [
-          "Good. Come with me, no laugh-type stuff."
-        ]
+        "sample_lines": ["Good. Come with me, no laugh-type stuff."]
       },
       "description": "",
       "npc_line_count": 1,
@@ -5029,10 +5008,7 @@
         "creature_type": "Human (Male)",
         "appearance": "Hey!",
         "faction": "Guard",
-        "sample_lines": [
-          "What?",
-          "I'm on duty. Make it quick."
-        ]
+        "sample_lines": ["What?", "I'm on duty. Make it quick."]
       },
       "description": "Human male dressed in protective leather clothing",
       "npc_line_count": 2,
@@ -5262,8 +5238,8 @@
         "faction": "Peasant",
         "sample_lines": [
           "Sorry, no boxing today.",
-          "Try again tomorrow. Saul will be boxing then.",
-          "You just missed it. Try again in a couple of days. Saul boxes every three days."
+          "Try again tomorrow. Saal will be boxing then.",
+          "You just missed it. Try again in a couple of days. Saal boxes every three days."
         ]
       },
       "description": "",
@@ -5276,11 +5252,11 @@
         },
         {
           "id": 105,
-          "text": "Try again tomorrow. Saul will be boxing then."
+          "text": "Try again tomorrow. Saal will be boxing then."
         },
         {
           "id": 106,
-          "text": "You just missed it. Try again in a couple of days. Saul boxes every three days."
+          "text": "You just missed it. Try again in a couple of days. Saal boxes every three days."
         },
         {
           "id": 113,
@@ -5292,7 +5268,7 @@
         },
         {
           "id": 120,
-          "text": "Who do you want to bet on, Saul or the challenger? Odds favor Saul winning. Cost is 25 caps to bet; you get 50 if you win betting on Saul, 100 if you win betting on the challenger!"
+          "text": "Who do you want to bet on, Saal or the challenger? Odds favor Saal winning. Cost is 25 caps to bet; you get 50 if you win betting on Saal, 100 if you win betting on the challenger!"
         },
         {
           "id": 123,
@@ -5300,7 +5276,7 @@
         },
         {
           "id": 128,
-          "text": "Saul, the fastest fist in Junktown! He's a marvel of manly musculature! A pulsating power puncher!"
+          "text": "Saal, the fastest fist in Junktown! He's a marvel of manly musculature! A pulsating power puncher!"
         },
         {
           "id": 129,
@@ -5308,7 +5284,7 @@
         },
         {
           "id": 132,
-          "text": "Gizmo, the casino owner, employs Saul. He occasionally likes to watch a match or two, but mostly it's good money - people will bet a lot on a fight. And nobody has to get killed, unlike those death matches they supposedly have in the Hub."
+          "text": "Gizmo, the casino owner, employs Saal. He occasionally likes to watch a match or two, but mostly it's good money - people will bet a lot on a fight. And nobody has to get killed, unlike those death matches they supposedly have in the Hub."
         },
         {
           "id": 135,
@@ -6159,9 +6135,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see a burly bounty hunter with a button that reads, 'I'm Christopher and you're meat.'",
         "faction": "Berzerker",
-        "sample_lines": [
-          "What do you want?"
-        ]
+        "sample_lines": ["What do you want?"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -6395,9 +6369,7 @@
         "creature_type": "Human (Female)",
         "appearance": "You see Jain",
         "faction": "CoC Jain",
-        "sample_lines": [
-          "Relax, I didn't mean it!"
-        ]
+        "sample_lines": ["Relax, I didn't mean it!"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -8034,9 +8006,7 @@
         "creature_type": "",
         "appearance": "You see a Knight.",
         "faction": "",
-        "sample_lines": [
-          "Hello Initiate. I'm Larry, how may I help you?"
-        ]
+        "sample_lines": ["Hello Initiate. I'm Larry, how may I help you?"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -9184,9 +9154,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see a guard.",
         "faction": "Brotherhood Knight",
-        "sample_lines": [
-          "What is your business here?"
-        ]
+        "sample_lines": ["What is your business here?"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -9644,9 +9612,7 @@
         "creature_type": "",
         "appearance": "You see Orfeo, a Senior Member of the Children of the Cathedral.",
         "faction": "",
-        "sample_lines": [
-          "Ah. A new convert. Welcome."
-        ]
+        "sample_lines": ["Ah. A new convert. Welcome."]
       },
       "description": "",
       "npc_line_count": 1,
@@ -11075,16 +11041,16 @@
     "saul": {
       "script_name": "saul",
       "script_index": 527,
-      "npc_name": "Saul",
+      "npc_name": "Saal",
       "voice_info": {
         "gender": "Male",
         "creature_type": "Human (Male)",
-        "appearance": "You see Saul, the boxer.",
+        "appearance": "You see Saal, the boxer.",
         "faction": "Guard",
         "sample_lines": [
           "What do you want?",
           "Yes?",
-          "[Saul laughs heartily.] Why, I am a boxer!"
+          "[Saal laughs heartily.] Why, I am a boxer!"
         ]
       },
       "description": "",
@@ -11101,7 +11067,7 @@
         },
         {
           "id": 111,
-          "text": "[Saul laughs heartily.] Why, I am a boxer!"
+          "text": "[Saal laughs heartily.] Why, I am a boxer!"
         },
         {
           "id": 128,
@@ -11109,7 +11075,7 @@
         },
         {
           "id": 129,
-          "text": "I'm Saul."
+          "text": "I'm Saal."
         },
         {
           "id": 133,
@@ -11764,9 +11730,7 @@
         "creature_type": "Human (Male)",
         "appearance": "You see Smitty.",
         "faction": "Guard",
-        "sample_lines": [
-          "So you found yourself a plasma rifle!"
-        ]
+        "sample_lines": ["So you found yourself a plasma rifle!"]
       },
       "description": "",
       "npc_line_count": 1,
@@ -11986,9 +11950,7 @@
         "creature_type": "Super Mutant",
         "appearance": "It's some kind of huge super mutant creature! And it has a very large gun!",
         "faction": "Super Mutant",
-        "sample_lines": [
-          "You're on Unity soil. I'd better take you in."
-        ]
+        "sample_lines": ["You're on Unity soil. I'd better take you in."]
       },
       "description": "",
       "npc_line_count": 1,
@@ -12794,7 +12756,7 @@
         },
         {
           "id": 158,
-          "text": "Saul is my boyfriend. He's really good to me."
+          "text": "Saal is my boyfriend. He's really good to me."
         },
         {
           "id": 161,
@@ -13546,9 +13508,7 @@
         "creature_type": "Human (Female)",
         "appearance": "You look distraught. Are you in need of assistance?",
         "faction": "Peasant",
-        "sample_lines": [
-          "You look distraught. Are you in need of assistance?"
-        ]
+        "sample_lines": ["You look distraught. Are you in need of assistance?"]
       },
       "description": "",
       "npc_line_count": 1,

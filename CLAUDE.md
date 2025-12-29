@@ -199,3 +199,8 @@ All code is in the `fallout` namespace (228 files).
 
 The game files can be found in `/Applications/Fallout/`, including MASTER.DAT
 The game .app is located in `/Applications/Fallout/Fallout Community Edition.app`
+
+
+# Python notes
+- venv is located in .venv in this base directory
+- use python3 and not python as commands
