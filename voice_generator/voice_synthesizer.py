@@ -9,6 +9,7 @@ Uses ElevenLabs API to:
 import base64
 import json
 import os
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,9 +23,10 @@ DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
 DEFAULT_NPC_DIALOGUE = Path(__file__).parent.parent / "tools" / "npc_dialogue.json"
 DEFAULT_OUTPUT_DIR = Path(__file__).parent / "output"
 DEFAULT_VOICE_IDS_FILE = Path(__file__).parent / "voice_ids.json"
+DEFAULT_VOICE_SEEDS_FILE = Path(__file__).parent / "voice_seeds.json"
 
 # Creature-specific audio effects
-SUPER_MUTANT_PITCH_FACTOR = 0.85  # 20% lower pitch for Super Mutants
+SUPER_MUTANT_PITCH_FACTOR = 0.9  # 10% lower pitch for Super Mutants
 
 
 @dataclass
@@ -75,6 +77,37 @@ class VoiceIDCache:
         return self._cache.items()
 
 
+class VoiceSeedCache:
+    """Persistent cache mapping character names to voice design seeds for reproducibility."""
+
+    def __init__(self, cache_file: Path = DEFAULT_VOICE_SEEDS_FILE):
+        self.cache_file = cache_file
+        self._cache: dict[str, int] = {}
+        self._load()
+
+    def _load(self):
+        if self.cache_file.exists():
+            with open(self.cache_file, 'r') as f:
+                self._cache = json.load(f)
+
+    def _save(self):
+        with open(self.cache_file, 'w') as f:
+            json.dump(self._cache, f, indent=2, sort_keys=True)
+
+    def get(self, name: str) -> int | None:
+        return self._cache.get(name.lower())
+
+    def set(self, name: str, seed: int):
+        self._cache[name.lower()] = seed
+        self._save()
+
+    def __contains__(self, name: str) -> bool:
+        return name.lower() in self._cache
+
+    def items(self):
+        return self._cache.items()
+
+
 class VoiceSynthesizer:
     """
     Synthesizes voices and speech using ElevenLabs API.
@@ -113,6 +146,7 @@ class VoiceSynthesizer:
 
         # Voice ID persistence
         self.voice_ids = VoiceIDCache()
+        self.voice_seeds = VoiceSeedCache()
 
         # Expression enhancement (adds audio tags like [angrily], [whispering], etc.)
         self.enable_expression_enhancement = enable_expression_enhancement
@@ -274,18 +308,36 @@ class VoiceSynthesizer:
         self,
         name: str,
         description: str,
+        seed: int | None = None,
     ) -> dict:
         """
         Design a voice from a text description.
 
-        Returns dict with 'generated_voice_id' and 'preview_audio' (base64).
-        """
-        print(f"[design] Designing voice for {name}...")
+        Args:
+            name: Character name (used for seed storage)
+            description: Voice description text
+            seed: Optional seed for reproducibility (0-2147483647).
+                  If not provided, generates a random seed.
 
-        response = self.client.text_to_voice.create_previews(
+        Returns dict with 'generated_voice_id', 'preview_audio' (base64), and 'seed'.
+        """
+        # Generate random seed if not provided
+        if seed is None:
+            seed = random.randint(0, 2147483647)
+
+        # Store seed for reproducibility
+        self.voice_seeds.set(name, seed)
+        print(f"[design] Designing voice for {name} (seed={seed})...")
+
+        response = self.client.text_to_voice.design(
+            model_id=self.voice_design_model_id,
+            guidance_scale=4.4,
+            loudness=0.5,
             voice_description=description,
             auto_generate_text=True,
             output_format="mp3_22050_32",
+            should_enhance=True,
+            seed=seed,
         )
 
         # Get the first preview
@@ -294,6 +346,7 @@ class VoiceSynthesizer:
             return {
                 "generated_voice_id": preview.generated_voice_id,
                 "preview_audio": preview.audio_base_64,
+                "seed": seed,
             }
 
         raise RuntimeError(f"No voice previews generated for {name}")

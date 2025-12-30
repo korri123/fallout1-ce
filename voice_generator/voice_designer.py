@@ -197,6 +197,7 @@ SYSTEM_PROMPT = """You generate ElevenLabs voice design prompts for Fallout 1 ch
 8. **Specify gender:** The prompt needs to always include the sex of the character, directly or indirectly.
 9. **Exaggerate, exaggerate, exaggerate:** For the prompt to be effective you need to exaggerate every detail, almost to a comical extent.
 10. Remove any jargon that might confuse the model. Anything unnecessary must be removed.
+11. Create fun interesting descriptions instead of bland noes, like if this were a character on The Simpsons, what would he sound like? 
 
 ## Output Format
 ---
@@ -205,8 +206,19 @@ SYSTEM_PROMPT = """You generate ElevenLabs voice design prompts for Fallout 1 ch
 
 ## Example
 ---
-Gruff old man, 50s. Redneck drawl. Sounds like he's been chewing dirt. Bossy but not a jerk about it. Talks like a real person, not a narrator. Has a deep voice.
----"""
+Gruff old man, 50s. Redneck drawl. Sounds like he's been chewing dirt. Bossy but not a jerk about it. Has a deep voice.
+---
+
+## AVOID - This is a boring prompt:
+---
+Male guard, medium-low pitch. Sounds like a security guard at an office building - polite but firm, a bit bored from the quiet shift but still alert. Direct, no-nonsense talker. American accent.
+---
+
+## BETTER:
+---
+Male, mid-40s. Deep gravelly voice. Sounds perpetually tired but trying to seem important. Midwestern American accent.
+---
+"""
 
 
 async def generate_voice_prompt(
