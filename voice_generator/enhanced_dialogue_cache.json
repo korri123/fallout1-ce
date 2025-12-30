@@ -735,6 +735,18 @@
     "ghguard:102": "[with raspy wariness] You shouldn't be here . . .",
     "ghguard:106": "[in a gravelly, measured tone] That doesn't sound right. You'd better come along with me.",
     "ghguard:109": "[with professional concern, voice grinding] I don't think you want to go to that room.",
-    "ghguard:113": "[slowly, each word grating like stone] We are here to make sure that people that don't belong in Set's room don't go into it. Not for Set's safety, actually, but for theirs. Anything else?"
+    "ghguard:113": "[slowly, each word grating like stone] We are here to make sure that people that don't belong in Set's room don't go into it. Not for Set's safety, actually, but for theirs. Anything else?",
+    "ghoul:101": "[with a raspy bark] Whatta you doing here?",
+    "ghoul:106": "[growling menacingly] Whad' you say?",
+    "ghoul:112": "[snarling through gravel-scraped throat] Donna be in my face likka dat. I runna dis show.",
+    "gideon:101": "[intensely, voice trailing] Jason is a living god! Only the nullified may pass!",
+    "gideon:107": "[spacily, confused] The walls also have minds . . . I saw you . . . tomorrow?",
+    "gideon:113": "[mumbling, lost] Jason? Who's Jason?",
+    "gideon:116": "[reverently, drifting] Yes, the walls are alive with those that have gone before.",
+    "gideon:119": "[dreamily, fragmented] Meeting of the soul . . . melded with, to protect, the Master of all.",
+    "gideon:125": "[whispering, voice trailing off] There is only peace and joining . . . the price . . . the pain . . . one must be blind . . . nulled.",
+    "gideon:130": "[softly, wobbling] I will anoint you . . . I must give what I must not.",
+    "gideon:135": "[manically, laughing] You cannot kill the genius of . . . the all . . . you . . . hehf!",
+    "gideon:145": "[ominously spaced-out, trailing] Those who have gone before . . . must stop your journey."
   }
 }

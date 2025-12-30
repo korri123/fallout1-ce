@@ -237,6 +237,10 @@ async def generate_voice_prompt(
     Returns:
         A concise voice design prompt string for ElevenLabs
     """
+    # Skip Ghouls - they use a shared pre-made voice
+    if character.creature_type and character.creature_type.lower() == "ghoul":
+        return "[Uses shared Ghoul voice]"
+
     key = character.cache_key()
 
     # Check cache first
@@ -294,6 +298,12 @@ async def generate_voice_prompts_batch(
     """
     results = {}
     for char in characters:
+        # Skip Ghouls - they use a shared pre-made voice
+        if char.creature_type and char.creature_type.lower() == "ghoul":
+            print(f"[ghoul] {char.name} - uses shared Ghoul voice")
+            results[char.name] = "[Uses shared Ghoul voice]"
+            continue
+
         key = char.cache_key()
         if cache and not force and key in cache:
             print(f"[cached] {char.name}")

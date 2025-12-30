@@ -28,6 +28,12 @@ DEFAULT_VOICE_SEEDS_FILE = Path(__file__).parent / "voice_seeds.json"
 # Creature-specific audio effects
 SUPER_MUTANT_PITCH_FACTOR = 0.9  # 10% lower pitch for Super Mutants
 
+# Shared voice for Ghouls - all ghoul characters use the same voice
+GHOUL_VOICE_ID = "KAJMJ4av1R2CVQ10ndCZ"
+
+# Protected voices that should not be deleted
+PROTECTED_VOICES = {"Ghoul"}
+
 
 @dataclass
 class VoiceConfig:
@@ -407,6 +413,12 @@ class VoiceSynthesizer:
         Returns:
             ElevenLabs voice_id
         """
+        # Check if this is a Ghoul - use shared Ghoul voice
+        creature_type = self.get_creature_type(name)
+        if creature_type and creature_type.lower() == "ghoul":
+            print(f"[ghoul] Using shared Ghoul voice for {name}: {GHOUL_VOICE_ID}")
+            return GHOUL_VOICE_ID
+
         # Check if we already have a voice ID
         if not force_recreate and name in self.voice_ids:
             voice_id = self.voice_ids.get(name)
@@ -642,7 +654,11 @@ class VoiceSynthesizer:
             Number of voices deleted (or would be deleted in dry_run mode)
         """
         voices = self.list_voices()
-        custom_voices = [v for v in voices if v["category"] not in ("premade", "professional")]
+        custom_voices = [
+            v for v in voices
+            if v["category"] not in ("premade", "professional")
+            and v["name"] not in PROTECTED_VOICES
+        ]
 
         if not custom_voices:
             print("[info] No custom voices to delete")
