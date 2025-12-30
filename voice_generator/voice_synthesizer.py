@@ -15,7 +15,8 @@ from typing import Iterator
 
 from elevenlabs import ElevenLabs
 
-from audio_effects import apply_fade_out, DEFAULT_FADE_DURATION_MS
+from audio_effects import apply_fade_out, normalize_loudness, DEFAULT_FADE_DURATION_MS, DEFAULT_TARGET_LUFS
+from expression_enhancer import ExpressionEnhancer
 
 # Default paths
 DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
@@ -89,9 +90,10 @@ class VoiceSynthesizer:
         voice_cache_file: Path = DEFAULT_VOICE_CACHE,
         npc_dialogue_file: Path = DEFAULT_NPC_DIALOGUE,
         output_dir: Path = DEFAULT_OUTPUT_DIR,
-        tts_model_id: str = "eleven_v3",
+        tts_model_id: str = "eleven_multilingual_v2",
         voice_design_model_id: str = "eleven_ttv_v3",
         output_format: str = "mp3_44100_128",
+        enable_expression_enhancement: bool = True,
     ):
         self.api_key = api_key or os.environ.get("ELEVENLABS_API_KEY")
         if not self.api_key:
@@ -105,13 +107,27 @@ class VoiceSynthesizer:
         self.voice_design_model_id = voice_design_model_id
         self.output_format = output_format
         self.fade_out_ms = DEFAULT_FADE_DURATION_MS
+        self.normalize_lufs = DEFAULT_TARGET_LUFS  # -16 LUFS for consistent volume
 
         # Voice ID persistence
         self.voice_ids = VoiceIDCache()
 
+        # Expression enhancement (adds audio tags like [angrily], [whispering], etc.)
+        self.enable_expression_enhancement = enable_expression_enhancement
+        self._expression_enhancer: ExpressionEnhancer | None = None
+
         # Loaded data
         self._voice_descriptions: dict[str, str] = {}
         self._dialogue_data: dict = {}
+
+    def get_expression_enhancer(self) -> ExpressionEnhancer:
+        """Get or create the expression enhancer (lazy initialization)."""
+        if self._expression_enhancer is None:
+            self._expression_enhancer = ExpressionEnhancer(
+                voice_cache_file=self.voice_cache_file,
+                npc_dialogue_file=self.npc_dialogue_file,
+            )
+        return self._expression_enhancer
 
     def load_voice_descriptions(self) -> dict[str, str]:
         """Load voice descriptions from voice_cache.json."""
@@ -338,6 +354,11 @@ class VoiceSynthesizer:
             model_id=self.tts_model_id,
             output_format=self.output_format,
             language_code='en',
+            voice_settings={
+                "stability": 0.4,
+                "similarity_boost": 0.05,
+                "speed": 1.17,
+            }
         )
 
         # Convert generator to bytes
@@ -347,6 +368,10 @@ class VoiceSynthesizer:
         if self.fade_out_ms > 0:
             audio_bytes = apply_fade_out(audio_bytes, self.fade_out_ms)
 
+        # Normalize loudness for consistent volume across all files
+        if self.normalize_lufs is not None:
+            audio_bytes = normalize_loudness(audio_bytes, self.normalize_lufs)
+
         if output_path:
             output_path.parent.mkdir(parents=True, exist_ok=True)
             with open(output_path, 'wb') as f:
@@ -355,28 +380,12 @@ class VoiceSynthesizer:
 
         return audio_bytes
 
-    def synthesize_line_streaming(
-        self,
-        text: str,
-        voice_id: str,
-    ) -> Iterator[bytes]:
-        """
-        Synthesize a line with streaming output.
-
-        Yields audio chunks as they're generated.
-        """
-        return self.client.text_to_speech.stream(
-            voice_id=voice_id,
-            text=text,
-            model_id=self.tts_model_id,
-            output_format=self.output_format,
-        )
-
     def synthesize_npc_dialogue(
         self,
         npc_key: str,
         voice_id: str | None = None,
         max_lines: int | None = None,
+        enhance: bool | None = None,
     ) -> list[Path]:
         """
         Synthesize all dialogue for an NPC.
@@ -385,6 +394,7 @@ class VoiceSynthesizer:
             npc_key: NPC identifier (e.g., "abel", "agatha")
             voice_id: Optional voice ID (will look up or create if not provided)
             max_lines: Optional limit on number of lines to synthesize
+            enhance: Override expression enhancement (None = use default setting)
 
         Returns:
             List of output file paths
@@ -398,22 +408,48 @@ class VoiceSynthesizer:
         if max_lines:
             lines = lines[:max_lines]
 
+        # Get enhanced text if enabled
+        should_enhance = enhance if enhance is not None else self.enable_expression_enhancement
+        enhanced_lines: dict[int, str] = {}
+
+        if should_enhance:
+            try:
+                enhancer = self.get_expression_enhancer()
+                enhanced_lines = enhancer.enhance_npc_dialogue(npc_key)
+            except Exception as e:
+                print(f"[warn] Expression enhancement failed: {e}")
+                print("[warn] Falling back to original text")
+
         # Create output directory for this NPC
         npc_output_dir = self.output_dir / npc_key
         npc_output_dir.mkdir(parents=True, exist_ok=True)
 
         output_files = []
+        skipped = 0
         for i, line in enumerate(lines):
             output_path = npc_output_dir / f"{line.line_id}.mp3"
 
-            print(f"[{i+1}/{len(lines)}] Synthesizing line {line.line_id}: {line.text[:50]}...")
+            if output_path.exists():
+                skipped += 1
+                output_files.append(output_path)
+                continue
+
+            # Use enhanced text if available, otherwise original
+            text_to_synthesize = enhanced_lines.get(line.line_id, line.text)
+
+            # Show what we're synthesizing
+            display_text = text_to_synthesize[:60] + "..." if len(text_to_synthesize) > 60 else text_to_synthesize
+            print(f"[{i+1}/{len(lines)}] Synthesizing line {line.line_id}: {display_text}")
 
             self.synthesize_line(
-                text=line.text,
+                text=text_to_synthesize,
                 voice_id=voice_id,
                 output_path=output_path,
             )
             output_files.append(output_path)
+
+        if skipped:
+            print(f"[skipped] {skipped} existing files")
 
         return output_files
 
@@ -499,10 +535,12 @@ def main():
     synth_parser.add_argument("npc", help="NPC name/key")
     synth_parser.add_argument("--voice-id", help="Override voice ID")
     synth_parser.add_argument("--max-lines", type=int, help="Max lines to synthesize")
+    synth_parser.add_argument("--no-enhance", action="store_true", help="Disable expression enhancement")
 
     # synthesize-all command
     all_parser = subparsers.add_parser("synthesize-all", help="Synthesize all NPCs")
     all_parser.add_argument("--max-lines", type=int, help="Max lines per NPC")
+    all_parser.add_argument("--no-enhance", action="store_true", help="Disable expression enhancement")
 
     # preview command
     preview_parser = subparsers.add_parser("preview", help="Preview a voice design")
@@ -534,14 +572,22 @@ def main():
         print(f"Voice ID for {args.npc}: {voice_id}")
 
     elif args.command == "synthesize":
+        # Determine enhancement setting
+        enhance = None if not args.no_enhance else False
+
         files = synth.synthesize_npc_dialogue(
             npc_key=args.npc,
             voice_id=args.voice_id,
             max_lines=args.max_lines,
+            enhance=enhance,
         )
         print(f"\nSynthesized {len(files)} files for {args.npc}")
 
     elif args.command == "synthesize-all":
+        # Set enhancement based on flag
+        if args.no_enhance:
+            synth.enable_expression_enhancement = False
+
         results = synth.synthesize_all_npcs(max_lines_per_npc=args.max_lines)
         print("\n=== Summary ===")
         for npc, files in results.items():
