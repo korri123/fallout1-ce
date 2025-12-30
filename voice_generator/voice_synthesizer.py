@@ -11,11 +11,10 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
 
 from elevenlabs import ElevenLabs
 
-from audio_effects import apply_fade_out, normalize_loudness, DEFAULT_FADE_DURATION_MS, DEFAULT_TARGET_LUFS
+from audio_effects import apply_fade_out, normalize_loudness, pitch_shift, DEFAULT_FADE_DURATION_MS, DEFAULT_TARGET_LUFS
 from expression_enhancer import ExpressionEnhancer
 
 # Default paths
@@ -23,6 +22,9 @@ DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
 DEFAULT_NPC_DIALOGUE = Path(__file__).parent.parent / "tools" / "npc_dialogue.json"
 DEFAULT_OUTPUT_DIR = Path(__file__).parent / "output"
 DEFAULT_VOICE_IDS_FILE = Path(__file__).parent / "voice_ids.json"
+
+# Creature-specific audio effects
+SUPER_MUTANT_PITCH_FACTOR = 0.85  # 20% lower pitch for Super Mutants
 
 
 @dataclass
@@ -159,6 +161,35 @@ class VoiceSynthesizer:
                 text=line["text"],
             ))
         return lines
+
+    def get_creature_type(self, npc_key: str) -> str | None:
+        """Get the creature_type from voice_info for an NPC."""
+        dialogue = self.load_dialogue()
+        if npc_key.lower() not in dialogue:
+            return None
+        npc_data = dialogue[npc_key.lower()]
+        voice_info = npc_data.get("voice_info", {})
+        return voice_info.get("creature_type") or None
+
+    def get_pitch_factor(self, npc_key: str) -> float:
+        """Get the pitch factor for an NPC based on creature type or appearance."""
+        creature_type = self.get_creature_type(npc_key)
+
+        # Check explicit creature_type first
+        if creature_type:
+            creature_lower = creature_type.lower()
+            if creature_lower in ("super mutant", "nightkin"):
+                return SUPER_MUTANT_PITCH_FACTOR
+
+        # Fallback: check appearance text if creature_type is blank
+        dialogue = self.load_dialogue()
+        if npc_key.lower() in dialogue:
+            npc_data = dialogue[npc_key.lower()]
+            appearance = npc_data.get("voice_info", {}).get("appearance", "").lower()
+            if "super mutant" in appearance or "nightkin" in appearance:
+                return SUPER_MUTANT_PITCH_FACTOR
+
+        return 1.0
 
     def get_sample_text(self, npc_key: str, min_length: int = 200, max_length: int = 500) -> str | None:
         """
@@ -351,6 +382,7 @@ class VoiceSynthesizer:
         text: str,
         voice_id: str,
         output_path: Path | None = None,
+        pitch_factor: float = 1.0,
     ) -> bytes:
         """
         Synthesize a single line of dialogue.
@@ -359,6 +391,7 @@ class VoiceSynthesizer:
             text: The text to speak
             voice_id: ElevenLabs voice ID
             output_path: Optional path to save the audio file
+            pitch_factor: Pitch multiplier (0.8 = 20% lower for Super Mutants)
 
         Returns:
             Audio data as bytes
@@ -376,6 +409,10 @@ class VoiceSynthesizer:
 
         # Convert generator to bytes
         audio_bytes = b"".join(audio)
+
+        # Apply pitch shift for creature types (e.g., Super Mutants)
+        if pitch_factor != 1.0:
+            audio_bytes = pitch_shift(audio_bytes, pitch_factor)
 
         # Apply fade-out effect
         if self.fade_out_ms > 0:
@@ -415,6 +452,15 @@ class VoiceSynthesizer:
         # Get or create voice
         if not voice_id:
             voice_id = self.get_or_create_voice(npc_key)
+
+        # Get pitch factor based on creature type (e.g., Super Mutants, Nightkin)
+        pitch_factor = self.get_pitch_factor(npc_key)
+        if pitch_factor != 1.0:
+            creature_type = self.get_creature_type(npc_key)
+            if creature_type:
+                print(f"[pitch] Applying {pitch_factor}x pitch shift for {creature_type}")
+            else:
+                print(f"[pitch] Applying {pitch_factor}x pitch shift (detected from appearance)")
 
         # Get dialogue lines
         lines = self.get_npc_lines(npc_key)
@@ -458,6 +504,7 @@ class VoiceSynthesizer:
                 text=text_to_synthesize,
                 voice_id=voice_id,
                 output_path=output_path,
+                pitch_factor=pitch_factor,
             )
             output_files.append(output_path)
 

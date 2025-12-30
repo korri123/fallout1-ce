@@ -10,8 +10,9 @@ import tempfile
 from pathlib import Path
 
 
-DEFAULT_FADE_DURATION_MS = 100
+DEFAULT_FADE_DURATION_MS = 50
 DEFAULT_TARGET_LUFS = -16.0
+DEFAULT_PITCH_SHIFT = 1.0  # 1.0 = no change, 0.8 = 20% lower pitch
 
 
 def normalize_loudness(audio_bytes: bytes, target_lufs: float = DEFAULT_TARGET_LUFS) -> bytes:
@@ -41,6 +42,55 @@ def normalize_loudness(audio_bytes: bytes, target_lufs: float = DEFAULT_TARGET_L
             [
                 "ffmpeg", "-y", "-i", tmp_in_path,
                 "-af", f"loudnorm=I={target_lufs}:TP=-1.5:LRA=11",
+                "-q:a", "2",
+                tmp_out_path
+            ],
+            capture_output=True,
+            check=True,
+        )
+
+        with open(tmp_out_path, "rb") as f:
+            return f.read()
+
+    finally:
+        Path(tmp_in_path).unlink(missing_ok=True)
+        Path(tmp_out_path).unlink(missing_ok=True)
+
+
+def pitch_shift(audio_bytes: bytes, pitch_factor: float = DEFAULT_PITCH_SHIFT) -> bytes:
+    """
+    Shift the pitch of audio without changing tempo.
+
+    Uses ffmpeg's rubberband filter for high-quality pitch shifting.
+
+    Args:
+        audio_bytes: MP3 audio data as bytes
+        pitch_factor: Pitch multiplier (0.8 = 20% lower, 1.2 = 20% higher)
+                     1.0 means no change
+
+    Returns:
+        Pitch-shifted audio as bytes
+    """
+    if pitch_factor == 1.0:
+        return audio_bytes
+
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_in:
+        tmp_in.write(audio_bytes)
+        tmp_in_path = tmp_in.name
+
+    tmp_out_path = tmp_in_path + ".pitch.mp3"
+
+    try:
+        # Use asetrate + aresample for pitch shifting without tempo change
+        # asetrate changes sample rate (which changes pitch and tempo)
+        # atempo compensates to restore original tempo
+        # For pitch_factor < 1, we need atempo > 1 to speed up
+        tempo_compensation = 1.0 / pitch_factor
+
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", tmp_in_path,
+                "-af", f"asetrate=44100*{pitch_factor},aresample=44100,atempo={tempo_compensation}",
                 "-q:a", "2",
                 tmp_out_path
             ],
