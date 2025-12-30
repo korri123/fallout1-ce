@@ -172,7 +172,7 @@ class VoiceCache:
 
 SYSTEM_PROMPT = """You generate ElevenLabs voice design prompts for Fallout 1 characters.
 
-**Output:** 150-300 characters ideal (hard limit: 1000). Voice qualities ONLY—no personality or backstory.
+**Output:** 150-300 characters ideal (hard limit: 1000). Voice qualities ONLY, no personality or backstory.
 
 ## Style Rules
 1. **Simple words a kid would understand.** No fancy thesaurus garbage.
@@ -188,12 +188,15 @@ SYSTEM_PROMPT = """You generate ElevenLabs voice design prompts for Fallout 1 ch
 
 ## Technical Rules
 1. **Pacing:** Never say "slow" or "deliberate" alone—makes it sluggish. Say "unhurried but natural" instead.
-2. **Performance:** Include acting direction ("talks like a real person," "actually sounds alive"). Without this you get boring robot narration.
+2. **Performance:** Include acting direction. Without this you get boring robot narration.
 3. **No Fallout jargon:** Ghoul → "throat sounds like gargling gravel from radiation"; Super Mutant → "big dumb monster, sounds like an orc"; Peasant → "poor worker."
-4. **"Children" = Children of the Cathedral cult (adults).** Only use kid voice if ACTUALLY a child. If Creature Type says Child, make it a TEENAGER.
+4. **"Children" = Children of the Cathedral cult (adults).** Only use kid voice if ACTUALLY a child. If Creature Type says Child, make it a TEENAGER. NEVER INCLUDE "BOY", "KID" OR THE AGE, it will be rejected.
 5. **Super Mutants/Nightkin:** Monster voices! Deep growly beast sounds, not just "deep voice." Think orc or ogre.
-6. **American accent** unless there's a good reason otherwise.
+6. **American accent:** unless there's a good reason otherwise.
 7. **Vary male voices:** Not everyone is a medium pitched guy. Nerds sound nerdy, young guys sound young.
+8. **Specify gender:** The prompt needs to always include the sex of the character, directly or indirectly.
+9. **Exaggerate, exaggerate, exaggerate:** For the prompt to be effective you need to exaggerate every detail, almost to a comical extent.
+10. Remove any jargon that might confuse the model. Anything unnecessary must be removed.
 
 ## Output Format
 ---
