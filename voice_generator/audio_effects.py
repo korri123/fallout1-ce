@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 
-DEFAULT_FADE_DURATION_MS = 50
+DEFAULT_FADE_DURATION_MS = 100
 DEFAULT_TARGET_LUFS = -16.0
 
 

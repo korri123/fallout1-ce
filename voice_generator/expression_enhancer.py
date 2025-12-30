@@ -124,17 +124,26 @@ Add tags in square brackets before or within dialogue lines. Examples:
 2. Use specific, evocative descriptions - not just basic emotions
 3. Consider the context of the conversation and character's situation
 4. For non-human characters (mutants, ghouls, etc.), include appropriate vocal qualities
-5. Don't over-tag - some neutral lines are fine without tags
-6. Tags can go mid-sentence for emphasis: "I told you [through gritted teeth] to leave."
-7. Multiple short tags are better than one long compound tag
-8. Keep the original text EXACTLY as-is, only add tags
+5. Tags can go mid-sentence for emphasis: "I told you [through gritted teeth] to leave."
+6. Multiple short tags are better than one long compound tag
+7. Keep the original text EXACTLY as-is, only add tags, unless you notice a typo.
 
 ## Common Tags
 Emotions: [angrily], [sadly], [nervously], [excitedly], [fearfully], [dismissively]
 Delivery: [whispering], [shouting], [muttering], [drawling], [quickly], [slowly]
 Actions: [sighing], [laughing], [scoffing], [growling], [coughing], [sobbing]
 Tone: [sarcastically], [mockingly], [threateningly], [pleadingly], [coldly]
-Character-specific: [with a gravelly rumble], [in a raspy croak], [with brutish slowness]"""
+Character-specific: [with a gravelly rumble], [in a raspy croak], [with brutish slowness]
+
+## Stage Directions
+Some dialogue contains existing bracketed stage directions describing actions, not speech.
+Examples: "[She looks down and shakes her head slowly.]", "[He sighs deeply]", "[Pauses]"
+These should be REPLACED with appropriate audio tags that convey the same emotion/action.
+- "[She looks down and shakes her head slowly.]" → [sadly, shaking head]
+- "[He sighs deeply]" → [sighing deeply]
+- "[Pauses]" → [with a pause]
+- "[She laughs nervously]" → [laughing nervously]
+Do NOT keep the original stage direction - transform it into a speakable audio tag."""
 
     def __init__(
         self,
@@ -279,10 +288,22 @@ Add appropriate expressive audio tags to each line. Return ONLY the enhanced lin
         lines = [(line["id"], line["text"]) for line in npc_data.get("npc_lines", [])]
         line_ids = [lid for lid, _ in lines]
 
-        # Check cache
-        if not force_refresh and self.cache.has_all_lines(npc_key, line_ids):
+        # Check cache - separate cached vs uncached lines
+        cached_results = {}
+        uncached_lines = []
+        for line_id, text in lines:
+            cached = self.cache.get(npc_key, line_id)
+            if cached and not force_refresh:
+                cached_results[line_id] = cached
+            else:
+                uncached_lines.append((line_id, text))
+
+        # If all lines are cached, return early
+        if not uncached_lines:
             print(f"[cache] All lines for {npc_key} already enhanced")
-            return {lid: self.cache.get(npc_key, lid) for lid in line_ids}
+            return cached_results
+
+        print(f"[cache] {len(cached_results)} cached, {len(uncached_lines)} need enhancement")
 
         # Get character context
         character = self.get_character_context(npc_key)
@@ -290,30 +311,42 @@ Add appropriate expressive audio tags to each line. Return ONLY the enhanced lin
         # Check if we have a voice description
         if not character.voice_description:
             print(f"[warn] No voice description for {npc_key}, skipping enhancement")
-            return {lid: text for lid, text in lines}
+            # Return cached + original text for uncached
+            return {**cached_results, **{lid: text for lid, text in uncached_lines}}
 
-        # Build prompt and call Claude via Agent SDK
-        prompt = self._build_enhancement_prompt(character, lines)
+        # Build prompt and call Claude via Agent SDK - only for uncached lines
+        prompt = self._build_enhancement_prompt(character, uncached_lines)
 
-        print(f"[enhance] Enhancing {len(lines)} lines for {npc_key}...")
+        print(f"[enhance] Enhancing {len(uncached_lines)} lines for {npc_key}...")
 
         # Use async query via Agent SDK
-        response_text = asyncio.run(self._query_claude(prompt))
+        # Handle both running inside and outside an existing event loop
+        try:
+            loop = asyncio.get_running_loop()
+            # We're inside an existing event loop - create a new thread to run our coroutine
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, self._query_claude(prompt))
+                response_text = future.result()
+        except RuntimeError:
+            # No running event loop - we can use asyncio.run directly
+            response_text = asyncio.run(self._query_claude(prompt))
 
         # Parse response
         enhanced = self._parse_enhanced_lines(response_text)
 
-        # Fill in any missing lines with original text
-        for line_id, original_text in lines:
+        # Fill in any missing lines with original text (only for uncached lines)
+        for line_id, original_text in uncached_lines:
             if line_id not in enhanced:
                 print(f"[warn] Line {line_id} not in response, using original")
                 enhanced[line_id] = original_text
 
-        # Cache results
+        # Cache only the newly enhanced results
         self.cache.set_batch(npc_key, enhanced)
-        print(f"[cache] Cached {len(enhanced)} enhanced lines for {npc_key}")
+        print(f"[cache] Cached {len(enhanced)} newly enhanced lines for {npc_key}")
 
-        return enhanced
+        # Merge cached results with newly enhanced results
+        return {**cached_results, **enhanced}
 
     def get_enhanced_line(
         self,

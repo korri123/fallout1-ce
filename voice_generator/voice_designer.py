@@ -41,29 +41,21 @@ def truncate_to_limit(text: str, limit: int = ELEVENLABS_CHAR_LIMIT) -> str:
 
 def extract_voice_prompt(text: str) -> str:
     """
-    Extract just the voice design prompt from LLM output,
-    stripping preamble, explanations, and source citations.
+    Extract just the voice design prompt from LLM output.
+    Looks for content between --- delimiters.
     """
-    # Remove common preamble patterns
-    preamble_patterns = [
-        r"^.*?voice design prompt[:\.]?\s*",  # "Here's the voice design prompt:"
-        r"^.*?I'll search.*?\.\s*",  # "I'll search for more information..."
-        r"^.*?Based on.*?:\s*",  # "Based on the wiki information:"
-        r"^.*?Here is.*?:\s*",  # "Here is the voice prompt:"
-    ]
+    # Look for content between --- delimiters
+    match = re.search(r"^---\s*\n(.*?)\n---", text, flags=re.MULTILINE | re.DOTALL)
+    if match:
+        return match.group(1).strip()
 
-    result = text.strip()
+    # Fallback: try to find any --- block (might not have leading newline)
+    match = re.search(r"---\s*(.*?)\s*---", text, flags=re.DOTALL)
+    if match:
+        return match.group(1).strip()
 
-    for pattern in preamble_patterns:
-        result = re.sub(pattern, "", result, flags=re.IGNORECASE | re.DOTALL)
-
-    # Remove Sources section at the end
-    result = re.split(r"\n\s*Sources?:", result, flags=re.IGNORECASE)[0]
-
-    # Remove any trailing markdown links
-    result = re.sub(r"\n\s*-?\s*\[.*?\]\(.*?\)\s*$", "", result, flags=re.MULTILINE)
-
-    return result.strip()
+    # Last resort: return cleaned text if no delimiters found
+    return text.strip()
 
 # Default cache file location
 DEFAULT_CACHE_FILE = Path(__file__).parent / "voice_cache.json"
@@ -94,11 +86,9 @@ class CharacterInfo:
         """
         voice_info = entry.get("voice_info", {})
 
-        # Get dialogue samples from voice_info first, fall back to npc_lines
-        dialogue_samples = voice_info.get("sample_lines", [])
-        if not dialogue_samples:
-            npc_lines = entry.get("npc_lines", [])
-            dialogue_samples = [line["text"] for line in npc_lines]
+        # Get all dialogue lines from npc_lines
+        npc_lines = entry.get("npc_lines", [])
+        dialogue_samples = [line["text"] for line in npc_lines]
 
         # Use npc_name if available, otherwise use the script_name/key
         name = entry.get("npc_name") or entry.get("script_name") or npc_key
@@ -193,7 +183,7 @@ You will receive:
 ### Your Task
 Analyze the provided information and generate a concise, evocative voice description that ElevenLabs can use to synthesize an appropriate voice.
 
-**CRITICAL: The voice prompt MUST be under 1000 characters total (not words—characters).** This is a hard API limit. Aim for 600-900 characters to be safe.
+**CRITICAL: The voice prompt MUST be under 1000 characters total (not words—characters).** This is a hard API limit. Aim for 300-450 characters. Be concise and direct—focus exclusively on how the voice sounds, not personality or backstory.
 
 ### Voice Prompt Guidelines
 
@@ -224,11 +214,9 @@ Terms like "Peasant," "Berserker," "Ghoul," "Super Mutant," or "Vault Dweller" m
 
 **4. "Children" in Fallout 1 usually refers to the Children of the Cathedral (a religious cult), NOT actual children.**
 Do not assume a child voice unless the description explicitly indicates a young character (age given, described as a kid/boy/girl). If it's a cult member, they're adults—often with an unsettling, reverent, or indoctrinated quality to their speech.
+If the Creature Type: Child, then it means it's an actual child. In this case, you need to instruct the prompt to be a TEENAGER instead as otherwise it will get auto rejected by ElevenLabs. 
 
-**5. For adult male characters, ALWAYS specify vocal pitch.**
-Without pitch guidance, results are unpredictable. Be explicit: "deep bass voice," "mid-range baritone," "higher tenor," "low rumbling pitch," etc. This is essential for consistency.
-
-**6. Super Mutants and Nightkin require EXTREME vocal characteristics.**
+**5. Super Mutants and Nightkin require EXTREME vocal characteristics.**
 These are massive, hulking mutated monsters—NOT humans with deep voices. Their voices must sound genuinely inhuman and monstrous:
 - Describe as "deep, rumbling, orcish growl" or "thunderous, brutish monster voice"
 - Emphasize guttural, bestial quality—like an ogre or fantasy orc
@@ -236,22 +224,30 @@ These are massive, hulking mutated monsters—NOT humans with deep voices. Their
 - Keep descriptions focused on the monstrous vocal quality; don't add personality quirks or emotional nuance that humanizes them
 - Most Super Mutants sound nearly identical—brutish, aggressive, and primitive—so don't over-differentiate unless the character is explicitly unique (like The Master or Marcus)
 - Nightkin are Super Mutants with stealth abilities but sound just as monstrous
+- They should ALWAYS have a DEEP VOICE, NEVER BARITONE
+
+**6. ALWAYS specify an American accent.**
+Fallout takes place in post-apocalyptic America. ElevenLabs sometimes defaults to British accents if not explicitly directed otherwise. Unless a character has a specific reason for a non-American accent (and this should be rare), always specify an American accent—whether General American, Western drawl, Californian, or regional variation. Be explicit: "American accent" or "General American accent" should appear in most prompts.
+
+**7. DON'T default to "baritone" for every male voice.**
+Not every man has a baritone voice. Consider the character's age, build, and personality. A nervous scientist might have a higher, thinner voice. A young trader might have a mid-range tenor.
+
+**8. Web Search**
+- You have a Web Search tool if you believe there exists a Fallout Wiki page for this character. Use it only if you need more information than provided.
 
 ### Output Format
 
-```
-[CHARACTER NAME] - Voice Design Prompt
+Output ONLY the voice description wrapped between `---` delimiters. No character name header, no preamble, no explanation—just the prompt itself:
 
-[Your voice description here (600-900 characters). Write in direct, descriptive prose. Focus on how the voice SOUNDS, not backstory. Use sensory language. Be specific about qualities that make this voice distinctive and recognizable.]
-```
+---
+[Your voice description here (300-450 characters). Be terse. Focus purely on vocal qualities: pitch, texture, accent, pace, age, gender. No personality or backstory.]
+---
 
 ### Example Output
 
-```
-KILLIAN DARKWATER - Voice Design Prompt
-
-A mid-range baritone voice belonging to a man in his late 50s. Speak with the gruff, no-nonsense cadence of a frontier sheriff—each word carries weight but maintains natural conversational flow. The tone carries decades of hard authority, tempered by genuine weariness, but never drags. There's a slight Western American drawl, not exaggerated, but present in the vowels. The voice has a dry, dusty quality, like someone who's spent years breathing desert air. Underneath the toughness is a current of paternal protectiveness. Delivery should be engaged and reactive, like a man actually speaking to someone in front of him—not reading lines. Even when calm or threatening, there's energy behind the words. This is a man who doesn't need to raise his volume to command a room, but he's fully present in every sentence.
-```
+---
+Gruff baritone, late 50s male. Slight Western American drawl. Dry, dusty vocal quality with decades of hard authority. Speaks with weight but maintains natural conversational flow—never sluggish. Engaged, reactive delivery like actual conversation, not narration.
+---
 
 ---
 
@@ -284,7 +280,7 @@ async def generate_voice_prompt(
 
     options = ClaudeAgentOptions(
         model="haiku",
-        allowed_tools=[],
+        allowed_tools=["WebSearch"],
         system_prompt=SYSTEM_PROMPT,
         env={"MAX_THINKING_TOKENS" : "2048"}
     )

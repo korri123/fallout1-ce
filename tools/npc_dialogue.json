@@ -1560,7 +1560,7 @@
       "voice_info": {
         "gender": "Male",
         "creature_type": "Human (Male)",
-        "appearance": "You see a Child with a real attitude.",
+        "appearance": "You see a Teenager with a real attitude.",
         "faction": "Guard",
         "sample_lines": [
           "What in the Hell do you want?",
@@ -1655,9 +1655,9 @@
       "npc_name": "",
       "voice_info": {
         "gender": "Male",
-        "creature_type": "Child",
-        "appearance": "You see a small child.",
-        "faction": "Little Kids",
+        "creature_type": "Teenager",
+        "appearance": "You see a Teenager.",
+        "faction": "Teenagers",
         "sample_lines": ["Hi!", "Hey, are you gonna kill someone?"]
       },
       "description": "",

@@ -90,7 +90,7 @@ class VoiceSynthesizer:
         voice_cache_file: Path = DEFAULT_VOICE_CACHE,
         npc_dialogue_file: Path = DEFAULT_NPC_DIALOGUE,
         output_dir: Path = DEFAULT_OUTPUT_DIR,
-        tts_model_id: str = "eleven_multilingual_v2",
+        tts_model_id: str = "eleven_v3",
         voice_design_model_id: str = "eleven_ttv_v3",
         output_format: str = "mp3_44100_128",
         enable_expression_enhancement: bool = True,
@@ -280,11 +280,26 @@ class VoiceSynthesizer:
         """
         print(f"[create] Creating permanent voice for {name}...")
 
-        response = self.client.text_to_voice.create(
-            voice_name=name,
-            voice_description=description,
-            generated_voice_id=generated_voice_id,
-        )
+        try:
+            response = self.client.text_to_voice.create(
+                voice_name=name,
+                voice_description=description,
+                generated_voice_id=generated_voice_id,
+            )
+        except Exception as e:
+            # Check if it's a voice limit error
+            error_str = str(e)
+            if "voice_limit_reached" in error_str:
+                print("[warn] Voice limit reached, deleting all custom voices...")
+                self.delete_all_custom_voices()
+                print("[retry] Retrying voice creation...")
+                response = self.client.text_to_voice.create(
+                    voice_name=name,
+                    voice_description=description,
+                    generated_voice_id=generated_voice_id,
+                )
+            else:
+                raise
 
         voice_id = response.voice_id
         self.voice_ids.set(name, voice_id)
@@ -355,9 +370,7 @@ class VoiceSynthesizer:
             output_format=self.output_format,
             language_code='en',
             voice_settings={
-                "stability": 0.4,
-                "similarity_boost": 0.05,
-                "speed": 1.17,
+                "stability": 0,
             }
         )
 
@@ -509,6 +522,46 @@ class VoiceSynthesizer:
             for v in response.voices
         ]
 
+    def delete_voice(self, voice_id: str) -> bool:
+        """Delete a voice by its ID."""
+        try:
+            self.client.voices.delete(voice_id=voice_id)
+            return True
+        except Exception as e:
+            print(f"[error] Failed to delete voice {voice_id}: {e}")
+            return False
+
+    def delete_all_custom_voices(self, dry_run: bool = False) -> int:
+        """
+        Delete all custom/cloned voices (not premade ones).
+
+        Args:
+            dry_run: If True, only print what would be deleted without actually deleting
+
+        Returns:
+            Number of voices deleted (or would be deleted in dry_run mode)
+        """
+        voices = self.list_voices()
+        custom_voices = [v for v in voices if v["category"] not in ("premade", "professional")]
+
+        if not custom_voices:
+            print("[info] No custom voices to delete")
+            return 0
+
+        print(f"[info] Found {len(custom_voices)} custom voices to delete")
+
+        deleted = 0
+        for v in custom_voices:
+            if dry_run:
+                print(f"[dry-run] Would delete: {v['name']} ({v['voice_id']})")
+                deleted += 1
+            else:
+                print(f"[delete] Deleting: {v['name']} ({v['voice_id']})")
+                if self.delete_voice(v["voice_id"]):
+                    deleted += 1
+
+        return deleted
+
 
 # CLI interface
 def main():
@@ -524,6 +577,10 @@ def main():
 
     # list-voices command
     voices_parser = subparsers.add_parser("list-voices", help="List ElevenLabs voices")
+
+    # delete-voices command
+    delete_parser = subparsers.add_parser("delete-voices", help="Delete all custom voices")
+    delete_parser.add_argument("--dry-run", action="store_true", help="Show what would be deleted without deleting")
 
     # create-voice command
     create_parser = subparsers.add_parser("create-voice", help="Create a voice for an NPC")
@@ -566,6 +623,13 @@ def main():
         print(f"ElevenLabs Voices ({len(voices)}):")
         for v in voices:
             print(f"  {v['name']}: {v['voice_id']} ({v['category']})")
+
+    elif args.command == "delete-voices":
+        deleted = synth.delete_all_custom_voices(dry_run=args.dry_run)
+        if args.dry_run:
+            print(f"\n[dry-run] Would delete {deleted} voices")
+        else:
+            print(f"\nDeleted {deleted} voices")
 
     elif args.command == "create-voice":
         voice_id = synth.get_or_create_voice(args.npc, force_recreate=args.force)
