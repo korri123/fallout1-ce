@@ -14,6 +14,7 @@
 #include "game/game.h"
 #include "game/gdialog.h"
 #include "game/gmouse.h"
+#include "game/gsound.h"
 #include "game/gmovie.h"
 #include "game/object.h"
 #include "game/protinst.h"
@@ -84,6 +85,7 @@ static int scr_read_ScriptSubNode(Script* scr, DB_FILE* stream);
 static int scr_read_ScriptNode(ScriptListExtent* a1, DB_FILE* stream);
 static int scr_new_id(int scriptType);
 static void scrExecMapProcScripts(int a1);
+static bool scr_play_extraspeech(int messageId);
 
 // Number of lines in scripts.lst
 //
@@ -2507,6 +2509,46 @@ int scr_get_dialog_msg_file(int a1, MessageList** messageListPtr)
     return 0;
 }
 
+// Try to play an extraspeech MP3 file for the given message ID.
+// Looks for: sound/extraspeech/<script_name>/<message_id>.mp3
+// Returns true if speech was successfully started.
+static bool scr_play_extraspeech(int messageId)
+{
+    if (dialog_target == nullptr || dialog_target->sid == -1) {
+        return false;
+    }
+
+    Script* script;
+    if (scr_ptr(dialog_target->sid, &script) == -1) {
+        return false;
+    }
+
+    char scriptName[COMPAT_MAX_PATH];
+    if (scr_list_str(script->scr_script_idx, scriptName, sizeof(scriptName)) == -1) {
+        return false;
+    }
+
+    // Remove extension if present
+    char* dot = strchr(scriptName, '.');
+    if (dot != nullptr) {
+        *dot = '\0';
+    }
+
+    // Convert to lowercase
+    compat_strlwr(scriptName);
+
+    // Build the path: <scriptname>/<messageid>
+    char speechPath[COMPAT_MAX_PATH];
+    snprintf(speechPath, sizeof(speechPath), "%s\\%d", scriptName, messageId);
+
+    if (gsound_speech_play(speechPath, 12, 13, 15, "extraspeech") == -1) {
+        return false;
+    }
+
+    debug_printf("Playing extraspeech: %s/%d\n", scriptName, messageId);
+    return true;
+}
+
 // 0x494DB4
 char* scr_get_msg_str(int messageListId, int messageId)
 {
@@ -2551,11 +2593,11 @@ char* scr_get_msg_str_speech(int messageListId, int messageId, int a3)
         return err_str;
     }
 
-    if (a3) {
-        if (dialog_active()) {
-            if (messageListItem.audio != NULL && messageListItem.audio[0] != '\0') {
-                gdialog_setup_speech(messageListItem.audio);
-            }
+    if (a3 && dialog_active()) {
+        // Try extraspeech first, fall back to normal audio
+        bool speechPlayed = scr_play_extraspeech(messageId);
+        if (!speechPlayed && messageListItem.audio != nullptr && messageListItem.audio[0] != '\0') {
+            gdialog_setup_speech(messageListItem.audio);
         }
     }
 

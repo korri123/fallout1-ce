@@ -45,7 +45,7 @@ static void gsound_internal_effect_callback(void* userData, int a2);
 static int gsound_background_allocate(Sound** out_s, int a2, int a3);
 static int gsound_background_find_with_copy(char* dest, const char* src);
 static int gsound_background_find_dont_copy(char* dest, const char* src);
-static int gsound_speech_find_dont_copy(char* dest, const char* src);
+static int gsound_speech_find_dont_copy(char* dest, const char* src, const char* basePath);
 static void gsound_background_remove_last_copy();
 static int gsound_background_start();
 static int gsound_speech_start();
@@ -973,7 +973,7 @@ int gsound_speech_length_get()
 }
 
 // 0x4485D0
-int gsound_speech_play(const char* fname, int a2, int a3, int a4)
+int gsound_speech_play(const char* fname, int a2, int a3, int a4, const char* basePath)
 {
     char path[COMPAT_MAX_PATH + 1];
 
@@ -1000,7 +1000,7 @@ int gsound_speech_play(const char* fname, int a2, int a3, int a4)
         return -1;
     }
 
-    if (gsound_speech_find_dont_copy(path, fname)) {
+    if (gsound_speech_find_dont_copy(path, fname, basePath)) {
         if (gsound_debug) {
             debug_printf("failed because the file could not be found.\n");
         }
@@ -1996,26 +1996,16 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
 }
 
 // 0x4498C0
-static int gsound_speech_find_dont_copy(char* dest, const char* src)
+static int gsound_speech_find_dont_copy(char* dest, const char* src, const char* basePath)
 {
     char path[COMPAT_MAX_PATH];
 
-    if (strlen(sound_speech_path) + strlen(".acm") > COMPAT_MAX_PATH) {
-        if (gsound_debug) {
-            // FIXME: The message is wrong (notes background path, but here
-            // we're dealing with speech path).
-            debug_printf("Full background path too long.\n");
-        }
-
-        return -1;
-    }
-
     if (gsound_debug) {
-        debug_printf(" finding speech sound ");
+        debug_printf(" finding speech sound in %s ", basePath);
     }
 
-    // Check for MP3 file first (loose file on disk)
-    snprintf(path, sizeof(path), "%s%s%s", sound_speech_path, src, ".mp3");
+    // Check for MP3 file first (loose file on disk in data/)
+    snprintf(path, sizeof(path), "data\\sound\\%s\\%s%s", basePath, src, ".mp3");
     if (gsound_file_exists_f(path)) {
         strncpy(dest, path, COMPAT_MAX_PATH);
         dest[COMPAT_MAX_PATH - 1] = '\0';
@@ -2026,7 +2016,7 @@ static int gsound_speech_find_dont_copy(char* dest, const char* src)
         return 0;
     }
 
-    snprintf(path, sizeof(path), "%s%s%s", sound_speech_path, src, ".ACM");
+    snprintf(path, sizeof(path), "sound\\%s\\%s%s", basePath, src, ".ACM");
 
     // NOTE: Uninline.
     if (!gsound_file_exists_db(path)) {

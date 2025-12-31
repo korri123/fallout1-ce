@@ -13,9 +13,8 @@
 
 namespace fallout {
 
-// Target format expected by the sound system
+// Target sample rate expected by the sound system
 #define AUDIOMP3_TARGET_RATE 22050
-#define AUDIOMP3_TARGET_CHANNELS 2
 
 typedef enum AudioMp3Flags {
     AUDIO_MP3_IN_USE = 0x01,
@@ -66,30 +65,29 @@ int audiomp3Open(const char* fname, int flags)
     mp3File->srcChannels = mp3File->decoder.info.channels;
     mp3File->srcSampleRate = mp3File->decoder.info.hz;
 
-    // Create audio stream for resampling if needed
-    if (mp3File->srcSampleRate != AUDIOMP3_TARGET_RATE || mp3File->srcChannels != AUDIOMP3_TARGET_CHANNELS) {
+    // Create audio stream for resampling if needed (sample rate only, preserve channels)
+    if (mp3File->srcSampleRate != AUDIOMP3_TARGET_RATE) {
         mp3File->stream = SDL_NewAudioStream(
             AUDIO_S16, mp3File->srcChannels, mp3File->srcSampleRate,
-            AUDIO_S16, AUDIOMP3_TARGET_CHANNELS, AUDIOMP3_TARGET_RATE);
+            AUDIO_S16, mp3File->srcChannels, AUDIOMP3_TARGET_RATE);
         if (mp3File->stream == NULL) {
             debug_printf("audiomp3Open: Failed to create audio stream: %s\n", SDL_GetError());
             mp3dec_ex_close(&mp3File->decoder);
             return -1;
         }
-        debug_printf("audiomp3Open: Resampling %dHz %dch -> %dHz %dch\n",
-            mp3File->srcSampleRate, mp3File->srcChannels,
-            AUDIOMP3_TARGET_RATE, AUDIOMP3_TARGET_CHANNELS);
+        debug_printf("audiomp3Open: Resampling %dHz -> %dHz (%dch)\n",
+            mp3File->srcSampleRate, AUDIOMP3_TARGET_RATE, mp3File->srcChannels);
     } else {
         mp3File->stream = NULL;
     }
 
     mp3File->flags = AUDIO_MP3_IN_USE;
 
-    // Calculate resampled file size
+    // Calculate resampled file size (preserving channel count)
     // Original: decoder.samples is total sample count (frames * channels)
     int64_t srcFrames = mp3File->decoder.samples / mp3File->srcChannels;
     int64_t dstFrames = (srcFrames * AUDIOMP3_TARGET_RATE) / mp3File->srcSampleRate;
-    mp3File->fileSize = dstFrames * AUDIOMP3_TARGET_CHANNELS * sizeof(mp3d_sample_t);
+    mp3File->fileSize = dstFrames * mp3File->srcChannels * sizeof(mp3d_sample_t);
     mp3File->position = 0;
 
     return index + 1;
@@ -215,7 +213,7 @@ long audiomp3Seek(int fileHandle, long offset, int origin)
     }
 
     // Convert resampled byte position to source sample position
-    int64_t dstFrames = newPos / (AUDIOMP3_TARGET_CHANNELS * sizeof(mp3d_sample_t));
+    int64_t dstFrames = newPos / (mp3File->srcChannels * sizeof(mp3d_sample_t));
     int64_t srcFrames = (dstFrames * mp3File->srcSampleRate) / AUDIOMP3_TARGET_RATE;
     uint64_t srcSamplePos = srcFrames * mp3File->srcChannels;
 

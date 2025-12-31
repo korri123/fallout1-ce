@@ -6,8 +6,9 @@
     This software is distributed without any warranty.
     See <http://creativecommons.org/publicdomain/zero/1.0/>.
 */
-#include <stddef.h>
 #include "minimp3.h"
+#include "platform_compat.h"
+#include <stddef.h>
 
 /* flags for mp3dec_ex_open_* functions */
 #define MP3D_SEEK_TO_BYTE   0      /* mp3dec_ex_seek seeks to byte in stream */
@@ -1229,7 +1230,7 @@ static int mp3dec_open_file(const char *file_name, mp3dec_map_info_t *map_info)
     if (!file_name)
         return MP3D_E_PARAM;
     memset(map_info, 0, sizeof(*map_info));
-    FILE *file = fopen(file_name, "rb");
+    FILE *file = fallout::compat_fopen(file_name, "rb");
     if (!file)
         return MP3D_E_IOERROR;
     int res = MP3D_E_IOERROR;
