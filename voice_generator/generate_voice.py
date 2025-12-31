@@ -122,7 +122,8 @@ class VoiceGenerationPipeline:
         npc_key: str,
         voice_prompt: str | None = None,
         force: bool = False,
-    ) -> str:
+        interactive: bool = True,
+    ) -> str | None:
         """
         Create an ElevenLabs voice for an NPC.
 
@@ -130,9 +131,10 @@ class VoiceGenerationPipeline:
             npc_key: NPC identifier
             voice_prompt: Voice design prompt (loaded from cache if not provided)
             force: Recreate even if voice exists
+            interactive: Use interactive 3-voice preview (default True)
 
         Returns:
-            ElevenLabs voice_id
+            ElevenLabs voice_id, or None if user cancelled interactive mode
         """
         synth = self._get_synthesizer()
         npc_key_lower = npc_key.lower()
@@ -143,11 +145,34 @@ class VoiceGenerationPipeline:
             if not voice_prompt:
                 raise ValueError(f"No voice prompt found for '{npc_key}'. Generate one first.")
 
-        return synth.get_or_create_voice(
-            name=npc_key_lower,
-            description=voice_prompt,
-            force_recreate=force,
-        )
+        # Check if voice already exists (and we're not forcing)
+        if not force and npc_key_lower in synth.voice_ids:
+            voice_id = synth.voice_ids.get(npc_key_lower)
+            print(f"[cached] Using existing voice for {npc_key}: {voice_id}")
+            return voice_id
+
+        if interactive:
+            # Interactive mode: show 3 previews, allow selection/rejection
+            result = synth.interactive_preview_voice(npc_key_lower, voice_prompt)
+
+            if result is None:
+                # User cancelled
+                return None
+
+            # Create permanent voice from selected preview
+            voice_id = synth.create_voice_from_preview(
+                name=npc_key_lower,
+                description=result['description'],
+                generated_voice_id=result['generated_voice_id'],
+            )
+            return voice_id
+        else:
+            # Non-interactive: use first preview automatically
+            return synth.get_or_create_voice(
+                name=npc_key_lower,
+                description=voice_prompt,
+                force_recreate=force,
+            )
 
     def synthesize_dialogue(
         self,
@@ -180,7 +205,8 @@ class VoiceGenerationPipeline:
         force_voice: bool = False,
         max_lines: int | None = None,
         skip_synthesis: bool = False,
-    ) -> dict:
+        interactive: bool = True,
+    ) -> dict | None:
         """
         Run the complete voice generation pipeline.
 
@@ -190,9 +216,11 @@ class VoiceGenerationPipeline:
             force_voice: Recreate ElevenLabs voice even if exists
             max_lines: Maximum dialogue lines to synthesize
             skip_synthesis: Only generate prompt and create voice, skip TTS
+            interactive: Use interactive 3-voice preview (default True)
 
         Returns:
             Dict with 'voice_prompt', 'voice_id', and 'output_files'
+            or None if user cancelled in interactive mode
         """
         print(f"\n{'='*50}")
         print(f"Voice Generation Pipeline: {npc_key}")
@@ -203,9 +231,20 @@ class VoiceGenerationPipeline:
         voice_prompt = await self.generate_prompt(npc_key, force=force_prompt)
         print(f"  Prompt: {voice_prompt[:100]}...")
 
-        # Step 2: Create ElevenLabs voice
+        # Step 2: Create ElevenLabs voice (interactive by default)
         print("\n[Step 2/3] Creating ElevenLabs voice...")
-        voice_id = self.create_voice(npc_key, voice_prompt, force=force_voice)
+        voice_id = self.create_voice(
+            npc_key,
+            voice_prompt,
+            force=force_voice,
+            interactive=interactive,
+        )
+
+        if voice_id is None:
+            # User cancelled in interactive mode
+            print("\n[cancelled] Voice creation cancelled by user")
+            return None
+
         print(f"  Voice ID: {voice_id}")
 
         # Step 3: Synthesize dialogue
@@ -235,6 +274,7 @@ class VoiceGenerationPipeline:
         force_voice: bool = False,
         max_lines: int | None = None,
         skip_synthesis: bool = False,
+        interactive: bool = True,
     ) -> list[dict]:
         """
         Run pipeline for multiple NPCs.
@@ -245,6 +285,7 @@ class VoiceGenerationPipeline:
             force_voice: Recreate all ElevenLabs voices
             max_lines: Max lines per NPC
             skip_synthesis: Only generate prompts and voices
+            interactive: Use interactive 3-voice preview (default True)
 
         Returns:
             List of result dicts
@@ -263,8 +304,16 @@ class VoiceGenerationPipeline:
                     force_voice=force_voice,
                     max_lines=max_lines,
                     skip_synthesis=skip_synthesis,
+                    interactive=interactive,
                 )
-                results.append(result)
+                if result is None:
+                    # User cancelled
+                    results.append({
+                        "npc_key": npc_key,
+                        "cancelled": True,
+                    })
+                else:
+                    results.append(result)
             except Exception as e:
                 print(f"[error] Failed to process {npc_key}: {e}")
                 results.append({
@@ -281,8 +330,11 @@ async def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate voice and synthesize all dialogue for an NPC
+  # Generate voice for an NPC (interactive: preview 3 voices, choose one)
   python generate_voice.py killian
+
+  # Skip interactive preview, use first voice automatically
+  python generate_voice.py killian --no-interactive
 
   # Generate voice prompt only (no ElevenLabs API calls)
   python generate_voice.py killian --prompt-only
@@ -296,11 +348,11 @@ Examples:
   # List all available NPCs
   python generate_voice.py --list
 
-  # Process multiple NPCs
+  # Process multiple NPCs (interactive for each)
   python generate_voice.py killian gizmo aradesh
 
-  # Process all NPCs (careful - uses lots of API credits!)
-  python generate_voice.py --all --max-lines 10
+  # Process all NPCs non-interactively (for automation)
+  python generate_voice.py --all --no-interactive --max-lines 10
 """,
     )
 
@@ -348,6 +400,11 @@ Examples:
         "--force-voice",
         action="store_true",
         help="Force recreate ElevenLabs voice only",
+    )
+    parser.add_argument(
+        "--no-interactive",
+        action="store_true",
+        help="Skip interactive voice preview (use first voice automatically)",
     )
     parser.add_argument(
         "--dialogue-file",
@@ -414,6 +471,7 @@ Examples:
     # Run pipeline
     force_prompt = args.force or args.force_prompt
     force_voice = args.force or args.force_voice
+    interactive = not args.no_interactive
 
     if npc_keys and len(npc_keys) == 1:
         # Single NPC
@@ -423,7 +481,12 @@ Examples:
             force_voice=force_voice,
             max_lines=args.max_lines,
             skip_synthesis=args.skip_synthesis,
+            interactive=interactive,
         )
+
+        if result is None:
+            print("\n[cancelled] Pipeline cancelled by user")
+            return
 
         # Print summary
         print("\nResult:")
@@ -438,6 +501,7 @@ Examples:
             force_voice=force_voice,
             max_lines=args.max_lines,
             skip_synthesis=args.skip_synthesis,
+            interactive=interactive,
         )
 
         # Print summary
@@ -445,10 +509,12 @@ Examples:
         print("Batch Summary")
         print("=" * 50)
 
-        success = [r for r in results if "error" not in r]
+        success = [r for r in results if "error" not in r and "cancelled" not in r]
+        cancelled = [r for r in results if "cancelled" in r]
         failed = [r for r in results if "error" in r]
 
         print(f"  Successful: {len(success)}")
+        print(f"  Cancelled: {len(cancelled)}")
         print(f"  Failed: {len(failed)}")
 
         if failed:

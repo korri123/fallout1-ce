@@ -10,6 +10,8 @@ import base64
 import json
 import os
 import random
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -356,6 +358,189 @@ class VoiceSynthesizer:
             }
 
         raise RuntimeError(f"No voice previews generated for {name}")
+
+    def design_voice_multi(
+        self,
+        name: str,
+        description: str,
+        seed: int | None = None,
+    ) -> list[dict]:
+        """
+        Design multiple voice previews from a text description.
+
+        Args:
+            name: Character name (used for seed storage)
+            description: Voice description text
+            seed: Optional seed for reproducibility (0-2147483647).
+                  If not provided, generates a random seed.
+
+        Returns list of dicts with 'generated_voice_id', 'preview_audio' (base64), and 'seed'.
+        """
+        # Generate random seed if not provided
+        if seed is None:
+            seed = random.randint(0, 2147483647)
+
+        # Store seed for reproducibility
+        self.voice_seeds.set(name, seed)
+        print(f"[design] Designing voices for {name} (seed={seed})...")
+
+        response = self.client.text_to_voice.design(
+            model_id=self.voice_design_model_id,
+            guidance_scale=4.4,
+            loudness=0.5,
+            voice_description=description,
+            auto_generate_text=True,
+            output_format="mp3_22050_32",
+            should_enhance=True,
+            seed=seed,
+        )
+
+        # Get all previews
+        if response.previews and len(response.previews) > 0:
+            return [
+                {
+                    "generated_voice_id": preview.generated_voice_id,
+                    "preview_audio": preview.audio_base_64,
+                    "seed": seed,
+                    "index": i + 1,
+                }
+                for i, preview in enumerate(response.previews)
+            ]
+
+        raise RuntimeError(f"No voice previews generated for {name}")
+
+    def update_voice_description(self, name: str, description: str) -> None:
+        """
+        Update the voice description in voice_cache.json.
+
+        Args:
+            name: Character name (key in voice_cache.json)
+            description: New voice description text
+        """
+        # Load current descriptions
+        with open(self.voice_cache_file, 'r') as f:
+            descriptions = json.load(f)
+
+        # Update the description
+        descriptions[name.lower()] = description
+
+        # Save back
+        with open(self.voice_cache_file, 'w') as f:
+            json.dump(descriptions, f, indent=2)
+
+        # Clear cached descriptions so they get reloaded
+        self._voice_descriptions = {}
+        print(f"[updated] voice_cache.json updated for {name}")
+
+    def interactive_preview_voice(self, name: str, initial_description: str | None = None) -> dict | None:
+        """
+        Interactive voice preview workflow.
+
+        Generates 3 voice previews, saves to temp directory, opens in Finder,
+        and waits for user selection. If rejected, allows prompt rewriting.
+
+        Args:
+            name: Character name
+            initial_description: Initial voice description (loaded from cache if not provided)
+
+        Returns:
+            Dict with 'generated_voice_id', 'description' (possibly updated), 'seed'
+            or None if user cancels
+        """
+        # Load description if not provided
+        if not initial_description:
+            descriptions = self.load_voice_descriptions()
+            if name.lower() not in descriptions:
+                raise KeyError(f"No voice description found for '{name}'")
+            initial_description = descriptions[name.lower()]
+
+        current_description = initial_description
+
+        while True:
+            # Generate 3 previews
+            print(f"\n{'='*60}")
+            print(f"Generating voice previews for: {name}")
+            print(f"{'='*60}")
+            print(f"\nPrompt:\n{current_description}\n")
+
+            previews = self.design_voice_multi(name, current_description)
+            print(f"[generated] {len(previews)} voice previews")
+
+            # Create temp directory and save previews
+            temp_dir = Path(tempfile.mkdtemp(prefix=f"voice_preview_{name}_"))
+            print(f"[temp] Saving previews to: {temp_dir}")
+
+            for preview in previews:
+                audio_data = base64.b64decode(preview["preview_audio"])
+                preview_path = temp_dir / f"voice_{preview['index']}.mp3"
+                with open(preview_path, 'wb') as f:
+                    f.write(audio_data)
+                print(f"  Saved: {preview_path.name}")
+
+            # Open in Finder
+            subprocess.run(["open", str(temp_dir)])
+            print(f"\n[finder] Opened preview folder in Finder")
+
+            # Wait for user input
+            print(f"\n{'='*60}")
+            print("Listen to the 3 voice previews and choose:")
+            print("  1, 2, or 3 - Select that voice")
+            print("  r          - Reject all and enter new prompt")
+            print("  q          - Quit/cancel")
+            print(f"{'='*60}")
+
+            while True:
+                choice = input("\nYour choice: ").strip().lower()
+
+                if choice in ('1', '2', '3'):
+                    idx = int(choice) - 1
+                    if idx < len(previews):
+                        selected = previews[idx]
+                        print(f"\n[selected] Voice {choice}")
+
+                        # Update voice_cache.json if prompt was changed
+                        if current_description != initial_description:
+                            self.update_voice_description(name, current_description)
+
+                        return {
+                            "generated_voice_id": selected["generated_voice_id"],
+                            "preview_audio": selected["preview_audio"],
+                            "seed": selected["seed"],
+                            "description": current_description,
+                        }
+                    else:
+                        print(f"Invalid choice. Only {len(previews)} previews available.")
+
+                elif choice == 'r':
+                    # Print current prompt and ask for new one
+                    print(f"\n{'='*60}")
+                    print("Current prompt (copy and modify):")
+                    print(f"{'='*60}")
+                    print(current_description)
+                    print(f"{'='*60}")
+                    print("\nEnter new prompt (paste modified version):")
+                    print("(Enter a blank line when done)")
+
+                    lines = []
+                    while True:
+                        line = input()
+                        if line == "":
+                            break
+                        lines.append(line)
+
+                    if lines:
+                        current_description = "\n".join(lines)
+                        print("\n[prompt] Updated. Generating new previews...")
+                        break  # Break inner loop to regenerate
+                    else:
+                        print("[cancelled] No prompt entered, keeping current.")
+
+                elif choice == 'q':
+                    print("[cancelled] Voice preview cancelled.")
+                    return None
+
+                else:
+                    print("Invalid choice. Enter 1, 2, 3, r, or q.")
 
     def create_voice_from_preview(
         self,
@@ -716,9 +901,10 @@ def main():
     all_parser.add_argument("--no-enhance", action="store_true", help="Disable expression enhancement")
 
     # preview command
-    preview_parser = subparsers.add_parser("preview", help="Preview a voice design")
+    preview_parser = subparsers.add_parser("preview", help="Preview a voice design (interactive)")
     preview_parser.add_argument("npc", help="NPC name/key")
-    preview_parser.add_argument("--save", help="Save preview to file")
+    preview_parser.add_argument("--save", help="Save single preview to file (non-interactive mode)")
+    preview_parser.add_argument("--create", action="store_true", help="Create permanent voice after selection")
 
     args = parser.parse_args()
 
@@ -779,17 +965,37 @@ def main():
             print(f"Error: No voice description for '{args.npc}'")
             return
 
-        description = descriptions[args.npc.lower()]
-        print(f"Description: {description}\n")
-
-        preview = synth.design_voice(args.npc, description)
-        print(f"Generated Voice ID: {preview['generated_voice_id']}")
-
         if args.save:
+            # Non-interactive mode: generate single preview and save
+            description = descriptions[args.npc.lower()]
+            print(f"Description: {description}\n")
+
+            preview = synth.design_voice(args.npc, description)
+            print(f"Generated Voice ID: {preview['generated_voice_id']}")
+
             audio_data = base64.b64decode(preview["preview_audio"])
             with open(args.save, 'wb') as f:
                 f.write(audio_data)
             print(f"Saved preview to: {args.save}")
+        else:
+            # Interactive mode: show 3 previews, allow selection/rejection
+            result = synth.interactive_preview_voice(args.npc)
+
+            if result:
+                print(f"\n{'='*60}")
+                print(f"Selected voice for {args.npc}")
+                print(f"Generated Voice ID: {result['generated_voice_id']}")
+                print(f"Seed: {result['seed']}")
+                print(f"{'='*60}")
+
+                if args.create:
+                    # Create permanent voice
+                    voice_id = synth.create_voice_from_preview(
+                        name=args.npc,
+                        description=result['description'],
+                        generated_voice_id=result['generated_voice_id'],
+                    )
+                    print(f"\n[success] Created permanent voice: {voice_id}")
 
 
 if __name__ == "__main__":

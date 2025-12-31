@@ -15,8 +15,8 @@
 #include "game/item.h"
 #include "game/map.h"
 #include "game/object.h"
-#include "game/proto.h"
 #include "game/protinst.h"
+#include "game/proto.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
 #include "game/tweaks.h"
@@ -29,6 +29,7 @@
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
+#include "scripts.h"
 
 namespace fallout {
 
@@ -824,6 +825,18 @@ void gmouse_bk_process()
 
                     // Update tooltip for the hovered object
                     gmouse_tooltip_update(target, mouseX, mouseY);
+
+                    // Debug: print target's script name
+                    if (target->sid != -1) {
+                        Script* script;
+                        if (scr_ptr(target->sid, &script) != -1) {
+                            char scriptName[16];
+                            if (scr_list_str(script->scr_script_idx, scriptName, sizeof(scriptName)) != -1) {
+                                printf("Target script: %s\n", scriptName);
+                            }
+                        }
+                    }
+
                 } else {
                     // No object under cursor, hide tooltip
                     gmouse_tooltip_update(NULL, mouseX, mouseY);
