@@ -17,6 +17,7 @@
 #include "game/worldmap.h"
 #include "int/audio.h"
 #include "int/audiof.h"
+#include "int/audiomp3.h"
 #include "int/movie.h"
 #include "platform_compat.h"
 #include "plib/db/db.h"
@@ -164,6 +165,12 @@ static char sfx_file_name[13];
 
 // 0x595562
 static char background_fname_requested[COMPAT_MAX_PATH];
+
+// Flag to track if background music is MP3
+static bool gsound_background_is_mp3 = false;
+
+// Flag to track if speech is MP3
+static bool gsound_speech_is_mp3 = false;
 
 // 0x4475A0
 int gsound_init()
@@ -387,6 +394,7 @@ int gsound_exit()
     sfxc_exit();
     audiofClose();
     audioClose();
+    audiomp3Close();
 
     gsound_initialized = false;
 
@@ -662,18 +670,6 @@ int gsound_background_play(const char* fileName, int a2, int a3, int a4)
         return -1;
     }
 
-    rc = soundSetFileIO(gsound_background_tag, audiofOpen, audiofCloseFile, audiofRead, NULL, audiofSeek, gsound_compressed_tell, audiofFileSize);
-    if (rc != 0) {
-        if (gsound_debug) {
-            debug_printf("failed because file IO could not be set for compression.\n");
-        }
-
-        soundDelete(gsound_background_tag);
-        gsound_background_tag = NULL;
-
-        return -1;
-    }
-
     rc = soundSetChannel(gsound_background_tag, 3);
     if (rc != 0) {
         if (gsound_debug) {
@@ -696,6 +692,23 @@ int gsound_background_play(const char* fileName, int a2, int a3, int a4)
     if (rc != SOUND_NO_ERROR) {
         if (gsound_debug) {
             debug_printf("'failed because the file could not be found.\n");
+        }
+
+        soundDelete(gsound_background_tag);
+        gsound_background_tag = NULL;
+
+        return -1;
+    }
+
+    // Set file I/O based on file type (MP3 or ACM)
+    if (gsound_background_is_mp3) {
+        rc = soundSetFileIO(gsound_background_tag, audiomp3Open, audiomp3CloseFile, audiomp3Read, NULL, audiomp3Seek, audiomp3Tell, audiomp3FileSize);
+    } else {
+        rc = soundSetFileIO(gsound_background_tag, audiofOpen, audiofCloseFile, audiofRead, NULL, audiofSeek, gsound_compressed_tell, audiofFileSize);
+    }
+    if (rc != 0) {
+        if (gsound_debug) {
+            debug_printf("failed because file IO could not be set.\n");
         }
 
         soundDelete(gsound_background_tag);
@@ -973,7 +986,7 @@ int gsound_speech_play(const char* fname, int a2, int a3, int a4)
     }
 
     if (gsound_debug) {
-        debug_printf("Loading speech sound file %s%s...", fname, ".ACM");
+        debug_printf("Loading speech sound file %s...", fname);
     }
 
     // uninline
@@ -987,18 +1000,25 @@ int gsound_speech_play(const char* fname, int a2, int a3, int a4)
         return -1;
     }
 
-    if (soundSetFileIO(gsound_speech_tag, audioOpen, audioCloseFile, audioRead, NULL, audioSeek, gsound_compressed_tell, audioFileSize)) {
+    if (gsound_speech_find_dont_copy(path, fname)) {
         if (gsound_debug) {
-            debug_printf("failed because file IO could not be set for compression.\n");
+            debug_printf("failed because the file could not be found.\n");
         }
         soundDelete(gsound_speech_tag);
         gsound_speech_tag = NULL;
         return -1;
     }
 
-    if (gsound_speech_find_dont_copy(path, fname)) {
+    // Set file I/O based on file type (MP3 or ACM)
+    int rc;
+    if (gsound_speech_is_mp3) {
+        rc = soundSetFileIO(gsound_speech_tag, audiomp3Open, audiomp3CloseFile, audiomp3Read, NULL, audiomp3Seek, audiomp3Tell, audiomp3FileSize);
+    } else {
+        rc = soundSetFileIO(gsound_speech_tag, audioOpen, audioCloseFile, audioRead, NULL, audioSeek, gsound_compressed_tell, audioFileSize);
+    }
+    if (rc != 0) {
         if (gsound_debug) {
-            debug_printf("failed because the file could not be found.\n");
+            debug_printf("failed because file IO could not be set.\n");
         }
         soundDelete(gsound_speech_tag);
         gsound_speech_tag = NULL;
@@ -1795,10 +1815,24 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
     }
 
     char outPath[COMPAT_MAX_PATH];
+
+    // Check for MP3 file first in path1
+    snprintf(outPath, sizeof(outPath), "%s%s%s", sound_music_path1, src, ".mp3");
+    if (gsound_file_exists_f(outPath)) {
+        strncpy(dest, outPath, COMPAT_MAX_PATH);
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = true;
+        if (gsound_debug) {
+            debug_printf("found MP3 ");
+        }
+        return 0;
+    }
+
     snprintf(outPath, sizeof(outPath), "%s%s%s", sound_music_path1, src, ".ACM");
     if (gsound_file_exists_f(outPath)) {
         strncpy(dest, outPath, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = false;
         return 0;
     }
 
@@ -1808,7 +1842,19 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
 
     gsound_background_remove_last_copy();
 
+    // Check for MP3 file in path2 (no need to copy MP3 files)
     char inPath[COMPAT_MAX_PATH];
+    snprintf(inPath, sizeof(inPath), "%s%s%s", sound_music_path2, src, ".mp3");
+    if (gsound_file_exists_f(inPath)) {
+        strncpy(dest, inPath, COMPAT_MAX_PATH);
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = true;
+        if (gsound_debug) {
+            debug_printf("found MP3 in path2 ");
+        }
+        return 0;
+    }
+
     snprintf(inPath, sizeof(inPath), "%s%s%s", sound_music_path2, src, ".ACM");
 
     FILE* inStream = compat_fopen(inPath, "rb");
@@ -1819,6 +1865,8 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
 
         return -1;
     }
+
+    gsound_background_is_mp3 = false;
 
     FILE* outStream = compat_fopen(outPath, "wb");
     if (outStream == NULL) {
@@ -1896,10 +1944,23 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
         debug_printf(" finding background sound ");
     }
 
+    // Check for MP3 file first in path1
+    snprintf(path, sizeof(path), "%s%s%s", sound_music_path1, src, ".mp3");
+    if (gsound_file_exists_f(path)) {
+        strncpy(dest, path, COMPAT_MAX_PATH);
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = true;
+        if (gsound_debug) {
+            debug_printf("found MP3 ");
+        }
+        return 0;
+    }
+
     snprintf(path, sizeof(path), "%s%s%s", sound_music_path1, src, ".ACM");
     if (gsound_file_exists_f(path)) {
         strncpy(dest, path, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = false;
         return 0;
     }
 
@@ -1907,10 +1968,23 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
         debug_printf("in 2nd path ");
     }
 
+    // Check for MP3 file in path2
+    snprintf(path, sizeof(path), "%s%s%s", sound_music_path2, src, ".mp3");
+    if (gsound_file_exists_f(path)) {
+        strncpy(dest, path, COMPAT_MAX_PATH);
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = true;
+        if (gsound_debug) {
+            debug_printf("found MP3 ");
+        }
+        return 0;
+    }
+
     snprintf(path, sizeof(path), "%s%s%s", sound_music_path2, src, ".ACM");
     if (gsound_file_exists_f(path)) {
         strncpy(dest, path, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_background_is_mp3 = false;
         return 0;
     }
 
@@ -1940,6 +2014,18 @@ static int gsound_speech_find_dont_copy(char* dest, const char* src)
         debug_printf(" finding speech sound ");
     }
 
+    // Check for MP3 file first (loose file on disk)
+    snprintf(path, sizeof(path), "%s%s%s", sound_speech_path, src, ".mp3");
+    if (gsound_file_exists_f(path)) {
+        strncpy(dest, path, COMPAT_MAX_PATH);
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        gsound_speech_is_mp3 = true;
+        if (gsound_debug) {
+            debug_printf("found MP3 ");
+        }
+        return 0;
+    }
+
     snprintf(path, sizeof(path), "%s%s%s", sound_speech_path, src, ".ACM");
 
     // NOTE: Uninline.
@@ -1953,6 +2039,7 @@ static int gsound_speech_find_dont_copy(char* dest, const char* src)
 
     strncpy(dest, path, COMPAT_MAX_PATH);
     dest[COMPAT_MAX_PATH] = '\0';
+    gsound_speech_is_mp3 = false;
 
     return 0;
 }

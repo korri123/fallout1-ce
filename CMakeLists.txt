@@ -193,6 +193,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/int/audio.h"
     "src/int/audiof.cc"
     "src/int/audiof.h"
+    "src/int/audiomp3.cc"
+    "src/int/audiomp3.h"
     "src/int/datafile.cc"
     "src/int/datafile.h"
     "src/int/dialog.cc"
