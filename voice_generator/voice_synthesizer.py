@@ -21,7 +21,7 @@ from expression_enhancer import ExpressionEnhancer
 # Default paths
 DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
 DEFAULT_NPC_DIALOGUE = Path(__file__).parent.parent / "tools" / "npc_dialogue.json"
-DEFAULT_OUTPUT_DIR = Path(__file__).parent / "output"
+DEFAULT_OUTPUT_DIR = Path(__file__).parent / "extraspeech"
 DEFAULT_VOICE_IDS_FILE = Path(__file__).parent / "voice_ids.json"
 DEFAULT_VOICE_SEEDS_FILE = Path(__file__).parent / "voice_seeds.json"
 
