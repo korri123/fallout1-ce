@@ -37,9 +37,10 @@ import re
 
 
 # Dialogue opcodes from script.py
-# Only gsay_reply with two integer literal arguments is extracted
+# Only gsay_reply/gsay_message with integer literal arguments are extracted
 DIALOGUE_OPCODES = {
     Opcode.GSAY_REPLY: ('gsay_reply', 2, 'npc'),      # gsay_reply(messageListId, msg)
+    Opcode.GSAY_MESSAGE: ('gsay_message', 3, 'npc'),  # gsay_message(messageListId, msg, reaction)
 }
 
 # Known NPC names for common scripts
@@ -651,11 +652,19 @@ class DialogueExtractor:
         PUSH_SIZE = 6  # 2 byte opcode + 4 byte value
 
         # gsay_reply(messageListId, msg) - 2 args
-        # Both must be integer literals (PUSH INT)
-        if name != 'gsay_reply':
+        # gsay_message(messageListId, msg, reaction) - 3 args
+        # Arguments must be integer literals (PUSH INT)
+        if name == 'gsay_reply':
+            # gsay_reply: stack is [messageListId, msg, OPCODE]
+            msg_offset = opcode_offset - PUSH_SIZE
+            list_offset = opcode_offset - 2 * PUSH_SIZE
+        elif name == 'gsay_message':
+            # gsay_message: stack is [messageListId, msg, reaction, OPCODE]
+            # We skip reaction and extract messageListId and msg
+            msg_offset = opcode_offset - 2 * PUSH_SIZE
+            list_offset = opcode_offset - 3 * PUSH_SIZE
+        else:
             return None
-        msg_offset = opcode_offset - PUSH_SIZE
-        list_offset = opcode_offset - 2 * PUSH_SIZE
 
         # Validate offsets
         if list_offset < 0 or msg_offset < 0:
