@@ -2545,6 +2545,9 @@ static bool scr_play_extraspeech(int messageId)
         return false;
     }
 
+    // Mark speech as playing so gdialog_free_speech() will stop it on dialogue exit
+    gdialog_mark_speech_playing();
+
     debug_printf("Playing extraspeech: %s/%d\n", scriptName, messageId);
     return true;
 }

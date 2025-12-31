@@ -813,6 +813,14 @@ void gdialog_free_speech()
     }
 }
 
+// Mark that speech is currently playing via gsound.
+// Called by extraspeech playback so dialogue exit can properly stop it.
+void gdialog_mark_speech_playing()
+{
+    gdialog_speech_playing = true;
+    gdialog_speech_using_gsound = true;
+}
+
 // 0x43E18C
 int gDialogEnableBK()
 {

@@ -25,6 +25,7 @@ void gdialog_enter(Object* target, int a2);
 void dialogue_system_enter();
 void gdialog_setup_speech(const char* audioFileName);
 void gdialog_free_speech();
+void gdialog_mark_speech_playing();
 int gDialogEnableBK();
 int gDialogDisableBK();
 int scr_dialogue_init(int headFid, int reaction);
