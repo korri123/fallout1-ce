@@ -10,6 +10,7 @@ import base64
 import json
 import os
 import random
+import re
 import subprocess
 import tempfile
 from dataclasses import dataclass
@@ -35,6 +36,19 @@ GHOUL_VOICE_ID = "KAJMJ4av1R2CVQ10ndCZ"
 
 # Protected voices that should not be deleted
 PROTECTED_VOICES = {"Ghoul"}
+
+# Regex to match bracketed expressions like [sighing], [taking money], etc.
+BRACKET_PATTERN = re.compile(r'\[[^\]]*\]')
+
+
+def strip_brackets(text: str) -> str:
+    """Remove all bracketed expressions from text and return stripped result."""
+    return BRACKET_PATTERN.sub('', text).strip()
+
+
+def is_only_brackets(text: str) -> bool:
+    """Check if text contains only bracketed expressions (no speakable content)."""
+    return strip_brackets(text) == ""
 
 
 @dataclass
@@ -735,6 +749,7 @@ class VoiceSynthesizer:
 
         output_files = []
         skipped = 0
+        skipped_brackets = 0
         for i, line in enumerate(lines):
             output_path = npc_output_dir / f"{line.line_id}.mp3"
 
@@ -745,6 +760,12 @@ class VoiceSynthesizer:
 
             # Use enhanced text if available, otherwise original
             text_to_synthesize = enhanced_lines.get(line.line_id, line.text)
+
+            # Skip lines that only contain bracketed expressions (no speakable content)
+            if is_only_brackets(text_to_synthesize):
+                skipped_brackets += 1
+                print(f"[{i+1}/{len(lines)}] Skipping line {line.line_id} (only brackets): {text_to_synthesize}")
+                continue
 
             # Show what we're synthesizing
             display_text = text_to_synthesize[:60] + "..." if len(text_to_synthesize) > 60 else text_to_synthesize
@@ -760,6 +781,8 @@ class VoiceSynthesizer:
 
         if skipped:
             print(f"[skipped] {skipped} existing files")
+        if skipped_brackets:
+            print(f"[skipped] {skipped_brackets} bracket-only lines")
 
         return output_files
 
