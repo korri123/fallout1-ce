@@ -19,6 +19,7 @@ from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBl
 DEFAULT_CACHE_FILE = Path(__file__).parent / "enhanced_dialogue_cache.json"
 DEFAULT_VOICE_CACHE = Path(__file__).parent / "voice_cache.json"
 DEFAULT_NPC_DIALOGUE = Path(__file__).parent.parent / "tools" / "npc_dialogue.json"
+DEFAULT_EXTRASPEECH_DIR = Path(__file__).parent / "extraspeech"
 
 # Cache version - increment to invalidate all cached entries
 CACHE_VERSION = 1
@@ -150,14 +151,25 @@ Do NOT keep the original stage direction - transform it into a speakable audio t
         cache_file: Path = DEFAULT_CACHE_FILE,
         voice_cache_file: Path = DEFAULT_VOICE_CACHE,
         npc_dialogue_file: Path = DEFAULT_NPC_DIALOGUE,
+        extraspeech_dir: Path = DEFAULT_EXTRASPEECH_DIR,
     ):
         self.cache = EnhancedDialogueCache(cache_file)
         self.voice_cache_file = voice_cache_file
         self.npc_dialogue_file = npc_dialogue_file
+        self.extraspeech_dir = extraspeech_dir
 
         # Loaded data
         self._voice_descriptions: dict[str, str] = {}
         self._dialogue_data: dict = {}
+
+    def _audio_file_exists(self, npc_key: str, line_id: int) -> bool:
+        """Check if audio file already exists for this line."""
+        audio_path = self.extraspeech_dir / npc_key.lower() / f"{line_id}.mp3"
+        return audio_path.exists()
+
+    def _get_lines_without_audio(self, npc_key: str, lines: list[tuple[int, str]]) -> list[tuple[int, str]]:
+        """Filter out lines that already have audio files."""
+        return [(lid, text) for lid, text in lines if not self._audio_file_exists(npc_key, lid)]
 
     async def _query_claude(self, prompt: str) -> str:
         """Query Claude Haiku via Agent SDK."""
@@ -286,21 +298,31 @@ Add appropriate expressive audio tags to each line. Return ONLY the enhanced lin
 
         npc_data = dialogue_data[npc_key.lower()]
         lines = [(line["id"], line["text"]) for line in npc_data.get("npc_lines", [])]
-        line_ids = [lid for lid, _ in lines]
+
+        # Filter out lines that already have audio files
+        lines_needing_enhancement = self._get_lines_without_audio(npc_key, lines)
+
+        if not lines_needing_enhancement:
+            print(f"[skip] All {len(lines)} lines for {npc_key} already have audio files")
+            return {}
+
+        if len(lines_needing_enhancement) < len(lines):
+            skipped = len(lines) - len(lines_needing_enhancement)
+            print(f"[skip] {skipped} lines for {npc_key} already have audio files")
 
         # Check cache - separate cached vs uncached lines
         cached_results = {}
         uncached_lines = []
-        for line_id, text in lines:
+        for line_id, text in lines_needing_enhancement:
             cached = self.cache.get(npc_key, line_id)
             if cached and not force_refresh:
                 cached_results[line_id] = cached
             else:
                 uncached_lines.append((line_id, text))
 
-        # If all lines are cached, return early
+        # If all remaining lines are cached, return early
         if not uncached_lines:
-            print(f"[cache] All lines for {npc_key} already enhanced")
+            print(f"[cache] All remaining lines for {npc_key} already enhanced")
             return cached_results
 
         print(f"[cache] {len(cached_results)} cached, {len(uncached_lines)} need enhancement")
