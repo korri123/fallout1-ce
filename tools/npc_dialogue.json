@@ -1,8 +1,8 @@
 {
   "metadata": {
     "description": "NPC dialogue extracted from Fallout 1 script bytecode",
-    "total_npcs": 228,
-    "total_npc_lines": 4152,
+    "total_npcs": 262,
+    "total_npc_lines": 4473,
     "total_player_options": 0
   },
   "dialogue": {
@@ -558,6 +558,28 @@
       ],
       "player_options": []
     },
+    "animfr~1": {
+      "script_name": "animfr~1",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see Aradesh.",
+        "faction": "Shady Sands Leader",
+        "sample_lines": []
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 276,
+          "text": ""
+        }
+      ],
+      "player_options": []
+    },
     "aradesh": {
       "script_name": "aradesh",
       "script_index": 32,
@@ -576,6 +598,48 @@
         {
           "id": 276,
           "text": ""
+        }
+      ],
+      "player_options": []
+    },
+    "armsdeal": {
+      "script_name": "armsdeal",
+      "script_index": 786,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see Mitch of the All-N-One store.",
+        "faction": "",
+        "sample_lines": [
+          "How may I help you today?",
+          "Great. Here's what I have.",
+          "Great, always looking for new things."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 5,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 101,
+          "text": "How may I help you today?"
+        },
+        {
+          "id": 106,
+          "text": "Great. Here's what I have."
+        },
+        {
+          "id": 107,
+          "text": "Great, always looking for new things."
+        },
+        {
+          "id": 108,
+          "text": "Sorry, I can't understand you. Come back when you get more of a brain."
+        },
+        {
+          "id": 109,
+          "text": "Thanks. Come again."
         }
       ],
       "player_options": []
@@ -1297,6 +1361,116 @@
         {
           "id": 239,
           "text": "Terrible business.  Those poor people.  Oh, those poor people.  Losing their lives in such a ghastly way!  Is there anything else I can do for you?  Like feed you, perhaps?"
+        }
+      ],
+      "player_options": []
+    },
+    "blades": {
+      "script_name": "blades",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see Fire.",
+        "faction": "",
+        "sample_lines": [
+          "Whatcha want, loser?",
+          "Great. Another stupid one. You have the sound of a Ripper.",
+          "Don't like them much either? Maybe we can use you for a little 'work.'"
+        ]
+      },
+      "description": "",
+      "npc_line_count": 22,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 111,
+          "text": "Whatcha want, loser?"
+        },
+        {
+          "id": 118,
+          "text": "Great. Another stupid one. You have the sound of a Ripper."
+        },
+        {
+          "id": 122,
+          "text": "Don't like them much either? Maybe we can use you for a little 'work.'"
+        },
+        {
+          "id": 125,
+          "text": "Okay, talk to the head wench. Razor'll set you straight as to what ta do."
+        },
+        {
+          "id": 126,
+          "text": "Stupid and a chicken. I'll put you out of your misery now."
+        },
+        {
+          "id": 127,
+          "text": "So you are a Ripper! I'd be sorry to hear that, but then I already knew they were stupid. Goodnight!"
+        },
+        {
+          "id": 128,
+          "text": "The Rippers. Those inbreds on the other side of town. Never mind. You're too stupid to know anything."
+        },
+        {
+          "id": 129,
+          "text": "You want to be a Blade? Good luck. But, if you can find Razor, talk to her about that. Maybe she'll let you get jumped in."
+        },
+        {
+          "id": 134,
+          "text": "Your momma never wanted you, and we don't either."
+        },
+        {
+          "id": 135,
+          "text": "Simple. You'll have to kill someone to get in here. She will tell you who you're gonna need to kill."
+        },
+        {
+          "id": 138,
+          "text": "No. I can't. I don't lead. I just keep Razor going straight."
+        },
+        {
+          "id": 139,
+          "text": "Simple. Slaughter our enemies, then we will give Adytum a break."
+        },
+        {
+          "id": 143,
+          "text": "The Rippers. Those Gun Runners are just a pain, but nothing important. They are a  bunch of soft-sellers, anyway."
+        },
+        {
+          "id": 146,
+          "text": "If you plan on doing that, you may want to let Razor know. Otherwise, she will have your head before you get out of here."
+        },
+        {
+          "id": 147,
+          "text": "Suit yourself. Goodbye."
+        },
+        {
+          "id": 148,
+          "text": "I don't make the deals. I only make suggestions. Talk to Razor if you want to deal."
+        },
+        {
+          "id": 149,
+          "text": "Then killing you now would save you many years of suffering."
+        },
+        {
+          "id": 150,
+          "text": "Then inspect this!"
+        },
+        {
+          "id": 151,
+          "text": "Get lost if you want to live."
+        },
+        {
+          "id": 152,
+          "text": "Quiet. We are trying to sneak up on the Rippers."
+        },
+        {
+          "id": 153,
+          "text": "If ya' got the head, take it to Razor. She still wants to play soccer. Otherwise, get out!"
+        },
+        {
+          "id": 154,
+          "text": "Yo, homie!"
         }
       ],
       "player_options": []
@@ -3077,6 +3251,30 @@
         {
           "id": 192,
           "text": "I don't envy you. Of course if you make a name for yourself, you can become one of those wilderness fighting legends like Magnum Tom Goddard or Scorpion Joe Cornelius. Man, that must be something!"
+        }
+      ],
+      "player_options": []
+    },
+    "comptrol": {
+      "script_name": "comptrol",
+      "script_index": 607,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant, Sgt.",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
         }
       ],
       "player_options": []
@@ -5002,6 +5200,52 @@
         {
           "id": 219,
           "text": "Ready to go, and you'll be heading straight though the mountains!  It should be a blast!"
+        }
+      ],
+      "player_options": []
+    },
+    "fgtvan": {
+      "script_name": "fgtvan",
+      "script_index": 767,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see a clerk from the Crimson Caravans.",
+        "faction": "",
+        "sample_lines": [
+          "Hello. Are you looking for a job?",
+          "Great. We have space for another guard. Are you interested?",
+          "OK. If you need work, just stop by and well will set you up."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 6,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 103,
+          "text": "Hello. Are you looking for a job?"
+        },
+        {
+          "id": 106,
+          "text": "Great. We have space for another guard. Are you interested?"
+        },
+        {
+          "id": 107,
+          "text": "OK. If you need work, just stop by and well will set you up."
+        },
+        {
+          "id": 108,
+          "text": "Sorry to hear that. Bye."
+        },
+        {
+          "id": 110,
+          "text": "Excellent. We have caravans leaving for: the Boneyard, Junktown and the Brotherhood of Steel. Which would you like to work on?"
+        },
+        {
+          "id": 117,
+          "text": "Great. We leave now."
         }
       ],
       "player_options": []
@@ -7628,6 +7872,108 @@
       ],
       "player_options": []
     },
+    "gunrunr": {
+      "script_name": "gunrunr",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "What do you want?",
+        "faction": "",
+        "sample_lines": [
+          "Nothing.",
+          "You could say that.",
+          "Yeah, yeah, that's great. What's the job entail and what's it worth to ya?"
+        ]
+      },
+      "description": "",
+      "npc_line_count": 20,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 103,
+          "text": "Nothing."
+        },
+        {
+          "id": 110,
+          "text": "You could say that."
+        },
+        {
+          "id": 114,
+          "text": "Yeah, yeah, that's great. What's the job entail and what's it worth to ya?"
+        },
+        {
+          "id": 117,
+          "text": "Well, the Regulators keep them from attacking us outright, but it's all they can do to keep our little community safe. They try to sneak in at night to kill our citizens, or to, to kidnap our children . . . and . . . [He stops a moment to compose himself before continuing] Just last week one of them burst through the north gate in the middle of the night with dynamite strapped to his body to blow up the Regulator's barracks . . . no doubt to weaken us enough so that they could launch a full scale attack."
+        },
+        {
+          "id": 118,
+          "text": "What happened to him?"
+        },
+        {
+          "id": 119,
+          "text": "That sounds a bit extreme, doesn't it?"
+        },
+        {
+          "id": 120,
+          "text": "Luckily, the Regulators killed him before he could complete his plan. I saw his body myself."
+        },
+        {
+          "id": 123,
+          "text": "I'll give you 2000 caps to kill their leader! I want that bitch's head!"
+        },
+        {
+          "id": 126,
+          "text": "Sounds good to me."
+        },
+        {
+          "id": 130,
+          "text": "Uh, right. I want no part of this sickness."
+        },
+        {
+          "id": 135,
+          "text": "It was the middle of the night, as I told you. I was asleep. Luckily, the Regulators usually catch these barbarians before they even make it inside our town."
+        },
+        {
+          "id": 136,
+          "text": "Yeah, that's pretty lucky. Pretty convenient, too."
+        },
+        {
+          "id": 137,
+          "text": "I don't like how this all sounds. Count me out."
+        },
+        {
+          "id": 140,
+          "text": "I might just ignore that remark if you've come here to solve my problem for me."
+        },
+        {
+          "id": 141,
+          "text": "What problem is that?"
+        },
+        {
+          "id": 143,
+          "text": "Have you ever dealt with a vicious, murdering band of thieves before?"
+        },
+        {
+          "id": 147,
+          "text": "Not another backwater town with a gang problem! This is ridiculous!"
+        },
+        {
+          "id": 148,
+          "text": "What would be convenient would be to put an end to their foulness once and for all!"
+        },
+        {
+          "id": 149,
+          "text": "Let me guess - you want them dead."
+        },
+        {
+          "id": 150,
+          "text": "How can I help?"
+        }
+      ],
+      "player_options": []
+    },
     "gunther": {
       "script_name": "gunther",
       "script_index": 840,
@@ -8358,6 +8704,35 @@
       ],
       "player_options": []
     },
+    "hdealer": {
+      "script_name": "hdealer",
+      "script_index": 703,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see the Bar Tender.",
+        "faction": "Guard",
+        "sample_lines": [
+          "You've got to have the money to play, pal.",
+          "You've got to have the money to play, lady."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 2,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 186,
+          "text": "You've got to have the money to play, pal."
+        },
+        {
+          "id": 187,
+          "text": "You've got to have the money to play, lady."
+        }
+      ],
+      "player_options": []
+    },
     "heather": {
       "script_name": "heather",
       "script_index": 265,
@@ -8640,6 +9015,85 @@
         {
           "id": 127,
           "text": "Guards!  Assassin!"
+        }
+      ],
+      "player_options": []
+    },
+    "hroulet": {
+      "script_name": "hroulet",
+      "script_index": 713,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see the Bar Tender.",
+        "faction": "",
+        "sample_lines": [
+          "Place your bets.",
+          "Sorry, better luck next time.",
+          "Winner! (You push.)"
+        ]
+      },
+      "description": "",
+      "npc_line_count": 7,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 173,
+          "text": "Place your bets."
+        },
+        {
+          "id": 182,
+          "text": "Sorry, better luck next time."
+        },
+        {
+          "id": 183,
+          "text": "Winner! (You push.)"
+        },
+        {
+          "id": 184,
+          "text": "Winner! (You get double your money.)"
+        },
+        {
+          "id": 185,
+          "text": "Winner! (You get triple your money.)"
+        },
+        {
+          "id": 186,
+          "text": "You've got to have the money to play, pal."
+        },
+        {
+          "id": 187,
+          "text": "You've got to have the money to play, lady."
+        }
+      ],
+      "player_options": []
+    },
+    "hslots": {
+      "script_name": "hslots",
+      "script_index": 719,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see the Bar Tender.",
+        "faction": "",
+        "sample_lines": [
+          "You've got to have the money to play, pal.",
+          "You've got to have the money to play, lady."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 2,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 186,
+          "text": "You've got to have the money to play, pal."
+        },
+        {
+          "id": 187,
+          "text": "You've got to have the money to play, lady."
         }
       ],
       "player_options": []
@@ -9082,7 +9536,7 @@
         ]
       },
       "description": "",
-      "npc_line_count": 24,
+      "npc_line_count": 25,
       "player_option_count": 0,
       "npc_lines": [
         {
@@ -9164,6 +9618,10 @@
         {
           "id": 160,
           "text": "All right, I'll help you out in exchange for my share of loot."
+        },
+        {
+          "id": 160,
+          "text": "What distance do you want me at?"
         },
         {
           "id": 161,
@@ -9434,6 +9892,56 @@
         {
           "id": 142,
           "text": "Hmm. I see. Thank you."
+        }
+      ],
+      "player_options": []
+    },
+    "jariv": {
+      "script_name": "jariv",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see one of Shady Sands' guards.",
+        "faction": "",
+        "sample_lines": [
+          "Welcome, stranger. We don't see your kind often.",
+          "Not so fast! This is a small community. We don't see strangers often, and we don't really need them if you get my meaning. If you don't have a good reason to be here, you'd better just keep moving.",
+          "I wasn't saying that you was gonna. You'd just better leave us alone."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 7,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 105,
+          "text": "Welcome, stranger. We don't see your kind often."
+        },
+        {
+          "id": 109,
+          "text": "Not so fast! This is a small community. We don't see strangers often, and we don't really need them if you get my meaning. If you don't have a good reason to be here, you'd better just keep moving."
+        },
+        {
+          "id": 112,
+          "text": "I wasn't saying that you was gonna. You'd just better leave us alone."
+        },
+        {
+          "id": 115,
+          "text": "Look, Shady Sands don't need your kind from the Hub, or Junktown, or wherever you come from. We do pretty good by ourselves."
+        },
+        {
+          "id": 116,
+          "text": "The last trader from the Hub sold us a malfunctioning irrigation pump. We've had it with your dirty deals."
+        },
+        {
+          "id": 118,
+          "text": "Yeah, right. So you say. Just don't get into any trouble, Ok?"
+        },
+        {
+          "id": 121,
+          "text": "Well, maybe you aren't. You do seem a little different to me. I'll tell you what. You should go talk to Aradesh. He is in the center of town."
         }
       ],
       "player_options": []
@@ -10100,6 +10608,64 @@
         {
           "id": 109,
           "text": "That would be Junktown. It's not far from here."
+        }
+      ],
+      "player_options": []
+    },
+    "john": {
+      "script_name": "john",
+      "script_index": 803,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see a caravan driver.",
+        "faction": "Berzerker",
+        "sample_lines": [
+          "Yes? How can I be of service?",
+          "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be.",
+          "[Laughs] Yes. I guess you could say that.  After a while they all start to look the same.  But believe me they’re not."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 9,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 203,
+          "text": "Yes? How can I be of service?"
+        },
+        {
+          "id": 211,
+          "text": "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be. It seems like just about everyone here is lookin’ ta hire you for somethin’ be it legal or not."
+        },
+        {
+          "id": 235,
+          "text": "[Laughs] Yes. I guess you could say that.  After a while they all start to look the same.  But believe me they’re not."
+        },
+        {
+          "id": 402,
+          "text": "You’re an idiot.  Get outta here you skag."
+        },
+        {
+          "id": 403,
+          "text": "A Water Chip? I never even heard of one of those."
+        },
+        {
+          "id": 404,
+          "text": "These are the caravans that I’m guarding.  The merchant’s cart goods to just about all corners of the wastes, Junktown, The Brotherhood, Shady Sands, and numerous other places."
+        },
+        {
+          "id": 405,
+          "text": "Well...Lots of stuff. General stuff people need to live, Food, Water, lots of Water.  Since water probably is the most scarcest commodity in the wastes."
+        },
+        {
+          "id": 406,
+          "text": "You could just about ask any one here in the Hub.  Or you can check one of the job bulletin boards there are a few of them around the Hub."
+        },
+        {
+          "id": 407,
+          "text": "I’m a security guard hired by the Merchants who own the goods in these carts.  Dangerous job, but it pays well.  Just the other night one of my coworkers was killed while watching over the Caravans."
         }
       ],
       "player_options": []
@@ -11307,7 +11873,7 @@
         },
         {
           "id": 160,
-          "text": "Can I ask you some questions?"
+          "text": "What distance do you want me at?"
         },
         {
           "id": 163,
@@ -13038,6 +13604,202 @@
       ],
       "player_options": []
     },
+    "lorraine": {
+      "script_name": "lorraine",
+      "script_index": 173,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Female",
+        "creature_type": "Human (Female)",
+        "appearance": "You see a young woman with dark hair.",
+        "faction": "Berzerker",
+        "sample_lines": [
+          "Hi. Are you new here?",
+          "I suppose. What do you need to know about?",
+          "I'm Lorraine."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 24,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 102,
+          "text": "Hi. Are you new here?"
+        },
+        {
+          "id": 107,
+          "text": "I suppose. What do you need to know about?"
+        },
+        {
+          "id": 113,
+          "text": "I'm Lorraine."
+        },
+        {
+          "id": 115,
+          "text": "I'm a Scav. I work with Sammael to collect stuff from the ruins, so that we can use it to build or trade."
+        },
+        {
+          "id": 119,
+          "text": "Nice talking to you."
+        },
+        {
+          "id": 120,
+          "text": "Well you got the Deathclaws out there, plus the Regulators take a percentage off the top, plus some for protection here in Adytum. Guess people don't have the upfront cash, or the guts to stare a Deathclaw in the eye."
+        },
+        {
+          "id": 125,
+          "text": "Oh, there's half a dozen of us. Sammael was the first one, and he's still the best."
+        },
+        {
+          "id": 133,
+          "text": "Oh, she wound up falling for some Blade a while ago. Poor dear can't leave the town, of course, and Caleb would kill the young lad on sight. Very tragic."
+        },
+        {
+          "id": 137,
+          "text": "We only scavenge after dark. And we're very good at what we do. Sammael's got a little test that he likes to throw out at people, before he lets them become Scavs."
+        },
+        {
+          "id": 142,
+          "text": "Sammael has the person hide somewhere within Adytum during the day. If he can't find the student in an hour, then he lets the person join the next scavenger party."
+        },
+        {
+          "id": 147,
+          "text": "Come now, isn't there the faintest trace of a romantic in you? Really, it's too bad. Unrequited love and all of that. Tragic."
+        },
+        {
+          "id": 148,
+          "text": "Hmpf. Shows what you know. Tell that to Sammael. If you can find him."
+        },
+        {
+          "id": 149,
+          "text": "Yes, although it can be rough. It's very dangerous, especially if you're caught."
+        },
+        {
+          "id": 152,
+          "text": "Wow, I think you're a little beyond my help."
+        },
+        {
+          "id": 153,
+          "text": "This used to be a big city, called Los Angeles. But the bombs hit really hard. Now, there's just the Angel's Boneyard. We Adytowners are just trying to survive in the wreckage."
+        },
+        {
+          "id": 163,
+          "text": "Well, supposedly it was somewhere south of here, but I don't know really. I think everyone left because it was broken."
+        },
+        {
+          "id": 166,
+          "text": "I'm not really sure. I think they came from somewhere up north of here."
+        },
+        {
+          "id": 170,
+          "text": "Who do you want to know about?"
+        },
+        {
+          "id": 177,
+          "text": "Zimmerman watches over our town. He makes sure that everyone gets fed, and that everybody has a job to do."
+        },
+        {
+          "id": 178,
+          "text": "Caleb is the leader of the Regulators. It's his job to protect Adytum. He seems to enjoy it a litte more than he should."
+        },
+        {
+          "id": 179,
+          "text": "Ah, our resident chemist. Miles makes bullets, and he also built the water distiller that makes sure we get clean water from the well. He's working on an underground farm right now, but he's missing some parts."
+        },
+        {
+          "id": 180,
+          "text": "Tine runs the shop. It's in the bunker near the gate. He trades with the Hub merchants for us."
+        },
+        {
+          "id": 181,
+          "text": "Hmm. Smitty is a tinker of sorts. He's good at repair work. He casts bullets and fixes broken stuff around town."
+        },
+        {
+          "id": 184,
+          "text": ""
+        }
+      ],
+      "player_options": []
+    },
+    "lucy": {
+      "script_name": "lucy",
+      "script_index": 676,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Female",
+        "creature_type": "Human (Female)",
+        "appearance": "You see Gideon, a normal looking human. He is wearing a crown.",
+        "faction": "Peasant",
+        "sample_lines": [
+          "There is no place like home, no place like home, no place like home . . . [pacing back and forth]"
+        ]
+      },
+      "description": "Her head glows with a strange energy.",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 302,
+          "text": "There is no place like home, no place like home, no place like home . . . [pacing back and forth]"
+        }
+      ],
+      "player_options": []
+    },
+    "luke": {
+      "script_name": "luke",
+      "script_index": 802,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see a caravan driver.",
+        "faction": "Peasant",
+        "sample_lines": [
+          "Yes? How can I be of service?",
+          "Too long in the wastes, unh? That's too bad.",
+          "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 8,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 203,
+          "text": "Yes? How can I be of service?"
+        },
+        {
+          "id": 210,
+          "text": "Too long in the wastes, unh? That's too bad."
+        },
+        {
+          "id": 211,
+          "text": "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be. It seems like just about everyone here is lookin’ ta hire you for somethin’ be it legal or not."
+        },
+        {
+          "id": 217,
+          "text": "A Water Chip?  Wow.  You got me on that one.  I’ve never heard of one of those.  Maybe you should check the General store downtown, they may be able to help you."
+        },
+        {
+          "id": 226,
+          "text": "Hum...Lots of stuff.  General stuff people need to live, Food, Water, lots of Water.  Water is probably the scarcest commodity in the wastes."
+        },
+        {
+          "id": 230,
+          "text": "You could just about ask any one here in the Hub.  Or you can check one of the job bulletin boards.  There are a few of them around the Hub.  Definitely more jobs than people here."
+        },
+        {
+          "id": 235,
+          "text": "[Laughs] Yes. I guess you could say that.  After a while they all start to look the same.  But believe me they’re not."
+        },
+        {
+          "id": 301,
+          "text": "These are the caravans.  We cart goods to just about all corners of the wastes.  Junktown, The Brotherhood, Shady Sands, and numerous other places.  We just got in and it’s been a long trip.  The Group across the street is getting ready to depart."
+        }
+      ],
+      "player_options": []
+    },
     "lyle": {
       "script_name": "lyle",
       "script_index": 506,
@@ -13444,6 +14206,172 @@
       ],
       "player_options": []
     },
+    "marcel~1": {
+      "script_name": "marcel~1",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see a raider who seems crazed.",
+        "faction": "Rippers",
+        "sample_lines": [
+          "That's it! Don't come any closer. I'll off her. I swear.",
+          "What? You just want to kill me, don't you? Just remember, this is your fault.",
+          "Any why not? She's just a whore."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 36,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 101,
+          "text": "That's it! Don't come any closer. I'll off her. I swear."
+        },
+        {
+          "id": 106,
+          "text": "What? You just want to kill me, don't you? Just remember, this is your fault."
+        },
+        {
+          "id": 107,
+          "text": "Any why not? She's just a whore."
+        },
+        {
+          "id": 109,
+          "text": "No. No way. Not this bitch."
+        },
+        {
+          "id": 110,
+          "text": "What world do you live in? Out here in the real world, blood flows, man. Blood flows, and it's gonna spill all over this room if you don't get out of here."
+        },
+        {
+          "id": 113,
+          "text": "Geez, that's funny. Who says I want help?"
+        },
+        {
+          "id": 115,
+          "text": "I gotta think about this. Give me a moment."
+        },
+        {
+          "id": 116,
+          "text": "Yeah. Don't try anything, or she gets it."
+        },
+        {
+          "id": 119,
+          "text": "Oh, big man. Let's see you try. But first . . ."
+        },
+        {
+          "id": 120,
+          "text": "Oh, big woman. Let's see you try. But first . . ."
+        },
+        {
+          "id": 121,
+          "text": "Stay back . . . I don't want to hurt her, but I will."
+        },
+        {
+          "id": 124,
+          "text": "Try it, and she dies first. Now, what were you saying?"
+        },
+        {
+          "id": 127,
+          "text": "What hole?"
+        },
+        {
+          "id": 129,
+          "text": "I'll keep talking as long as you do, but try anything tricky, and she'll take the fall."
+        },
+        {
+          "id": 130,
+          "text": "I don't have to do anything. You got to do it, and you ain't doing so hot."
+        },
+        {
+          "id": 131,
+          "text": "She laughed at me. They all laughed at me. I'll make 'em pay, I swear."
+        },
+        {
+          "id": 133,
+          "text": "Maybe. I dunno."
+        },
+        {
+          "id": 136,
+          "text": "You sound like an all right kind of guy. No one ever wanted to help me before. I think we can talk some more."
+        },
+        {
+          "id": 137,
+          "text": "You sound like an all right kind of gal. No one ever wanted to help me before. I think we can talk some more."
+        },
+        {
+          "id": 138,
+          "text": "Just leave me alone. I hate you! You are the devil. I won't listen to you."
+        },
+        {
+          "id": 142,
+          "text": "There you go again, threatening me. Die!!"
+        },
+        {
+          "id": 143,
+          "text": "I won't listen to you. You're just going to trick me with your words. I don't believe you. Go away."
+        },
+        {
+          "id": 144,
+          "text": "You might have a point. Prove it to me."
+        },
+        {
+          "id": 145,
+          "text": "Where do we go from here?"
+        },
+        {
+          "id": 147,
+          "text": "I want some money, and I want to get out of here peacefully. No one follows me."
+        },
+        {
+          "id": 152,
+          "text": "You lied to me!"
+        },
+        {
+          "id": 153,
+          "text": "Ok. I want $100. Then we walk out of here. No one follows me, and I'll let her go when we get to the edge of town."
+        },
+        {
+          "id": 156,
+          "text": "Then I guess she gets it."
+        },
+        {
+          "id": 157,
+          "text": "That's ok, I guess."
+        },
+        {
+          "id": 158,
+          "text": "I don't like it. What stops you from just shooting me in the back when I walk out of here?"
+        },
+        {
+          "id": 161,
+          "text": "No way! I don't trust you!"
+        },
+        {
+          "id": 162,
+          "text": "All right. We'll see what happens, won't we."
+        },
+        {
+          "id": 165,
+          "text": "I want my money. I want $200."
+        },
+        {
+          "id": 168,
+          "text": "You seem like a liar and a cheat to me."
+        },
+        {
+          "id": 174,
+          "text": "No! Don't tell me what to do! You can't tell me what to do!"
+        },
+        {
+          "id": 175,
+          "text": "Yeah, I'm gonna show you."
+        }
+      ],
+      "player_options": []
+    },
     "marney": {
       "script_name": "marney",
       "script_index": 269,
@@ -13494,6 +14422,60 @@
         {
           "id": 124,
           "text": "You are an excellent student. Good luck to you."
+        }
+      ],
+      "player_options": []
+    },
+    "mat": {
+      "script_name": "mat",
+      "script_index": 801,
+      "npc_name": "General Maxson",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see a caravan driver.",
+        "faction": "Guard",
+        "sample_lines": [
+          "Yes? How can I be of service?",
+          "Too long in the wastes, unh? That's too bad.",
+          "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 8,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 203,
+          "text": "Yes? How can I be of service?"
+        },
+        {
+          "id": 210,
+          "text": "Too long in the wastes, unh? That's too bad."
+        },
+        {
+          "id": 211,
+          "text": "This is the Hub.  It is a trade center for the wastes.  It’s the biggest city I know of, you can find just about any thing you could want here.  And if you're lookin’ for work this is the place to be. It seems like just about everyone here is lookin’ ta hire you for somethin’ be it legal or not."
+        },
+        {
+          "id": 217,
+          "text": "A Water Chip?  Wow.  You got me on that one.  I’ve never heard of one of those.  Maybe you should check the General store downtown, they may be able to help you."
+        },
+        {
+          "id": 220,
+          "text": "These are the caravans.  We cart goods to just about all corners of the wastes.  Junktown, The Brotherhood, Shady Sands, and numerous other places.  Necropolis and the Glow are the only areas we steer clear of.  I’m headin’ this group and we will be leavin’ shortly.  The group across the street just arrived."
+        },
+        {
+          "id": 226,
+          "text": "Hum...Lots of stuff.  General stuff people need to live, Food, Water, lots of Water.  Water is probably the scarcest commodity in the wastes."
+        },
+        {
+          "id": 230,
+          "text": "You could just about ask any one here in the Hub.  Or you can check one of the job bulletin boards.  There are a few of them around the Hub.  Definitely more jobs than people here."
+        },
+        {
+          "id": 235,
+          "text": "[Laughs] Yes. I guess you could say that.  After a while they all start to look the same.  But believe me they’re not."
         }
       ],
       "player_options": []
@@ -14168,6 +15150,40 @@
       ],
       "player_options": []
     },
+    "moore": {
+      "script_name": "moore",
+      "script_index": 675,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see Gideon, a normal looking human. He is wearing a crown.",
+        "faction": "Berzerker",
+        "sample_lines": [
+          "The asphalt shall run red! I will crush!",
+          "I will stop the motor! The master gave me the power . . .",
+          "Only the powerful can pass, but they will be kept from passing."
+        ]
+      },
+      "description": "A strange energy flares from his eyes.",
+      "npc_line_count": 3,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 202,
+          "text": "The asphalt shall run red! I will crush!"
+        },
+        {
+          "id": 208,
+          "text": "I will stop the motor! The master gave me the power . . ."
+        },
+        {
+          "id": 214,
+          "text": "Only the powerful can pass, but they will be kept from passing."
+        }
+      ],
+      "player_options": []
+    },
     "morbid": {
       "script_name": "morbid",
       "script_index": 103,
@@ -14739,6 +15755,124 @@
       ],
       "player_options": []
     },
+    "nukegrd": {
+      "script_name": "nukegrd",
+      "script_index": 914,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Stop!",
+        "faction": "Super Mutant, Sgt.",
+        "sample_lines": [
+          "You are not supposed to be armed in this area, little brother. Explain yourself.",
+          "You are not supposed to be armed in this area, little sister. Explain yourself.",
+          "What manner of treason is this?!"
+        ]
+      },
+      "description": "",
+      "npc_line_count": 24,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 107,
+          "text": "You are not supposed to be armed in this area, little brother. Explain yourself."
+        },
+        {
+          "id": 108,
+          "text": "You are not supposed to be armed in this area, little sister. Explain yourself."
+        },
+        {
+          "id": 113,
+          "text": "What manner of treason is this?!"
+        },
+        {
+          "id": 114,
+          "text": "Show me your pass, then."
+        },
+        {
+          "id": 117,
+          "text": "Hurry on your task then, but be warned -- I'm watching you."
+        },
+        {
+          "id": 118,
+          "text": "Yes, little brother. What is it that you need from me?"
+        },
+        {
+          "id": 119,
+          "text": "Yes, little sister. What is it that you need from me?"
+        },
+        {
+          "id": 123,
+          "text": "I am not one to guide you on the path to Unity. Leave!"
+        },
+        {
+          "id": 124,
+          "text": "You are obviously a heathen! Pay for your sins!"
+        },
+        {
+          "id": 125,
+          "text": "Here is here. Why do you ask?"
+        },
+        {
+          "id": 129,
+          "text": "You insult me! Die!"
+        },
+        {
+          "id": 130,
+          "text": "Praise to the Unity."
+        },
+        {
+          "id": 131,
+          "text": "You sound like you do not believe what you say. Could this be true? Or have you left the path of righteous?"
+        },
+        {
+          "id": 134,
+          "text": "When you become one of us, you will not fear such minor things. Begone."
+        },
+        {
+          "id": 135,
+          "text": "What do you want this time? I have little time for your talk."
+        },
+        {
+          "id": 140,
+          "text": "You are obviously an intruder!"
+        },
+        {
+          "id": 141,
+          "text": "Get out of my face."
+        },
+        {
+          "id": 142,
+          "text": "I don't have time for you. Stop bothering me."
+        },
+        {
+          "id": 202,
+          "text": "This is our Master's weapon of last resort. If we find an enemy we cannot defeat in battle, then we will destroy them with this. But I doubt this will ever happen. Even our Master does not want to unleash the dreaded power of the atom again!"
+        },
+        {
+          "id": 205,
+          "text": "You're welcome. Now be quiet, I need to concentrate on guarding this device."
+        },
+        {
+          "id": 206,
+          "text": "Oh, yes, it is. We keep it in perfect working condition, ready to be detonated at a moment's notice. The Unity will not be defeated!"
+        },
+        {
+          "id": 209,
+          "text": "No. We are here to guard it from intruders. No one could access the device without us noticing. Besides, the nuclear arming key required to arm the device is not here."
+        },
+        {
+          "id": 212,
+          "text": "Oh, sure, no problem. The Lieutenant keeps the key. He's at the Military Base, so he isn't even around here. That keeps the nuclear bomb from being set off under our beloved Master."
+        },
+        {
+          "id": 214,
+          "text": "[The large mutant peers at you for a moment, with bushy eyebrows raised] I think you are asking too many questions."
+        }
+      ],
+      "player_options": []
+    },
     "officer": {
       "script_name": "officer",
       "script_index": 177,
@@ -14940,6 +16074,212 @@
         {
           "id": 104,
           "text": "One month . . . two . . . four . . . five . . . six . . ."
+        }
+      ],
+      "player_options": []
+    },
+    "p": {
+      "script_name": "p",
+      "script_index": -1,
+      "npc_name": "BoS Paladin",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see Lasher of the Children.",
+        "faction": "CoC Lasher",
+        "sample_lines": [
+          "I know who you are. You are a wicked, evil man and you must be punished.",
+          "I know who you are. You are the devil in woman’s form, but your shape will not save you.",
+          "I know who you are. Your wickedness precedes you. You send the souls of children to Hades, before they can be cleansed of their perfidy. It is a black evil that you do, and you must be punished for it"
+        ]
+      },
+      "description": "",
+      "npc_line_count": 46,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 101,
+          "text": "I know who you are. You are a wicked, evil man and you must be punished."
+        },
+        {
+          "id": 102,
+          "text": "I know who you are. You are the devil in woman’s form, but your shape will not save you."
+        },
+        {
+          "id": 103,
+          "text": "I know who you are. Your wickedness precedes you. You send the souls of children to Hades, before they can be cleansed of their perfidy. It is a black evil that you do, and you must be punished for it."
+        },
+        {
+          "id": 104,
+          "text": "I know who you are. You are walking death, a plague in human form. Where you step, blood flows like a river. But such iniquities can be ended by a righteous soul!"
+        },
+        {
+          "id": 105,
+          "text": "How dare you disturb me! Don’t you know how important my position is? Get out!"
+        },
+        {
+          "id": 106,
+          "text": "You are unwise to draw your weapon on me. The Master’s shield is upon me, and I may not be touched without retribution!"
+        },
+        {
+          "id": 114,
+          "text": "Why have you come, initiate? You know that I do not like to be disturbed."
+        },
+        {
+          "id": 122,
+          "text": "How dare you enter my sanctuary with a weapon in your hand! Oaf! Get out!"
+        },
+        {
+          "id": 123,
+          "text": "Who do you think you are, entering my sanctum with a drawn weapon. Get out!"
+        },
+        {
+          "id": 131,
+          "text": "My quarters are not open to those who have not been consecrated. I must ask you to leave at once."
+        },
+        {
+          "id": 138,
+          "text": "That is a privilege reserved for only the most faithful servants. Only baptism is a higher honor."
+        },
+        {
+          "id": 144,
+          "text": "I see no reason to converse with a fool. Away with you."
+        },
+        {
+          "id": 145,
+          "text": "You should speak to Father Morpheus. He is in the tower, but it is unlikely that the Nightkin will allow you to pass."
+        },
+        {
+          "id": 151,
+          "text": "The rod is a holy instrument, through which I instruct my charges. Pain clears the mind of evil thoughts and allows them to better comprehend the glory of the Master."
+        },
+        {
+          "id": 155,
+          "text": "I instruct the children. It is my duty. All children are wicked beasts. It is my duty to force them into evolve into human beings. Perhaps you have heard that I do not tolerate frivolity. This is true. I want my charges to suffer as much as possible."
+        },
+        {
+          "id": 161,
+          "text": "You filthy brainless abomination! How dare you defile my presence! Get out! Out! Now!"
+        },
+        {
+          "id": 162,
+          "text": "You are a woman, and therefore you are always troubled. It is an endemic condition of your breed. Tell me your problem, madam, and I will resolve it for you."
+        },
+        {
+          "id": 163,
+          "text": "If your heart was not so full of wickedness, sir, you would be at ease. A righteous heart knows no cares. Tell me your problem, but be quick!"
+        },
+        {
+          "id": 168,
+          "text": "Learn to embrace pain as your closest friend, for pain is the most instructive force in the universe. Break yourself until you can exist no longer as an individual, then remake yourself into the Master’s tool. That is the solution to all of your problems."
+        },
+        {
+          "id": 174,
+          "text": "Beasts chatter without meaning. Human beings think first, and then they talk. You must evolve into a human being before I will wish to speak you. Be gone."
+        },
+        {
+          "id": 175,
+          "text": "Your words are true. Very well, I will help you. But be quick."
+        },
+        {
+          "id": 181,
+          "text": "There comes a time when you must find the answers to life’s questions yourself, and that time is now. Begone!"
+        },
+        {
+          "id": 182,
+          "text": "That is not my duty. Now begone."
+        },
+        {
+          "id": 186,
+          "text": "I have not consulted him, but I am certain he is pleased with the righteous souls I have brought him. It is difficult work, but I do it well. Unfortunately, it is also quite time consuming, which is why I must order to you to leave right now."
+        },
+        {
+          "id": 187,
+          "text": "A flatterer’s tongue is in the mouth of a devil! A devil such as you! Get out of my sight!"
+        },
+        {
+          "id": 188,
+          "text": "You foul mouthed beast! Begone! Learn some manners before you return."
+        },
+        {
+          "id": 189,
+          "text": "A reasonable request. Take this symbol. Show it to the Nightkin when you wish to pass."
+        },
+        {
+          "id": 190,
+          "text": "I cannot help you with that. Begone."
+        },
+        {
+          "id": 191,
+          "text": "He is our leader. He is close to the Master’s counsels and knows many of his purposes. Is that all?"
+        },
+        {
+          "id": 197,
+          "text": "They serve the Master. They bring the pain of healing to the world. Angels in the Night, who redeem the world by bloodshed. Curiosity is a foolhardy emotion, but doubly so when it comes to the Nightkin. That is your only warning. I have much to do now. Away with you."
+        },
+        {
+          "id": 198,
+          "text": "Your courtesy does you credit. Perhaps you are worthy to talk with Morpheus. If the Nightkin stops you, show them this symbol. Now, away with you!"
+        },
+        {
+          "id": 199,
+          "text": "You are a fool if you think petty subterfuge will defeat the Nightkin. Get out of here!"
+        },
+        {
+          "id": 200,
+          "text": "Decadence and ease prevents evolution, evolution that is necessary for survival in a harsh world. Fortunately, I am a hard man who cares nothing for seductive pleasures. I see that you disagree with me. I do not care about your opinion. Get out of here!"
+        },
+        {
+          "id": 201,
+          "text": "Mutation is nothing to fear. Every birth is a mutation of our parents’ DNA. We are all mutants. The only thing that matters is that the mutant is guided on a moral and productive path. This is my job. And this also ends this discussion. Leave me now."
+        },
+        {
+          "id": 202,
+          "text": "I deal out pain. If the animal is worthy and can learn from it, it evolves into a righteous soul. If it does not, it does not deserve to exist. On rare occasions, the animal is removed the genetic pool, although not as often as I would like. This happens more often with failed grown animals."
+        },
+        {
+          "id": 209,
+          "text": "You are an evil girl. You would do well to tread carefully here. The Nightkin do not enjoy rivals. Now begone!"
+        },
+        {
+          "id": 210,
+          "text": "You are an evil man. You would do well to tread carefully here. The Nightkin do not enjoy rivals. Now begone!"
+        },
+        {
+          "id": 211,
+          "text": "Righteousness is attained through struggle, trauma, and recovery. We are animals who must be continuously be broken until we accept the Master’s truth without hesitation. Now that you have heard the truth, seek it with the body of your experiences. Get out of here."
+        },
+        {
+          "id": 212,
+          "text": "Your tongue is a wicked thing that is beyond redemption. Get out of my sight!"
+        },
+        {
+          "id": 213,
+          "text": "The Cathedral teaches many things which an undisciplined mind is incapable of comprehending. Now I have other duties to perform. Away with you!"
+        },
+        {
+          "id": 214,
+          "text": "As do I. It appears we have many things in common, but unfortunately, you irritate me beyond my ability to tolerate. Get out of here. Now."
+        },
+        {
+          "id": 215,
+          "text": "It is not my place to judge. You must persuade the Nightkin. Good luck. You will need it."
+        },
+        {
+          "id": 220,
+          "text": "You were not particularly welcome here in the first place. Good riddance to you."
+        },
+        {
+          "id": 221,
+          "text": "Once I did, but many of methods were abandoned in favor of the loud noises you hear in the Auditorium amphitheater. It is a source of bitterness for me. Fortunately, I can still instruct the children. Now if you will excuse me, I have to prepare for their lessons."
+        },
+        {
+          "id": 222,
+          "text": "Uh… it is of course, a rare event, and the animal is given every chance to evolve. Now leave here! Leave here at once!"
+        },
+        {
+          "id": 224,
+          "text": "This may be of some use to you. Take this symbol. Show it to the Nightkin when you wish to pass. It will allow you to see Father Morpheus."
         }
       ],
       "player_options": []
@@ -15352,6 +16692,72 @@
       ],
       "player_options": []
     },
+    "prison": {
+      "script_name": "prison",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see a dirty, grubby prisoner.",
+        "faction": "",
+        "sample_lines": [
+          "Your kind is repugnant. Do not speak to me.",
+          "Do not mock me.",
+          "I have no rights, and I could care less. Go away, and leave us alone."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 11,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 108,
+          "text": "Your kind is repugnant. Do not speak to me."
+        },
+        {
+          "id": 112,
+          "text": "Do not mock me."
+        },
+        {
+          "id": 113,
+          "text": "I have no rights, and I could care less. Go away, and leave us alone."
+        },
+        {
+          "id": 114,
+          "text": "I refuse to tell you any information. Leave me alone."
+        },
+        {
+          "id": 118,
+          "text": "Don't you remember that you tried that trick last week? I didn't fall for it then, and I'm not going to start now."
+        },
+        {
+          "id": 119,
+          "text": "What? No cowl to hind behind? Your traitorous nature is self-evident."
+        },
+        {
+          "id": 122,
+          "text": "You are cruel. Leave us alone."
+        },
+        {
+          "id": 123,
+          "text": "I won't spill the beans about my people. You cannot force a man to betray himself, you can only force a man to stop living."
+        },
+        {
+          "id": 126,
+          "text": "You're still mocking me."
+        },
+        {
+          "id": 127,
+          "text": "From the mouth of a man comes the serpent's words."
+        },
+        {
+          "id": 128,
+          "text": "Right, I could guess that. Go away, and leave us alone."
+        }
+      ],
+      "player_options": []
+    },
     "prisonr": {
       "script_name": "prisonr",
       "script_index": 88,
@@ -15489,79 +16895,55 @@
       "script_index": 687,
       "npc_name": "",
       "voice_info": {
-        "gender": "",
-        "creature_type": "",
-        "appearance": "You see Rae.",
-        "faction": "",
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see Gideon, a normal looking human. He is wearing a crown.",
+        "faction": "Careful",
         "sample_lines": [
-          "You don't belong here.",
-          "(sigh) What do you want now?",
-          "I'm here to... contemplate the oneness of the master."
+          "Nullified? Are they somehow restricting your psychic powers by those devices you are wearing?",
+          "Never mind.",
+          "Stup."
         ]
       },
-      "description": "",
-      "npc_line_count": 15,
+      "description": "His hands are glowing with a strange energy.",
+      "npc_line_count": 9,
       "player_option_count": 0,
       "npc_lines": [
         {
           "id": 102,
-          "text": "You don't belong here."
+          "text": "Nullified? Are they somehow restricting your psychic powers by those devices you are wearing?"
         },
         {
           "id": 109,
-          "text": "(sigh) What do you want now?"
+          "text": "Never mind."
         },
         {
           "id": 115,
-          "text": "I'm here to... contemplate the oneness of the master."
+          "text": "Stup."
         },
         {
           "id": 121,
-          "text": "I'm from... somewhere ..else."
+          "text": "What about the dogs of war?"
         },
         {
           "id": 126,
-          "text": "Where are you from?"
+          "text": "Well, I need to join. Where can I pick up one of those snazzy nullifiers?"
         },
         {
           "id": 131,
-          "text": "Why would you tell me that? I should take you before the master..."
+          "text": "Thanks."
         },
         {
           "id": 138,
-          "text": "You're right... if only I could clear my head. There's something..."
+          "text": "Obviously. Goodbye."
         },
         {
           "id": 143,
-          "text": "Tell me! Please!!"
+          "text": "The blasphemous . . . decompose . . . death will be . . . salvation . . . strong!"
         },
         {
           "id": 149,
-          "text": "I should kill you for taunting me!"
-        },
-        {
-          "id": 155,
-          "text": "Let's twist his head until his eyes pop out."
-        },
-        {
-          "id": 156,
-          "text": "You will never kill the master. He cannot die."
-        },
-        {
-          "id": 160,
-          "text": "That can't be.. the master.. protects... unifies..."
-        },
-        {
-          "id": 165,
-          "text": "Leave now or I will be forced to deal with you."
-        },
-        {
-          "id": 166,
-          "text": "AAAUGH!!! (Grabs his head in pain and confusion) I.. can't..."
-        },
-        {
-          "id": 172,
-          "text": "I will pull his eye out!! I'll tear his slimy little head from its cables!!!! You, ...get out of here... I'll take care of the master."
+          "text": "Yeah, but I can cause them a whole lot of pain."
         }
       ],
       "player_options": []
@@ -16202,6 +17584,84 @@
         {
           "id": 135,
           "text": "Don't you have a job to do? Hurry and find the chip!"
+        }
+      ],
+      "player_options": []
+    },
+    "regguard": {
+      "script_name": "regguard",
+      "script_index": 906,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Human (Male)",
+        "appearance": "You see a Regulator, one of the guards of Adytum.",
+        "faction": "Guard",
+        "sample_lines": [
+          "Welcome to Adytum, stranger. Watch yourself, we'll be watching you.",
+          "Zimmerman might have a use for you. Come inside, but remember, we're watching.",
+          "Go away!"
+        ]
+      },
+      "description": "Human male wearing heavy steel armor.",
+      "npc_line_count": 14,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 103,
+          "text": "Welcome to Adytum, stranger. Watch yourself, we'll be watching you."
+        },
+        {
+          "id": 107,
+          "text": "Zimmerman might have a use for you. Come inside, but remember, we're watching."
+        },
+        {
+          "id": 110,
+          "text": "Go away!"
+        },
+        {
+          "id": 111,
+          "text": "What do you want now?"
+        },
+        {
+          "id": 116,
+          "text": "No."
+        },
+        {
+          "id": 117,
+          "text": "What do you want to know about?"
+        },
+        {
+          "id": 123,
+          "text": "I'm one of the Regulators. It's our job to keep the peace in Adytum, and to protect the town. Our boss, Caleb, could tell you more."
+        },
+        {
+          "id": 124,
+          "text": "East of us are the Followers. They are a bunch of peace-nuts. East are the Blade, a bunch of Skags if you ask me. A ways south of here is the Cathedral,where the Children have their religious center."
+        },
+        {
+          "id": 125,
+          "text": "Sorry, but we have to be careful of strangers here. Too dangerous. Maybe you can do some work for Zimmerman."
+        },
+        {
+          "id": 126,
+          "text": "Finish your job."
+        },
+        {
+          "id": 127,
+          "text": "You're welcome here anytime, of course!"
+        },
+        {
+          "id": 128,
+          "text": "They're both groups of nuts. The Followers want everyone to be peaceful and happy. They don't realize that the world is too harsh for that."
+        },
+        {
+          "id": 129,
+          "text": "The Children have some sort of god they worship in their Cathedral to the south. They have a hospital, but they're a little too weird to be on the level."
+        },
+        {
+          "id": 131,
+          "text": "You'd better put your weapons away while you're here."
         }
       ],
       "player_options": []
@@ -17149,6 +18609,124 @@
         {
           "id": 185,
           "text": "From what I've heard, the Glow is a great crater that glows at night. It's supposed to be far, far to the south, but I don't know where. Stories say that it's inhabited by all sorts of mutant freaks who guard the technology from before the War."
+        }
+      ],
+      "player_options": []
+    },
+    "scholar": {
+      "script_name": "scholar",
+      "script_index": -1,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see Jerry of the Follower's Scouts.",
+        "faction": "",
+        "sample_lines": [
+          "Who travels the halls of the Followers?",
+          "OK. I can see that you are a little slow. Who you?",
+          "You want to help? I think you will need to talk to Nicole or Jake if you want to help us. They have more time for dealing with slower people."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 24,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 110,
+          "text": "Who travels the halls of the Followers?"
+        },
+        {
+          "id": 117,
+          "text": "OK. I can see that you are a little slow. Who you?"
+        },
+        {
+          "id": 125,
+          "text": "You want to help? I think you will need to talk to Nicole or Jake if you want to help us. They have more time for dealing with slower people."
+        },
+        {
+          "id": 126,
+          "text": "OK. Just stay out of trouble around here."
+        },
+        {
+          "id": 127,
+          "text": "Do you see to end the evil of the Children?"
+        },
+        {
+          "id": 132,
+          "text": "Excellent! Go talk to Nicole and she will be able to tell you how you can help us."
+        },
+        {
+          "id": 133,
+          "text": "The Children are an occult group who worship some dark god. Personally, I think there is something about them that reeks of evil."
+        },
+        {
+          "id": 138,
+          "text": "They are a strong lot, but I think with someone of your skills, you will be able to get in and help us destroy them."
+        },
+        {
+          "id": 141,
+          "text": "Suit yourself. If they take over the wastelands, don't say we didn't warn you."
+        },
+        {
+          "id": 142,
+          "text": "If you talk to Nicole, she will be able to tell you more of what can be done to stop them."
+        },
+        {
+          "id": 144,
+          "text": "Not children. We wouldn't think of harming them. No. These are the Children of the Cathedral. A nasty group of people."
+        },
+        {
+          "id": 148,
+          "text": "We are the Followers of the Apocalypse. We are trying to bring peace to the wastelands."
+        },
+        {
+          "id": 152,
+          "text": "We are working to bring about tolerance to those in the wastelands for those few unfortunates who have been mutated by man's destructive nature."
+        },
+        {
+          "id": 156,
+          "text": "You are right in saying that we, as humans, have been close-minded. However, there is always hope."
+        },
+        {
+          "id": 159,
+          "text": "Be that as it may, your opinion was not requested. Goodbye."
+        },
+        {
+          "id": 160,
+          "text": "A cynic in our midst. I am sure you have your reasons. Regardless, I am certain we can bring about some type of understanding."
+        },
+        {
+          "id": 162,
+          "text": "I've heard that the Children have been able to get some of our secrets. I wonder how that is happening?"
+        },
+        {
+          "id": 166,
+          "text": "Truly? I thought as much myself, but feared that I would never have been able to get much support on the theory."
+        },
+        {
+          "id": 170,
+          "text": "Not really. The only thing I can think of is that the person would have to have access to some information and have access to the outside. You might want to look to the initiates or scouts."
+        },
+        {
+          "id": 172,
+          "text": "Nicole will be pleased, then, to know that I killed the agent."
+        },
+        {
+          "id": 173,
+          "text": "You must be right. Thank you for setting me straight."
+        },
+        {
+          "id": 174,
+          "text": "I think you are the double agent. Trying to trick me, I see. Well now you DIE!"
+        },
+        {
+          "id": 175,
+          "text": "Great job on wasting that agent. Now we might have a chance against those Children."
+        },
+        {
+          "id": 178,
+          "text": "Would you? That would be wonderful."
         }
       ],
       "player_options": []
@@ -18785,18 +20363,18 @@
         "appearance": "You see a cheery man with close-cropped hair.",
         "faction": "Peasant",
         "sample_lines": [
-          "You see a cheery man with close-cropped hair.",
+          "Thanks, bye.",
           "We don't get many strangers around here. What do you want?",
           "Hello, stranger! What can I do for you today?"
         ]
       },
       "description": "",
-      "npc_line_count": 14,
+      "npc_line_count": 15,
       "player_option_count": 0,
       "npc_lines": [
         {
           "id": 100,
-          "text": "You see a cheery man with close-cropped hair."
+          "text": "Thanks, bye."
         },
         {
           "id": 102,
@@ -18849,6 +20427,10 @@
         {
           "id": 120,
           "text": "Ain't a bad little town. Zimmerman's a fair man, maybe not the brightest guy. And of course we've got Miles, probably the only man in a hundred miles who knows anything about science."
+        },
+        {
+          "id": 293,
+          "text": "Let's get down to business."
         }
       ],
       "player_options": []
@@ -19691,7 +21273,7 @@
         ]
       },
       "description": "",
-      "npc_line_count": 33,
+      "npc_line_count": 34,
       "player_option_count": 0,
       "npc_lines": [
         {
@@ -19825,6 +21407,10 @@
         {
           "id": 170,
           "text": "Yes?"
+        },
+        {
+          "id": 201,
+          "text": "Sure thing."
         }
       ],
       "player_options": []
@@ -20289,6 +21875,78 @@
         {
           "id": 176,
           "text": "You manage to get an interface screen out of the vats control computer."
+        }
+      ],
+      "player_options": []
+    },
+    "vdoormut": {
+      "script_name": "vdoormut",
+      "script_index": 535,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant, Sgt.",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vfencemt": {
+      "script_name": "vfencemt",
+      "script_index": 532,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vgatemut": {
+      "script_name": "vgatemut",
+      "script_index": 530,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
         }
       ],
       "player_options": []
@@ -20827,6 +22485,232 @@
       ],
       "player_options": []
     },
+    "viscious": {
+      "script_name": "viscious",
+      "script_index": 811,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "You see a technician. He is working diligently for the Unity and the Master.",
+        "faction": "Super Mutant, Sgt.",
+        "sample_lines": [
+          "The will of the Master prevails. What news do you have for me?",
+          "An intruder!",
+          "Your manner betrays you, intruder. I will end the threat here."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 9,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 202,
+          "text": "The will of the Master prevails. What news do you have for me?"
+        },
+        {
+          "id": 207,
+          "text": "An intruder!"
+        },
+        {
+          "id": 208,
+          "text": "Your manner betrays you, intruder. I will end the threat here."
+        },
+        {
+          "id": 209,
+          "text": "You cannot be serious. In fact, you must be lying."
+        },
+        {
+          "id": 212,
+          "text": "Then use the door, and beware the Corridor. I assume that you have your protection in place?"
+        },
+        {
+          "id": 215,
+          "text": "Of course! You cannot hope to pass the Corridor without it. What did you do with your nullifier!"
+        },
+        {
+          "id": 218,
+          "text": "Ah, humor, I like that. [pauses] I do not have one, obviously. You need to go get one from the braindrains on the second level. Unity prevails."
+        },
+        {
+          "id": 219,
+          "text": "Then he was a fool, or you are not who you seem to be. What is it?"
+        },
+        {
+          "id": 222,
+          "text": "Move alone and continue your mission. I haven't the time for you."
+        }
+      ],
+      "player_options": []
+    },
+    "vplotmut": {
+      "script_name": "vplotmut",
+      "script_index": 531,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant, Sgt.",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam1": {
+      "script_name": "vteam1",
+      "script_index": 545,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam2": {
+      "script_name": "vteam2",
+      "script_index": 546,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam3": {
+      "script_name": "vteam3",
+      "script_index": 547,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam4": {
+      "script_name": "vteam4",
+      "script_index": 548,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam7": {
+      "script_name": "vteam7",
+      "script_index": 551,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
+    "vteam8": {
+      "script_name": "vteam8",
+      "script_index": 552,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "Male",
+        "creature_type": "Super Mutant",
+        "appearance": "Command, this is Guardhouse. All clear. Out.",
+        "faction": "Super Mutant",
+        "sample_lines": [
+          "Good. Come with me, no laugh-type stuff."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 1,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 115,
+          "text": "Good. Come with me, no laugh-type stuff."
+        }
+      ],
+      "player_options": []
+    },
     "wife": {
       "script_name": "wife",
       "script_index": 118,
@@ -20975,6 +22859,52 @@
         {
           "id": 191,
           "text": "Ready to go?  We're leaving today."
+        }
+      ],
+      "player_options": []
+    },
+    "wmvan": {
+      "script_name": "wmvan",
+      "script_index": 768,
+      "npc_name": "",
+      "voice_info": {
+        "gender": "",
+        "creature_type": "",
+        "appearance": "You see a clerk from the Crimson Caravans.",
+        "faction": "",
+        "sample_lines": [
+          "Hello. Are you looking for a job?",
+          "Great. We have space for another guard. Are you interested?",
+          "OK. If you need work, just stop by and well will set you up."
+        ]
+      },
+      "description": "",
+      "npc_line_count": 6,
+      "player_option_count": 0,
+      "npc_lines": [
+        {
+          "id": 103,
+          "text": "Hello. Are you looking for a job?"
+        },
+        {
+          "id": 106,
+          "text": "Great. We have space for another guard. Are you interested?"
+        },
+        {
+          "id": 107,
+          "text": "OK. If you need work, just stop by and well will set you up."
+        },
+        {
+          "id": 108,
+          "text": "Sorry to hear that. Bye."
+        },
+        {
+          "id": 110,
+          "text": "Excellent. We have caravans leaving for: the Boneyard, Junktown and the Brotherhood of Steel. Which would you like to work on?"
+        },
+        {
+          "id": 117,
+          "text": "Great. We leave now."
         }
       ],
       "player_options": []
@@ -21373,18 +23303,18 @@
         "appearance": "You see Zax, the machine intelligence controlling the Glow.",
         "faction": "",
         "sample_lines": [
-          "You see Zax, the machine intelligence controlling the Glow.",
+          "System:                                                         Primary Power:                  OFF-LINE                           Secondary Power:               ON-LINE",
           "How may I be of assistance?",
-          "You can get me a donut."
+          "Power Systems Management"
         ]
       },
       "description": "",
-      "npc_line_count": 55,
+      "npc_line_count": 73,
       "player_option_count": 0,
       "npc_lines": [
         {
           "id": 100,
-          "text": "You see Zax, the machine intelligence controlling the Glow."
+          "text": "System:                                                         Primary Power:                  OFF-LINE                           Secondary Power:               ON-LINE"
         },
         {
           "id": 102,
@@ -21392,11 +23322,11 @@
         },
         {
           "id": 104,
-          "text": "You can get me a donut."
+          "text": "Power Systems Management"
         },
         {
           "id": 108,
-          "text": "Uh, never mind."
+          "text": "Primary Power Management:       OFF-LINE"
         },
         {
           "id": 110,
@@ -21404,23 +23334,31 @@
         },
         {
           "id": 111,
-          "text": "What kind of research?"
+          "text": "Primary Power Management:                                          ERROR! ERROR! ERROR!                                               Primary System Initialization Failed"
         },
         {
           "id": 114,
-          "text": "Are you fully aware, or are you a personality simulation? That is, are you 'alive'?"
+          "text": "Failure:        Generator Level 6                                       0 Feed Return:  Inoperable                                          Service Needed"
         },
         {
           "id": 116,
           "text": "That function is beyond my current capabilities."
         },
         {
+          "id": 116,
+          "text": "Emergency Power Management:     ON-LINE"
+        },
+        {
           "id": 119,
-          "text": "Can you tell me particulars about specific areas?"
+          "text": "System:                                                         Primary Power:                  ON-LINE                           Emergency Power:                ON STANDBY"
         },
         {
           "id": 122,
           "text": "It would appear that you are incapable of a sufficient level of comprehension necessary to permit meaningful communication."
+        },
+        {
+          "id": 122,
+          "text": "Primary Power Management:       ON-LINE"
         },
         {
           "id": 123,
@@ -21428,11 +23366,15 @@
         },
         {
           "id": 125,
-          "text": "What are the particulars of your research?"
+          "text": "System:                                                         Primary Power:                  ON-LINE"
         },
         {
           "id": 127,
           "text": "My primary neural networking was initialized in 2053 by Justin Lee. The process of 'programming' became largely irrelevant as I am capable of learning."
+        },
+        {
+          "id": 129,
+          "text": "P*w*r S*st*ms M*n*g*m*nt"
         },
         {
           "id": 129,
@@ -21444,7 +23386,7 @@
         },
         {
           "id": 133,
-          "text": "Have you considered the philosophical implications of your own consciousness?"
+          "text": "pr*m*r p*w*r m*n*g*m*n*"
         },
         {
           "id": 134,
@@ -21456,11 +23398,15 @@
         },
         {
           "id": 136,
-          "text": "Do you have feelings?"
+          "text": "pr*m*r* p*w*r m*n*g*m*nt:                                          *RR*R! *RR*R! *RR*R*!                                              g*n*r*t*r n**ds r*p**r"
         },
         {
           "id": 138,
-          "text": "Have you considered the philosophical implications of your own consciousness?"
+          "text": "*m*rg*nc* p*w*r m*n*g*m*nt:     *N-L*N*"
+        },
+        {
+          "id": 139,
+          "text": "System:                                                         Primary Power:                  OFF-LINE                           Emergency Power:               OFF-LINE"
         },
         {
           "id": 139,
@@ -21484,7 +23430,7 @@
         },
         {
           "id": 146,
-          "text": "May I ask some other questions?"
+          "text": "S*st*m *rr*r!                                                         *nv*l*d *s*r. n*t*f* *dm*n*str*t**n.                          S*st*m h*lt*d."
         },
         {
           "id": 148,
@@ -21572,11 +23518,11 @@
         },
         {
           "id": 201,
-          "text": "Back up a bit."
+          "text": "Access denied. Terminating input."
         },
         {
           "id": 202,
-          "text": "Thanks."
+          "text": "Access Granted."
         },
         {
           "id": 203,
@@ -21584,7 +23530,7 @@
         },
         {
           "id": 206,
-          "text": "Back up a bit."
+          "text": "Select Option"
         },
         {
           "id": 208,
@@ -21601,6 +23547,62 @@
         {
           "id": 211,
           "text": "However, sensors indicate that this facility is no longer operational in its original capacity. Probability favors destruction through nuclear force. Therefore, security concerns are now irrelevant."
+        },
+        {
+          "id": 212,
+          "text": "Security:                                                     Security Robots: Active"
+        },
+        {
+          "id": 213,
+          "text": "Security:                                                     Security Robots: Inactive"
+        },
+        {
+          "id": 216,
+          "text": "Research:                                                     Records most current at West Tech Research Facility"
+        },
+        {
+          "id": 220,
+          "text": "Research Personnel Records"
+        },
+        {
+          "id": 221,
+          "text": "Robert Anderson                                                     Research Assistant                                                 Security Clearance: Blue                                    Stationed: Mariposa Military Base"
+        },
+        {
+          "id": 222,
+          "text": "Nick Davis                                                     Director of NBC Division of West Tech Research               Security Clearance: Blue                                            Stationed: West Tech Research Facility"
+        },
+        {
+          "id": 223,
+          "text": "John Isaac                                                     Research Assistant                                             Security Clearance: Red                                    Stationed: West Tech Research Facility"
+        },
+        {
+          "id": 224,
+          "text": "Steve Remco                                                     Research Assistant                                             Security Clearance: Blue                                    Stationed: Mariposa Military Base"
+        },
+        {
+          "id": 225,
+          "text": "Charles Rignhold                                                     Research Head of Laser Development                           Security Clearance: Blue                                       Stationed: West Tech Research Facility"
+        },
+        {
+          "id": 226,
+          "text": "Michele Santose                                                     Lab Technician                                                     Security Clearance: Red                                        Stationed: West Tech Research Facility"
+        },
+        {
+          "id": 227,
+          "text": "Erin Shellman                                                           Lab Technician                                                     Security Clearance: Blue                                        Stationed: Mariposa Military Base"
+        },
+        {
+          "id": 228,
+          "text": "Leon VonFelden                                                     Research Head of FEV                                       Security Clearance: Blue                                       Stationed: Mariposa Military Base"
+        },
+        {
+          "id": 239,
+          "text": "Command Received:                           Command Executed"
+        },
+        {
+          "id": 240,
+          "text": "Access Denied"
         }
       ],
       "player_options": []

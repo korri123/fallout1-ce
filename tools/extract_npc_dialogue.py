@@ -249,7 +249,7 @@ class DialogueExtractor:
             scripts_with_dialogue = 0
 
             # Parse each script and find dialogue calls
-            # Group by script FILENAME, not by embedded message_list_id
+            # Use embedded message_list_id to find MSG file (not script filename)
             for script_path in sorted(int_files):
                 # Extract script name from path (e.g., SCRIPTS\SAUL.INT -> saul)
                 filename = script_path.split('\\')[-1]
@@ -259,9 +259,23 @@ class DialogueExtractor:
                 if not calls:
                     continue
 
-                # Load messages from MSG file matching the script name
-                msg_dict = self._load_messages(script_name)
-                if not msg_dict:
+                # Load all MSG files referenced by dialogue calls
+                # Scripts can reference multiple MSG files (e.g., ian, tycho, katja)
+                # message_list_id = script_index + 1, so script_index = message_list_id - 1
+                msg_dicts: Dict[int, Dict[int, MessageEntry]] = {}
+                for call in calls:
+                    list_id = call.message_list_id
+                    if list_id not in msg_dicts:
+                        msg_script_index = list_id - 1
+                        msg_script_name = self._script_list.get(msg_script_index, script_name)
+                        msg_dict = self._load_messages(msg_script_name)
+                        if not msg_dict:
+                            # Fallback to script filename
+                            msg_dict = self._load_messages(script_name)
+                        msg_dicts[list_id] = msg_dict if msg_dict else {}
+
+                # Skip if no messages could be loaded
+                if not any(msg_dicts.values()):
                     continue
 
                 scripts_with_dialogue += 1
@@ -269,19 +283,20 @@ class DialogueExtractor:
                 npc_name = self._lookup_npc_name(script_name)
                 script_index = name_to_index.get(script_name, -1)
 
-                # Collect unique message IDs by type
-                npc_msg_ids: Set[int] = set()
-                player_msg_ids: Set[int] = set()
+                # Collect unique (message_list_id, message_id) pairs by type
+                npc_calls: Set[tuple] = set()
+                player_calls: Set[tuple] = set()
 
                 for call in calls:
                     if call.call_type == 'npc':
-                        npc_msg_ids.add(call.message_id)
+                        npc_calls.add((call.message_list_id, call.message_id))
                     else:
-                        player_msg_ids.add(call.message_id)
+                        player_calls.add((call.message_list_id, call.message_id))
 
-                # Build NPC lines
+                # Build NPC lines - look up each message in its specific MSG file
                 npc_lines = []
-                for msg_id in sorted(npc_msg_ids):
+                for list_id, msg_id in sorted(npc_calls, key=lambda x: x[1]):
+                    msg_dict = msg_dicts.get(list_id, {})
                     if msg_id in msg_dict:
                         entry = msg_dict[msg_id]
                         npc_lines.append(DialogueLine(
@@ -294,7 +309,8 @@ class DialogueExtractor:
                 # Build player options
                 player_options = []
                 if include_player_options:
-                    for msg_id in sorted(player_msg_ids):
+                    for list_id, msg_id in sorted(player_calls, key=lambda x: x[1]):
+                        msg_dict = msg_dicts.get(list_id, {})
                         if msg_id in msg_dict:
                             entry = msg_dict[msg_id]
                             player_options.append(DialogueLine(
@@ -306,7 +322,11 @@ class DialogueExtractor:
 
                 if npc_lines or player_options:
                     # Look up voice-relevant info from proto data
-                    proto_info = self._lookup_proto_info(script_name, script_index, msg_dict)
+                    # Use the first non-empty msg_dict for proto lookup
+                    primary_msg_dict = next(
+                        (d for d in msg_dicts.values() if d), {}
+                    )
+                    proto_info = self._lookup_proto_info(script_name, script_index, primary_msg_dict)
 
                     result[script_name] = NPCDialogue(
                         script_name=script_name,
