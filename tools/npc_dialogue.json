@@ -9487,8 +9487,8 @@
         "faction": "Hub Thief",
         "sample_lines": [
           "Welcome to the Circle of Thieves. I'm Jasmine. I'm here to help make your infiltration of the Daren Hightower estate as painless as possible. Hightower's estate is located in the Heights. It has a min",
-          "Well done, lad.  Here's your reward.",
-          "Well done, miss.  Here's your reward."
+          "Well done, lad.  Here's your reward.  [Jasmine gives you 3000 bucks]",
+          "Well done, miss.  Here's your reward.  [Jasmine gives you 3000 bucks]"
         ]
       },
       "description": "",
@@ -9501,11 +9501,11 @@
         },
         {
           "id": 118,
-          "text": "Well done, lad.  Here's your reward."
+          "text": "Well done, lad.  Here's your reward.  [Jasmine gives you 3000 bucks]"
         },
         {
           "id": 119,
-          "text": "Well done, miss.  Here's your reward."
+          "text": "Well done, miss.  Here's your reward.  [Jasmine gives you 3000 bucks]"
         },
         {
           "id": 121,
@@ -9542,6 +9542,10 @@
         {
           "id": 134,
           "text": "Pfah! A real thief lives on her wits. We're being generous with you miss. Now scat!"
+        },
+        {
+          "id": 135,
+          "text": "[Jasmine hands you a set of Electronic Lockpicks]"
         }
       ],
       "player_options": []
