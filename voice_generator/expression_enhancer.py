@@ -127,7 +127,8 @@ Add tags in square brackets before or within dialogue lines. Examples:
 4. For non-human characters (mutants, ghouls, etc.), include appropriate vocal qualities
 5. Tags can go mid-sentence for emphasis: "I told you [through gritted teeth] to leave."
 6. Multiple short tags are better than one long compound tag
-7. Keep the original text EXACTLY as-is, only add tags, unless you notice a typo.
+7. You are free to fix typos, add commas and make fixes where the developers made mistakes.
+8. If you notice text is clearly not part of the dialogue, such as "Mrs. Jackie hands you the disk", remove it.
 
 ## Common Tags
 Emotions: [angrily], [sadly], [nervously], [excitedly], [fearfully], [dismissively]
@@ -174,7 +175,7 @@ Do NOT keep the original stage direction - transform it into a speakable audio t
     async def _query_claude(self, prompt: str) -> str:
         """Query Claude Haiku via Agent SDK."""
         options = ClaudeAgentOptions(
-            model="haiku",
+            model="sonnet",
             allowed_tools=[],
             system_prompt=self.SYSTEM_PROMPT,
         )
